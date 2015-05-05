@@ -6,6 +6,7 @@
 #include "TGraph.h"
 
 TGraph* CreateTGraph(const char* );
+TGraph* CreateTGraphLambda(const char* , std::string type = "" );
 
 
 #endif

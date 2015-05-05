@@ -12,15 +12,24 @@ LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR)
 CPPFLAGS += -g
 
 TARGET = CreateDMnucleonXsec
+TARGET1 = CreateLambda
 
 SRC = app/CreateDMnucleonXsec.cc src/create_TGraph.cc
+SRC1 = app/CreateLambda.cc src/create_TGraph.cc
 
 OBJ = $(SRC:.cc=.o)
+OBJ1 = $(SRC1:.cc=.o)
 
-all : $(TARGET)
+all : $(TARGET) $(TARGET1)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
+$(TARGET1) : $(OBJ1)
+	$(LD) $(CPPFLAGS) -o $(TARGET1) $(OBJ1) $(LDFLAGS)
 	@echo $@
 	@echo $<
 	@echo $^
@@ -30,5 +39,5 @@ $(TARGET) : $(OBJ)
 	@echo $@	
 	@echo $<
 clean :
-	rm -f *.o src/*.o $(TARGET) *~
+	rm -f *.o src/*.o $(TARGET) $(TARGET1) *~
 

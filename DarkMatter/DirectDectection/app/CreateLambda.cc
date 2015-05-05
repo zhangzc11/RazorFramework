@@ -30,7 +30,7 @@ int main(){
       it_l = fname.find(".txt") - fname.find_last_of('/') -1;
       std::cout<< "SUBSTR: " << fname.substr( it_f, it_l ) << std::endl;
       name_graph[ctr] = fname.substr( it_f, it_l );
-      g[ctr] = CreateTGraph(fname.c_str());
+      g[ctr] = CreateTGraphLambda( fname.c_str(), "SI" );
       ctr++;
     }
     mfile.close();
@@ -38,7 +38,7 @@ int main(){
     std::cout << "Unable to open file";
   }
   
-  TFile* file = new TFile("SI_Graphs.root", "RECREATE");
+  TFile* file = new TFile("SI_Lambda_Graphs.root", "RECREATE");
   std::cout << "here 0" << std::endl;
   for(int i = 0; i < ctr; i++){
     g[i]->Write(name_graph[i].c_str());
@@ -59,7 +59,7 @@ int main(){
       it_l = fname.find(".txt") - fname.find_last_of('/') -1;
       std::cout<< "SUBSTR: " << fname.substr( it_f, it_l ) << std::endl;
       name_graph[ctr] = fname.substr( it_f, it_l );
-      g[ctr] = CreateTGraph(fname.c_str());
+      g[ctr] = CreateTGraphLambda( fname.c_str(), "SD");
       ctr++;
     }
     mfile.close();
@@ -67,7 +67,7 @@ int main(){
     std::cout << "Unable to open file";
   }
   
-  TFile* file1 = new TFile("SD_Graphs.root", "RECREATE");
+  TFile* file1 = new TFile("SD_Lambda_Graphs.root", "RECREATE");
   
   std::cout << "here 0" << std::endl;
   for(int i = 0; i < ctr; i++){

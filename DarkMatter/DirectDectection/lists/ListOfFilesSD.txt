@@ -1,4 +1,4 @@
 /Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/AV_SD_Monojet.txt
 /Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/COUPP_2012_SD.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SIMPLE_2012_SD.xml
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SUPER-K_SD.xml
+/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SIMPLE_2012_SD.txt
+/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SUPER-K_SD.txt
