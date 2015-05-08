@@ -35,7 +35,7 @@ int main(){
     }
     mfile.close();
   }else{
-    std::cout << "Unable to open file";
+    std::cout << "Unable to open file" << std::endl;
   }
   
   TFile* file = new TFile("SI_Lambda_Graphs.root", "RECREATE");

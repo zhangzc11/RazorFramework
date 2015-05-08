@@ -27,7 +27,7 @@ TGraph* CreateTGraph(const char* filename){
       ctr++;
     }
     myfile.close();
-  }else std::cout << "Unable to open file";
+  }else std::cout << "Unable to open file" << std::endl;
   
   std::cout << "ctr: " << ctr << std::endl;
   TGraph* gr = new TGraph(ctr-1,mass,xsec);
@@ -70,7 +70,7 @@ TGraph* CreateTGraphLambda( const char* filename , std::string type)
       ctr++;
     }
     myfile.close();
-  }else std::cout << "Unable to open file";
+  }else std::cout << "Unable to open file" << std::endl;
   
   std::cout << "ctr: " << ctr << std::endl;
   TGraph* gr = new TGraph(ctr-1,mass,lambda);

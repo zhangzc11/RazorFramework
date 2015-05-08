@@ -1,8 +1,8 @@
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/CDMSII_SI.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/COUPP_2012_SI.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/LUX2013.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SIMPLE_2012_SI.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/SUPER-K_SD.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/V_SI_Monojet.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/XENON100_SI.txt
-/Users/cmorgoth/Software/git/RazorFramework/DarkMatter/DirectDectection/OtherExpLimits/superCDMS_SI.txt
+OtherExpLimits/CDMSII_SI.txt
+OtherExpLimits/COUPP_2012_SI.txt
+OtherExpLimits/LUX2013.txt
+OtherExpLimits/SIMPLE_2012_SI.txt
+OtherExpLimits/SUPER-K_SD.txt
+OtherExpLimits/V_SI_Monojet.txt
+OtherExpLimits/XENON100_SI.txt
+OtherExpLimits/superCDMS_SI.txt
