@@ -1,2 +1,0 @@
-# SyncTools
-Synchronization Tools
