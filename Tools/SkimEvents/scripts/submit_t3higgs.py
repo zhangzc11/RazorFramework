@@ -114,7 +114,7 @@ for ijob in range(njobs):
                       )
     outputfile.write("\nmkdir -p /mnt/hadoop/store/user/cmorgoth/"+hadoopDir)
     outputfile.write("\nmkdir -p /mnt/hadoop/store/user/cmorgoth/"+hadoopDir+"/"+process)
-    outputfile.write("\ncp " + rootOutput + "/mnt/hadoop/store/user/cmorgoth/"+hadoopDir+"/"+process+"/.")
+    outputfile.write("\ncp " + rootOutput + " /mnt/hadoop/store/user/cmorgoth/"+hadoopDir+"/"+process+"/.")
     
     outputfile.close()
     os.system("sleep .1\n")
