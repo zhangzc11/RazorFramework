@@ -21,11 +21,15 @@ TString cut = "MR > 150. && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta 
 
 int main ( int argc, char* argv[] )
 {
-  TFile* f       = new TFile("/Users/cmorgoth/Work/data/run2Hgg/MC/Run2TTH_Selection.root"); 
-  TTree* tree    = (TTree*)f->Get("HighPt"); 
+  //TFile* f       = new TFile("/Users/cmorgoth/Work/data/run2Hgg/MC/Run2TTH_Selection.root"); 
+  TFile* f       = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/Run2TTH_Selection.root"); 
+  TTree* tree    = (TTree*)f->Get("HighPt");
+  std::cout << "n: " << tree->GetEntries() << std::endl;
   //TTree* cutTree = (TTree*)tree->CopyTree( cut );
+  //HggTree* tth = new HggTree( tree );
   HggRazorClass* tth = new HggRazorClass( tree );
+  //delete f;
   tth->Loop();
-  //tth->WriteOutput();
+  tth->WriteOutput();
   return 0;
 }

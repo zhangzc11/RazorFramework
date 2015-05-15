@@ -19,6 +19,8 @@ public:
   void Loop();
   bool WriteOutput();
 private:
+  bool _debug;
+  bool _info;
   TString process_name;
   // D e f i n e   B i n n i n g
   //----------------------------
@@ -31,6 +33,10 @@ private:
   static float ptgg_l;
   static float ptgg_h;
   TH1F* h_ptgg;
+
+  // o u t p u t  r o o t  f i l e
+  //------------------------------
+  TFile* fout;
 };
 
 #endif
