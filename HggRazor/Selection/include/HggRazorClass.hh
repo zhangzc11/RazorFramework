@@ -8,20 +8,23 @@
 #include <TString.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
+
 class HggRazorClass : public HggTree
 {
 public:
   HggRazorClass( );
   HggRazorClass( TTree* tree );
+  HggRazorClass( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~HggRazorClass( );
   bool InitMggHisto( );
   bool InitPtggHisto( );
   void Loop();
-  bool WriteOutput();
+  bool WriteOutput( TString outName = "default" );
 private:
   bool _debug;
   bool _info;
-  TString process_name;
+  TString processName;
+  TString boxName;
   // D e f i n e   B i n n i n g
   //----------------------------
   static int   n_mgg;

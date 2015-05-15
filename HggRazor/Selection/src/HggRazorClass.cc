@@ -15,15 +15,43 @@ float HggRazorClass::ptgg_h;
 HggRazorClass::HggRazorClass( )
 {
 };
-HggRazorClass::HggRazorClass( TTree* tree ) : HggTree( tree ), _info( false ), _debug( true )
+HggRazorClass::HggRazorClass( TTree* tree ) : HggTree( tree ), _info( false ), _debug( false )
 {
   std::cout << "[DEBUG]: n_mgg: " << n_mgg << std::endl;
   InitMggHisto();
   InitPtggHisto();
 };
 
+HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName, bool info, bool debug ) : HggTree( tree ), _info( info ), _debug( debug )
+{
+  //processName
+  if ( processName == "" )
+    {
+      this->processName = "dummy_process";
+    }
+  else
+    {
+      this->processName = processName;
+    }
+  //boxName
+  if ( boxName == "" )
+    {
+      this->boxName = "dummy_box";
+    }
+  else
+    {
+      this->boxName = boxName;
+    }
+  
+  InitMggHisto();
+  InitPtggHisto();
+};
 HggRazorClass::~HggRazorClass()
 {
+  if ( _debug ) std::cout << "[DEBUG]: Entering Destructor" << std::endl;
+  delete h_mgg;
+  delete h_ptgg;
+  if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
 
 bool HggRazorClass::InitMggHisto( )
@@ -34,7 +62,7 @@ bool HggRazorClass::InitMggHisto( )
       return false;
     }
   std::cout << "[INFO]: Initializing mgg histogram" << std::endl;
-  h_mgg = new TH1F( this->process_name + "_mgg", "mgg", n_mgg, mgg_l, mgg_h );
+  h_mgg = new TH1F( this->processName + "_" + this->boxName +  "_mgg", "mgg", n_mgg, mgg_l, mgg_h );
   return true;
 };
 
@@ -45,13 +73,13 @@ bool HggRazorClass::InitPtggHisto( )
       std::cerr << "[ERROR]: ptgg histogram parameters not initialized" << std::endl;
       return false;
     }
-  h_ptgg = new TH1F( this->process_name + "_ptgg", "ptgg", n_ptgg, ptgg_l, ptgg_h );
+  h_ptgg = new TH1F( this->processName + "_" + this->boxName +  "_ptgg", "ptgg", n_ptgg, ptgg_l, ptgg_h );
   return true;
 };
 
 void HggRazorClass::Loop()
 {
-  std::cout << "n3: " << fChain->GetEntriesFast() << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
   if (fChain == 0) return;
   if ( h_mgg == NULL || h_ptgg == NULL )
     {
@@ -68,15 +96,17 @@ void HggRazorClass::Loop()
       // if (Cut(ientry) < 0) continue;
       h_mgg->Fill( mGammaGamma );
       h_ptgg->Fill( pTGammaGamma );
-      std::cout << "mgg: " << mGammaGamma << std::endl;
     }
+  if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
-bool HggRazorClass::WriteOutput()
+bool HggRazorClass::WriteOutput( TString outName )
 {
-  this->fout = new TFile("test_tth.root", "recreate");
+  if ( _debug ) std::cout << "[DEBUG]: Entering WriteOutput" << std::endl;
+  this->fout = new TFile( outName + "_" + this->processName + ".root", "recreate");
   h_mgg->Write("mgg");
   h_ptgg->Write("ptgg");
   fout->Close();
+  if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
   return true;
 };
