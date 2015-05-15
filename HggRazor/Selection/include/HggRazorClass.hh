@@ -16,6 +16,8 @@ public:
   ~HggRazorClass( );
   bool InitMggHisto( );
   bool InitPtggHisto( );
+  void Loop();
+  bool WriteOutput();
 private:
   TString process_name;
   // D e f i n e   B i n n i n g
