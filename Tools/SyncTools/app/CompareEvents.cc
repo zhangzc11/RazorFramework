@@ -66,8 +66,8 @@ int main( int argc, char* argv[] )
   
   std::map < std::string, evt > map1 = MakeMap( fname1 );
   std::map < std::string, evt > map2 = MakeMap( fname2 );
-  CreateDiff( map1, map2, "HggRazorMissing.txt" );
-  CreateDiff( map2, map1, "SusyHggTreeMissing.txt" );
+  CreateDiff( map1, map2, outname2 );//writes in outname2, missing run,event map2 
+  CreateDiff( map2, map1, outname1 );//writes in outname1, missing run,event map1 
   
   return 0;
 };
