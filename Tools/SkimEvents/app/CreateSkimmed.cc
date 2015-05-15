@@ -92,7 +92,9 @@ int main( int argc, char* argv[] )
     }
   */
   //Skimming Tree
-  SkimTree( mymap, list_name, tree_name, run_branch, event_branch, root_output, true );
+  bool _isRazorEvent = false;
+  if ( tree_name == "RazorEvents" ) _isRazorEvent = true;
+  SkimTree( mymap, list_name, tree_name, run_branch, event_branch, root_output, _isRazorEvent );
   return 0;
 };
 
