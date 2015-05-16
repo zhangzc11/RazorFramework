@@ -56,7 +56,7 @@ std::string GetProcessString( Process process )
     }
   else if ( process == Process::ggH )
     {
-      return "ggh";
+      return "ggH";
     }
   else if ( process == Process::vbfH )
     {

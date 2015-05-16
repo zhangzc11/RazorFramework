@@ -36,12 +36,13 @@ int main ( int argc, char* argv[] )
   TFile* f;
   f = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/Run2TTH_Selection.root");
   TTree* tree;
+  TChain* chain;
   TTree* cutTree;
   HggRazorClass* tth;
   for( const auto& process : Process() )
     {
       std::string processName = GetProcessString( process );
-      std::cout << "[INFO]: process name: " << processName << std::endl;
+      std::cout << "[INFO]: process name: " << mapList[processName] << std::endl;
     }
   for( const auto& box : Boxes() )
     {
@@ -49,6 +50,7 @@ int main ( int argc, char* argv[] )
       // R e t r i e v i n g  T r e e
       //-----------------------------
       tree    = (TTree*)f->Get( boxName.c_str() );
+      chain   = new TChain( boxName.c_str() );
       
       //need to create temporary root file to store cutTree
       TFile* tmp = new TFile("tmp","recreate");
