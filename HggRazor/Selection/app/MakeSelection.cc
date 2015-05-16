@@ -38,6 +38,11 @@ int main ( int argc, char* argv[] )
   TTree* tree;
   TTree* cutTree;
   HggRazorClass* tth;
+  for( const auto& process : Process() )
+    {
+      std::string processName = GetProcessString( process );
+      std::cout << "[INFO]: process name: " << processName << std::endl;
+    }
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
