@@ -1,11 +1,13 @@
 //C++ INCLUDES
 #include <iostream>
+#include <map>
 //ROOT INCLUDES
 #include <TString.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
 #include "HggRazorClass.hh"
 #include "HggAux.hh"
+#include "CommandLineInput.hh"
 
 // D e f i n e  B i n n i n g
 //---------------------------
@@ -22,7 +24,15 @@ TString cut = "MR > 150. && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta 
 
 int main ( int argc, char* argv[] )
 {
-  //TFile* f       = new TFile("/Users/cmorgoth/Work/data/run2Hgg/MC/Run2TTH_Selection.root"); 
+  //Map Containing the lists for different processes 
+  std::map< std::string, std::string > mapList;
+  std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+  FillMapList( mapList, inputFile );
+  std::cout << "[INFO]: map size: " << mapList.size() << std::endl;
+  for( auto& myMap : mapList )
+    {
+      std::cout << " first: " << myMap.first << " second: " << myMap.second << std::endl;
+    }
   TFile* f;
   f = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/Run2TTH_Selection.root");
   TTree* tree;

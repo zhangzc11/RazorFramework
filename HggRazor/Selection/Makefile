@@ -2,16 +2,19 @@ CXX = $(shell root-config --cxx)
 LD = $(shell root-config --ld)
 
 INC = $(shell pwd)
-CommonTools = $(shell pwd)/../CommonTools
+Repo = $(shell git rev-parse --show-toplevel)
+Aux = $(Repo)/Aux
+HggRazor = $(Repo)/HggRazor
+CommonTools = $(HggRazor)/CommonTools
 
-CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include
+CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include
 LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR)
 
 CPPFLAGS += -g -std=c++11
 
 TARGET = MakeSelection
 
-SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc
+SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ = $(SRC:.cc=.o)
 
