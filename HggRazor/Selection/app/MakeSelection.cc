@@ -8,6 +8,7 @@
 #include "HggRazorClass.hh"
 #include "HggAux.hh"
 #include "CommandLineInput.hh"
+#include "TChainTools.hh"
 
 // D e f i n e  B i n n i n g
 //---------------------------
@@ -39,31 +40,38 @@ int main ( int argc, char* argv[] )
   TChain* chain;
   TTree* cutTree;
   HggRazorClass* tth;
+  /*
   for( const auto& process : Process() )
     {
       std::string processName = GetProcessString( process );
       std::cout << "[INFO]: process name: " << mapList[processName] << std::endl;
     }
-  for( const auto& box : Boxes() )
+  */
+  for( const auto& process : Process() )
     {
-      std::string boxName = GetBoxString( box );
-      // R e t r i e v i n g  T r e e
-      //-----------------------------
-      tree    = (TTree*)f->Get( boxName.c_str() );
-      chain   = new TChain( boxName.c_str() );
-      
-      //need to create temporary root file to store cutTree
-      TFile* tmp = new TFile("tmp","recreate");
-      //A p p l y i n g  C u t s
-      //------------------------
-      cutTree = (TTree*)tree->CopyTree( cut );
-      std::cout << "[INFO]: Including tree: " << boxName << std::endl;
-      //C r e a t in g   S e l e c t i o n   O b j e c t
-      //------------------------------------------------
-      tth = new HggRazorClass( tree, "TTH", boxName, false, false );
-      tth->Loop();
-      tth->WriteOutput( boxName );
+      std::string processName = GetProcessString( process );
+      std::cout << "[INFO]: process name: " << processName << std::endl;
+      for( const auto& box : Boxes() )
+	{
+	  std::string boxName = GetBoxString( box );
+	  // R e t r i e v i n g  T r e e
+	  //-----------------------------
+	  //tree    = (TTree*)f->Get( boxName.c_str() );
+	  chain   = new TChain( boxName.c_str() );
+	  AddTChain( chain, mapList[processName] );
+	  
+	  //need to create temporary root file to store cutTree
+	  TFile* tmp = new TFile("tmp","recreate");
+	  //A p p l y i n g  C u t s
+	  //------------------------
+	  cutTree = (TTree*)chain->CopyTree( cut );
+	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
+	  //C r e a t in g   S e l e c t i o n   O b j e c t
+	  //------------------------------------------------
+	  tth = new HggRazorClass( cutTree, processName, boxName, false, false );
+	  tth->Loop();
+	  tth->WriteOutput( boxName );
+	}
     }
-  
   return 0;
 }

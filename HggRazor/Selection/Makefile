@@ -14,7 +14,7 @@ CPPFLAGS += -g -std=c++11
 
 TARGET = MakeSelection
 
-SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
+SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
 
 OBJ = $(SRC:.cc=.o)
 
@@ -31,4 +31,4 @@ $(TARGET) : $(OBJ)
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(TARGET) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) *~
