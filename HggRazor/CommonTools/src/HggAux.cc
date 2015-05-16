@@ -1,5 +1,6 @@
 //C++ INCLUDES
 #include <iostream>
+#include <fstream>
 //ROOT INCLUDES
 //LOCAL INCLUDES
 #include "HggAux.hh"
@@ -70,4 +71,31 @@ std::string GetProcessString( Process process )
       std::cerr << "[ERROR]: Process not found" << std::endl;
     }
   return "";
+};
+
+//Fill map with input lists
+bool FillMapList( std::map< std::string, std::string >& thisMap, std::string inputList )
+{
+  std::string key;
+  std::string val;
+  
+  std::ifstream ifs ( inputList.c_str(), std::fstream::in );
+  if ( ifs.is_open() )
+    {
+      while( ifs.good() )
+	{
+	  if ( ifs.eof() ) break;
+	  ifs >> key >> val;
+	  if ( thisMap.find( key ) == thisMap.end() )
+	    {
+	      thisMap[key] = val;
+	    }
+	}
+    }
+  else
+    {
+      std::cerr << "[ERROR]: Unable to Open File-> " << inputList << std::endl;
+      return false;
+    }
+  return true;
 };

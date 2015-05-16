@@ -2,6 +2,7 @@
 #define HGG_AUX_HH
 //C++ INCLUDES
 #include <string>
+#include <map>
 //ROOT INCLUDES
 #include <TString.h>
 //LOCAL INCLUDES
@@ -26,4 +27,6 @@ Process& operator++( Process& process );
 Process operator*( Process process );
 
 std::string GetProcessString( Process process );
+
+bool FillMapList( std::map< std::string, std::string >& thisMap, std::string inputList );
 #endif
