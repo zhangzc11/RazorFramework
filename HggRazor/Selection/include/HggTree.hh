@@ -74,6 +74,7 @@ public :
   Float_t         jet_Pt[10];   //[n_Jets]
   Float_t         jet_Eta[10];   //[n_Jets]
   Float_t         jet_Phi[10];   //[n_Jets]
+  Float_t         xsecSF;
   
   // List of branches
   TBranch        *b_run;   //!
@@ -127,6 +128,7 @@ public :
   TBranch        *b_jet_Pt;   //!
   TBranch        *b_jet_Eta;   //!
   TBranch        *b_jet_Phi;   //!
+  TBranch        *b_xsecSF;   //!
   
   HggTree(TTree *tree=0);
   virtual ~HggTree();
@@ -252,6 +254,7 @@ void HggTree::Init(TTree *tree)
   fChain->SetBranchAddress("jet_Pt", jet_Pt, &b_jet_Pt);
   fChain->SetBranchAddress("jet_Eta", jet_Eta, &b_jet_Eta);
   fChain->SetBranchAddress("jet_Phi", jet_Phi, &b_jet_Phi);
+  fChain->SetBranchAddress("xsecSF", &xsecSF, &b_xsecSF);
   Notify();
 }
 

@@ -5,6 +5,7 @@
 #include <string>
 //ROOT INCLUDES
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TString.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
@@ -18,6 +19,9 @@ public:
   ~HggRazorClass( );
   bool InitMggHisto( );
   bool InitPtggHisto( );
+  bool InitMrHisto( );
+  bool InitRsqHisto( );
+  bool InitMrRsqHisto( );
   void Loop();
   bool WriteOutput( TString outName = "default" );
 private:
@@ -37,6 +41,18 @@ private:
   static float ptgg_h;
   TH1F* h_ptgg;
 
+  static int   n_mr;
+  static float mr_l;
+  static float mr_h;
+  TH1F* h_mr;
+
+  static int   n_rsq;
+  static float rsq_l;
+  static float rsq_h;
+  TH1F* h_rsq;
+
+  //2D Histos
+  TH2F* h_mr_rsq;
   // o u t p u t  r o o t  f i l e
   //------------------------------
   TFile* fout;

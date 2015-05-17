@@ -45,6 +45,9 @@ HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName,
   
   InitMggHisto();
   InitPtggHisto();
+  InitMrHisto();
+  InitRsqHisto();
+  InitMrRsqHisto();
 };
 HggRazorClass::~HggRazorClass()
 {
@@ -77,6 +80,42 @@ bool HggRazorClass::InitPtggHisto( )
   return true;
 };
 
+bool HggRazorClass::InitMrHisto( )
+{
+  if ( n_mr == 0 || mr_l == mr_h )
+    {
+      std::cerr << "[ERROR]: mr histogram parameters not initialized" << std::endl;
+      return false;
+    }
+  std::cout << "[INFO]: Initializing mr histogram" << std::endl;
+  h_mr = new TH1F( this->processName + "_" + this->boxName +  "_mr", "mr", n_mr, mr_l, mr_h );
+  return true;
+};
+
+bool HggRazorClass::InitRsqHisto( )
+{
+  if ( n_rsq == 0 || rsq_l == rsq_h )
+    {
+      std::cerr << "[ERROR]: rsq histogram parameters not initialized" << std::endl;
+      return false;
+    }
+  std::cout << "[INFO]: Initializing rsq histogram" << std::endl;
+  h_rsq = new TH1F( this->processName + "_" + this->boxName +  "_rsq", "rsq", n_rsq, rsq_l, rsq_h );
+  return true;
+};
+
+//2D Histos
+bool HggRazorClass::InitMrRsqHisto( )
+{
+  if ( ( n_rsq == 0 || rsq_l == rsq_h )  || ( n_mr == 0 || mr_l == mr_h ) )
+    {
+      std::cerr << "[ERROR]: mr_rsq histogram parameters not initialized" << std::endl;
+      return false;
+    }
+  std::cout << "[INFO]: Initializing mr_rsq histogram" << std::endl;
+  h_mr_rsq = new TH2F( this->processName + "_" + this->boxName +  "_mr_rsq", "mr_rsq", n_mr, mr_l, mr_h, n_rsq, rsq_l, rsq_h );
+  return true; 
+};
 void HggRazorClass::Loop()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
@@ -94,8 +133,11 @@ void HggRazorClass::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
-      h_mgg->Fill( mGammaGamma );
-      h_ptgg->Fill( pTGammaGamma );
+      h_mgg->Fill( mGammaGamma, xsecSF );
+      h_ptgg->Fill( pTGammaGamma, xsecSF );
+      h_mr->Fill( MR, xsecSF );
+      h_rsq->Fill( Rsq, xsecSF );
+      h_mr_rsq->Fill( MR, Rsq, xsecSF );
     }
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
@@ -106,6 +148,9 @@ bool HggRazorClass::WriteOutput( TString outName )
   this->fout = new TFile( outName + "_" + this->processName + ".root", "recreate");
   h_mgg->Write("mgg");
   h_ptgg->Write("ptgg");
+  h_mr->Write("mr");
+  h_rsq->Write("rsq");
+  h_mr_rsq->Write("mr_rsq");
   fout->Close();
   if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
   return true;

@@ -20,8 +20,15 @@ int HggRazorClass::n_ptgg = 100;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 700.;
 
+int HggRazorClass::n_mr = 290;
+float HggRazorClass::mr_l = 130.;
+float HggRazorClass::mr_h = 8130.;
 
-TString cut = "MR > 150. && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+int HggRazorClass::n_rsq = 100;
+float HggRazorClass::rsq_l = .0;
+float HggRazorClass::rsq_h = 5.0;
+
+TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
 
 int main ( int argc, char* argv[] )
 {
