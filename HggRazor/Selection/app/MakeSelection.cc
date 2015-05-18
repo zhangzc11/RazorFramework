@@ -28,8 +28,27 @@ int HggRazorClass::n_rsq = 1000;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 
-TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+//C u s t o m MR_RSQ_BINNING
+//--------------------------
+//HighPt
+const int N_HighPt = 5;
+float MR_HighPt[N_HighPt+1] = {150,200,300,500,1600,3000};
+float Rsq_HighPt[N_HighPt+1] = {0.001,0.05,0.10,0.15,0.20,3.00};
 
+//HighRes
+const int N_HighRes = 4;
+float MR_HighRes[N_HighRes+1] = {150,250,400,1400,3000};
+float Rsq_HighRes[N_HighRes+1] = {0.001,0.05,0.10,0.15,3.00};
+
+//Hbb
+const int N_Hbb = 2;
+float MR_Hbb[N_Hbb+1] = {150,300,3000};
+float Rsq_Hbb[N_Hbb+1] = {0.001,0.05,3.00};
+
+
+//A p p l y   B a s e l i n e   C u t
+//-----------------------------------
+TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
 
 #define _debug 0
 
@@ -52,7 +71,7 @@ int main ( int argc, char* argv[] )
   TTree* tree;
   TChain* chain;
   TTree* cutTree;
-  HggRazorClass* tth;
+  HggRazorClass* hggclass;
   
   for( const auto& process : Process() )
     {
@@ -75,9 +94,25 @@ int main ( int argc, char* argv[] )
 	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
-	  tth = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  tth->Loop();
-	  tth->WriteOutput( boxName );
+	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
+	  if ( box == Boxes::HighPt )
+	    {
+	      hggclass->InitMrRsqCustomHisto( N_HighPt, MR_HighPt, N_HighPt, Rsq_HighPt );
+	    }
+	  else if ( box == Boxes::HighRes || box == Boxes::LowRes )
+	    {
+	      hggclass->InitMrRsqCustomHisto( N_HighRes, MR_HighRes, N_HighRes, Rsq_HighRes );
+	    }
+	  else if( box == Boxes::Hbb || box == Boxes::Zbb )
+	    {
+	      hggclass->InitMrRsqCustomHisto( N_Hbb, MR_Hbb, N_Hbb, Rsq_Hbb );
+	    }
+	  else
+	    {
+	      std::cout << "[WARNING]: Undefined box->" << std::endl;
+	    }
+	  hggclass->Loop();
+	  hggclass->WriteOutput( boxName );
 	}
     }
   return 0;

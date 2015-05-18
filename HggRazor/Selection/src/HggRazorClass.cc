@@ -110,6 +110,19 @@ bool HggRazorClass::InitMrRsqHisto( )
   return true; 
 };
 
+
+bool HggRazorClass::InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by )
+{
+  if ( ( nx == 0 || bx == NULL )  || ( ny == 0 || by == NULL ) )
+    {
+      std::cerr << "[ERROR]: Custom mr_rsq histogram parameters not initialized" << std::endl;
+      return false;
+    }
+  if ( _debug ) std::cout << "[DEBUG]: Initializing custom mr_rsq histogram" << std::endl;
+  h_mr_rsq_c = new TH2F( this->processName + "_" + this->boxName +  "_mr_rsq_c", "mr_rsq", nx, bx, ny, by );
+  return true; 
+};
+
 void HggRazorClass::Loop()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
@@ -134,6 +147,7 @@ void HggRazorClass::Loop()
       h_mr->Fill( MR, w );
       h_rsq->Fill( Rsq, w );
       h_mr_rsq->Fill( MR, Rsq, w );
+      if ( h_mr_rsq_c != NULL ) h_mr_rsq_c->Fill( MR, Rsq, w );
     }
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
@@ -147,6 +161,7 @@ bool HggRazorClass::WriteOutput( TString outName )
   h_mr->Write("mr");
   h_rsq->Write("rsq");
   h_mr_rsq->Write("mr_rsq");
+  h_mr_rsq_c->Write("mr_rsq_custom");
   fout->Close();
   if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
   return true;

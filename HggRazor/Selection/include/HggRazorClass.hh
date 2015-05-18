@@ -22,6 +22,7 @@ public:
   bool InitMrHisto( );
   bool InitRsqHisto( );
   bool InitMrRsqHisto( );
+  bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
   void Loop();
   bool WriteOutput( TString outName = "default" );
   static float GetHggBF( );
