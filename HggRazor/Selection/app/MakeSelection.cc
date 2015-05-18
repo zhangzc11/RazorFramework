@@ -24,36 +24,36 @@ int HggRazorClass::n_mr = 290;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
 
-int HggRazorClass::n_rsq = 100;
+int HggRazorClass::n_rsq = 1000;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 
 TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
 
+
+#define _debug 0
+
 int main ( int argc, char* argv[] )
 {
+  std::cout << "[INFO]: Initializing program" << std::endl;
+  std::cout << "[INFO]: Hgg Branching Fraction = " << HggRazorClass::GetHggBF() << std::endl;
   //Map Containing the lists for different processes 
   std::map< std::string, std::string > mapList;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
   FillMapList( mapList, inputFile );
-  std::cout << "[INFO]: map size: " << mapList.size() << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
+  
   for( auto& myMap : mapList )
     {
-      std::cout << " first: " << myMap.first << " second: " << myMap.second << std::endl;
+      if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
     }
+  
   TFile* f;
-  f = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/Run2TTH_Selection.root");
   TTree* tree;
   TChain* chain;
   TTree* cutTree;
   HggRazorClass* tth;
-  /*
-  for( const auto& process : Process() )
-    {
-      std::string processName = GetProcessString( process );
-      std::cout << "[INFO]: process name: " << mapList[processName] << std::endl;
-    }
-  */
+  
   for( const auto& process : Process() )
     {
       std::string processName = GetProcessString( process );

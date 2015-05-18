@@ -148,9 +148,9 @@ HggTree::HggTree(TTree *tree) : fChain(0)
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
-  std::cout << "debug: creating tree" << std::endl; 
+  //std::cout << "debug: creating tree" << std::endl; 
   if (tree == 0) {
-    std::cout << "debug: creating tree, not here" << std::endl;
+    //std::cout << "debug: creating tree, not here" << std::endl;
     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("Run2VH_Selection.root");
     if (!f || !f->IsOpen()) {
       f = new TFile("Run2VH_Selection.root");
@@ -197,7 +197,7 @@ void HggTree::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set branch addresses and branch pointers
-  std::cout << "debug: creating tree2" << std::endl; 
+  //std::cout << "debug: creating tree2" << std::endl; 
   if (!tree) return;
   fChain = tree;
   fCurrent = -1;

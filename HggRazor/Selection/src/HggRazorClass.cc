@@ -3,18 +3,9 @@
 //ROOT INCLUDES
 //LOCAL INCLUDES
 #include "HggRazorClass.hh"
-/*
-int   HggRazorClass::n_mgg;
-float HggRazorClass::mgg_l;
-float HggRazorClass::mgg_h;
 
-int   HggRazorClass::n_ptgg;
-float HggRazorClass::ptgg_l;
-float HggRazorClass::ptgg_h;
-*/
-HggRazorClass::HggRazorClass( )
-{
-};
+HggRazorClass::HggRazorClass( ){ };
+
 HggRazorClass::HggRazorClass( TTree* tree ) : HggTree( tree ), _info( false ), _debug( false )
 {
   std::cout << "[DEBUG]: n_mgg: " << n_mgg << std::endl;
@@ -49,6 +40,7 @@ HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName,
   InitRsqHisto();
   InitMrRsqHisto();
 };
+
 HggRazorClass::~HggRazorClass()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Destructor" << std::endl;
@@ -64,7 +56,7 @@ bool HggRazorClass::InitMggHisto( )
       std::cerr << "[ERROR]: mgg histogram parameters not initialized" << std::endl;
       return false;
     }
-  std::cout << "[INFO]: Initializing mgg histogram" << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: Initializing mgg histogram" << std::endl;
   h_mgg = new TH1F( this->processName + "_" + this->boxName +  "_mgg", "mgg", n_mgg, mgg_l, mgg_h );
   return true;
 };
@@ -76,6 +68,7 @@ bool HggRazorClass::InitPtggHisto( )
       std::cerr << "[ERROR]: ptgg histogram parameters not initialized" << std::endl;
       return false;
     }
+  if ( _debug ) std::cout << "[DEBUG]: Initializing ptgg histogram" << std::endl;
   h_ptgg = new TH1F( this->processName + "_" + this->boxName +  "_ptgg", "ptgg", n_ptgg, ptgg_l, ptgg_h );
   return true;
 };
@@ -87,7 +80,7 @@ bool HggRazorClass::InitMrHisto( )
       std::cerr << "[ERROR]: mr histogram parameters not initialized" << std::endl;
       return false;
     }
-  std::cout << "[INFO]: Initializing mr histogram" << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: Initializing mr histogram" << std::endl;
   h_mr = new TH1F( this->processName + "_" + this->boxName +  "_mr", "mr", n_mr, mr_l, mr_h );
   return true;
 };
@@ -99,7 +92,7 @@ bool HggRazorClass::InitRsqHisto( )
       std::cerr << "[ERROR]: rsq histogram parameters not initialized" << std::endl;
       return false;
     }
-  std::cout << "[INFO]: Initializing rsq histogram" << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: Initializing rsq histogram" << std::endl;
   h_rsq = new TH1F( this->processName + "_" + this->boxName +  "_rsq", "rsq", n_rsq, rsq_l, rsq_h );
   return true;
 };
@@ -112,10 +105,11 @@ bool HggRazorClass::InitMrRsqHisto( )
       std::cerr << "[ERROR]: mr_rsq histogram parameters not initialized" << std::endl;
       return false;
     }
-  std::cout << "[INFO]: Initializing mr_rsq histogram" << std::endl;
+  if ( _debug ) std::cout << "[DEBUG]: Initializing mr_rsq histogram" << std::endl;
   h_mr_rsq = new TH2F( this->processName + "_" + this->boxName +  "_mr_rsq", "mr_rsq", n_mr, mr_l, mr_h, n_rsq, rsq_l, rsq_h );
   return true; 
 };
+
 void HggRazorClass::Loop()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
@@ -133,11 +127,13 @@ void HggRazorClass::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
-      h_mgg->Fill( mGammaGamma, xsecSF );
-      h_ptgg->Fill( pTGammaGamma, xsecSF );
-      h_mr->Fill( MR, xsecSF );
-      h_rsq->Fill( Rsq, xsecSF );
-      h_mr_rsq->Fill( MR, Rsq, xsecSF );
+      //double w = xsecSF*hggBF;
+      double w = xsecSF;
+      h_mgg->Fill( mGammaGamma, w );
+      h_ptgg->Fill( pTGammaGamma, w );
+      h_mr->Fill( MR, w );
+      h_rsq->Fill( Rsq, w );
+      h_mr_rsq->Fill( MR, Rsq, w );
     }
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
@@ -154,4 +150,9 @@ bool HggRazorClass::WriteOutput( TString outName )
   fout->Close();
   if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
   return true;
+};
+
+float HggRazorClass::GetHggBF( )
+{
+  return hggBF;
 };

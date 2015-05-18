@@ -24,7 +24,11 @@ public:
   bool InitMrRsqHisto( );
   void Loop();
   bool WriteOutput( TString outName = "default" );
+  static float GetHggBF( );
 private:
+
+  static constexpr float hggBF = 2.28e-3;
+  
   bool _debug;
   bool _info;
   TString processName;
@@ -53,6 +57,7 @@ private:
 
   //2D Histos
   TH2F* h_mr_rsq;
+  TH2F* h_mr_rsq_c;//custom binning
   // o u t p u t  r o o t  f i l e
   //------------------------------
   TFile* fout;
