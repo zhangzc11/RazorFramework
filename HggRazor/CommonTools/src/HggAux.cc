@@ -48,7 +48,7 @@ std::string GetProcessString( Process process )
 {
   if ( process == Process::ttH )
     {
-      return "tth";
+      return "ttH";
     }
   else if ( process == Process::vH )
     {
