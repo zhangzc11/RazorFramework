@@ -14,7 +14,7 @@ CPPFLAGS += -g -std=c++11
 
 TARGET = PlotCustomMrRsq
 
-SRC = app/PlotCustomMrRsq.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
+SRC = app/PlotCustomMrRsq.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 
 OBJ = $(SRC:.cc=.o)
 

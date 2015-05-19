@@ -9,13 +9,17 @@
 #include "HggAux.hh"
 #include "CommandLineInput.hh"
 #include "TChainTools.hh"
+#include "PlotCosmetics.hh"
 
-#define _debug 0
+#define _debug 1
 
 int main ( int argc, char* argv[] )
 {
   std::cout << "[INFO]: Initializing program" << std::endl;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+  std::string histoMake = ParseCommandLine( argc, argv, "-histoMake=" );
+  std::string option = ParseCommandLine( argc, argv, "-option=" );
+  std::string histoName = histoMake;
   if ( inputFile == "" )
     {
       std::cerr << "[ERROR]: Please provide an input file using --inputFile=<your_input_file>" << std::endl;
@@ -26,7 +30,9 @@ int main ( int argc, char* argv[] )
   if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
   
   TFile* f;
-  TH1F* h_mr_rsq;
+  TH2F* h_mr_rsq;
+  TH1F* h;
+  THStack* stack = new THStack( "hs" , "Hgg Stack " );
   
   for( auto& myMap : mapList )
     {
@@ -47,8 +53,37 @@ int main ( int argc, char* argv[] )
       // R e t r i e v i n g  H i s t o
       //-------------------------------
       f = new TFile( mapList[processName].c_str() );
-      h_mr_rsq = (TH1F*)f->Get( "mr_rsq_custom" ) ;
-      std::cout << "[INFO]: Number of events (5 fb-1) -> " << h_mr_rsq->Integral() << std::endl;
+      if ( histoName == "" || histoName == "MrRsqCustom" )
+	{
+	  h_mr_rsq = (TH2F*)f->Get( "mr_rsq_custom" );
+	  std::cout << "[INFO]: Number of events (5 fb-1) -> " << h_mr_rsq->Integral() << std::endl;
+	  MakeCustomMrRsq( h_mr_rsq, processName );
+	}
+      else if ( histoName == "mgg" )
+	{
+	  h = (TH1F*)f->Get( "mgg" );
+	  TH1F* h_s = GetStyledHisto( h, process );
+	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	}
+      else if ( histoName == "ptgg" )
+	{
+	  h = (TH1F*)f->Get( "ptgg" );
+	  TH1F* h_s = GetStyledHisto( h, process );
+	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	}
+      else if ( histoName == "mr" )
+	{
+	  h = (TH1F*)f->Get( "mr" );
+	  TH1F* h_s = GetStyledHisto( h, process );
+	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	}
+      else if ( histoName == "rsq" )
+	{
+	  h = (TH1F*)f->Get( "rsq" );
+	  TH1F* h_s = GetStyledHisto( h, process );
+	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	}
     }
+  MakeStackPlot( stack, histoName, histoName );
   return 0;
 }

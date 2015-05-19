@@ -12,7 +12,7 @@ Boxes end( Boxes box ){ return Boxes::Last; };
 
 Process& operator++( Process& process ){ return process = (Process)( std::underlying_type<Process>::type( process ) + 1 ); };
 Process operator*( Process process ){ return process; };
-Process begin( Process process ){ return Process::ttH; };
+Process begin( Process process ){ return Process::gammaJet; };
 Process end( Process process ){ return Process::Last; };
 
 std::string GetBoxString( Boxes box )

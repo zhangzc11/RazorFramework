@@ -24,7 +24,7 @@ int HggRazorClass::n_mr = 290;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
 
-int HggRazorClass::n_rsq = 1000;
+int HggRazorClass::n_rsq = 200;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 
@@ -33,17 +33,17 @@ float HggRazorClass::rsq_h = 5.0;
 //HighPt
 const int N_HighPt = 5;
 float MR_HighPt[N_HighPt+1] = {150,200,300,500,1600,3000};
-float Rsq_HighPt[N_HighPt+1] = {0.001,0.05,0.10,0.15,0.20,3.00};
+float Rsq_HighPt[N_HighPt+1] = {0.01,0.05,0.10,0.15,0.20,1.00};
 
 //HighRes
 const int N_HighRes = 4;
 float MR_HighRes[N_HighRes+1] = {150,250,400,1400,3000};
-float Rsq_HighRes[N_HighRes+1] = {0.001,0.05,0.10,0.15,3.00};
+float Rsq_HighRes[N_HighRes+1] = {0.01,0.05,0.10,0.15,1.00};
 
 //Hbb
 const int N_Hbb = 2;
 float MR_Hbb[N_Hbb+1] = {150,300,3000};
-float Rsq_Hbb[N_Hbb+1] = {0.001,0.05,3.00};
+float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 
 //A p p l y   B a s e l i n e   C u t
