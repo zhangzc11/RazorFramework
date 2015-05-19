@@ -5,6 +5,7 @@
 #include <map>
 //ROOT INCLUDES
 #include <TString.h>
+#include <TLegend.h>
 //LOCAL INCLUDES
 
 

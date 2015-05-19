@@ -16,15 +16,15 @@ int HggRazorClass::n_mgg = 38;
 float HggRazorClass::mgg_l = 103.;
 float HggRazorClass::mgg_h = 160.;
 
-int HggRazorClass::n_ptgg = 100;
+int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
-float HggRazorClass::ptgg_h = 700.;
+float HggRazorClass::ptgg_h = 720.;
 
-int HggRazorClass::n_mr = 290;
+int HggRazorClass::n_mr = 160;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
 
-int HggRazorClass::n_rsq = 200;
+int HggRazorClass::n_rsq = 250;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 

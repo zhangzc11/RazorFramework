@@ -33,6 +33,7 @@ int main ( int argc, char* argv[] )
   TH2F* h_mr_rsq;
   TH1F* h;
   THStack* stack = new THStack( "hs" , "Hgg Stack " );
+  TLegend* leg = new TLegend( 0.63, 0.7, 0.85, 0.89, NULL, "brNDC" );
   
   for( auto& myMap : mapList )
     {
@@ -63,27 +64,41 @@ int main ( int argc, char* argv[] )
 	{
 	  h = (TH1F*)f->Get( "mgg" );
 	  TH1F* h_s = GetStyledHisto( h, process );
-	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	  if ( option == "stack" )
+	    {
+	      stack->Add( h_s, "histo" );
+	    }
 	}
       else if ( histoName == "ptgg" )
 	{
 	  h = (TH1F*)f->Get( "ptgg" );
 	  TH1F* h_s = GetStyledHisto( h, process );
-	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	  if ( option == "stack" )
+	    {
+	      stack->Add( h_s, "histo" );
+	    }
 	}
       else if ( histoName == "mr" )
 	{
 	  h = (TH1F*)f->Get( "mr" );
 	  TH1F* h_s = GetStyledHisto( h, process );
-	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	  if ( option == "stack" )
+	    {
+	      stack->Add( h_s, "histo" );
+	      AddLegend( h_s, leg, process );
+	    }
 	}
       else if ( histoName == "rsq" )
 	{
 	  h = (TH1F*)f->Get( "rsq" );
 	  TH1F* h_s = GetStyledHisto( h, process );
-	  if ( option == "stack" ) stack->Add( h_s, "histo" );
+	  if ( option == "stack" )
+	    {
+	      stack->Add( h_s, "histo" );
+	    }
 	}
     }
-  MakeStackPlot( stack, histoName, histoName );
+  
+  MakeStackPlot( stack, histoName, histoName, leg );
   return 0;
 }

@@ -50,7 +50,7 @@ bool MakeCustomMrRsq( TH2F* h, TString outName )
   return true;
 };
 
-bool MakeStackPlot( THStack* s, TString var, TString outName )
+bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
 {
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -63,8 +63,11 @@ bool MakeStackPlot( THStack* s, TString var, TString outName )
   c->SetBottomMargin( bottomMargin );
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);
-
+  
+  s->SetTitle("");
   s->Draw();
+  s->GetXaxis()->SetTitleSize( axisTitleSize );
+  s->GetXaxis()->SetTitleOffset( axisTitleOffset );
   
   if( var == "rsq" )
     {
@@ -73,12 +76,24 @@ bool MakeStackPlot( THStack* s, TString var, TString outName )
   else if ( var == "mr" )
     {
       s->GetXaxis()->SetRangeUser(0.0, 4000.0);
+      s->GetXaxis()->SetTitle("M_{R} (GeV)");
     }
     
   if ( var == "mr" || var == "rsq" )
     {
       c->SetLogy();
       
+    }
+  if ( leg != NULL )
+    {
+      leg->SetBorderSize(0);
+      //leg->SetTextSize(0.03);
+      leg->SetLineColor(1);
+      leg->SetLineStyle(1);
+      leg->SetLineWidth(1);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(1001);
+      leg->Draw();
     }
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
@@ -96,23 +111,28 @@ bool SetHistoStyle( TH1F* h, Process process )
 {
   if ( process == Process::gammaJet )
     {
-      h->SetFillColor( kRed - 4 );
+      h->SetFillColor( kBlue - 7 );
+      h->SetLineColor( kBlue - 7 );
     }
   else if ( process == Process::ttH )
     {
-      h->SetFillColor( kBlue - 4 );
+      h->SetFillColor( kViolet + 6 );
+      h->SetLineColor( kViolet + 6 );
     }
   else if ( process == Process::ggH )
     {
-      h->SetFillColor( kGreen - 4 );
+      h->SetFillColor( kGreen + 2 );
+      h->SetLineColor( kGreen + 2 );
     }
   else if ( process == Process::vH )
     {
-      h->SetFillColor( kViolet - 4 );
+      h->SetFillColor( kMagenta - 3 );
+      h->SetLineColor( kMagenta - 3 );
     }
   else if ( process == Process::vbfH )
     {
-      h->SetFillColor( kAzure - 4 );
+      h->SetFillColor( kAzure + 7 );
+      h->SetLineColor( kAzure + 7 );
     }
   else
     {
@@ -120,5 +140,45 @@ bool SetHistoStyle( TH1F* h, Process process )
       std::cout << "[WARNING]: Setting Fill Color to kGray" << std::endl;
       h->SetFillColor( kGray );
     }
+  return true;
+};
+
+
+bool AddLegend( TH1F* h, TLegend* leg, Process process )
+{
+  if ( leg == NULL ) return false;
+
+  if ( process == Process::gammaJet )
+    {
+      leg->AddEntry( h, "#gamma + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::ttH )
+    {
+      leg->AddEntry( h, "t#bar{t}H + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::ggH )
+    {
+      leg->AddEntry( h, "ggH + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::vH )
+    {
+      leg->AddEntry( h, "VH + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::vbfH )
+    {
+      leg->AddEntry( h, "VBFH + jets", "f" );
+      return true;
+    }
+  else
+    {
+      std::cout << "[WARNING]: unrecognized process, setting unknown legend" << std::endl;
+      leg->AddEntry( h, "unknown", "f" );
+      return false;
+    }
+  
   return true;
 };
