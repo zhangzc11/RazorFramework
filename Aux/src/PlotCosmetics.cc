@@ -72,7 +72,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName )
     }
   else if ( var == "mr" )
     {
-      s->GetXaxis()->SetRangeUser(0.0, 3000.0);
+      s->GetXaxis()->SetRangeUser(0.0, 4000.0);
     }
     
   if ( var == "mr" || var == "rsq" )
