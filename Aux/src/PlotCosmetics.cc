@@ -72,11 +72,17 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   if( var == "rsq" )
     {
       s->GetXaxis()->SetRangeUser(0.0, 1.0);
+      s->GetXaxis()->SetTitle("R^{2}");
     }
   else if ( var == "mr" )
     {
       s->GetXaxis()->SetRangeUser(0.0, 4000.0);
       s->GetXaxis()->SetTitle("M_{R} (GeV)");
+    }
+  else if ( var == "mgg" )
+    {
+      s->GetXaxis()->SetRangeUser( 103., 160. );
+      s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
     }
     
   if ( var == "mr" || var == "rsq" )

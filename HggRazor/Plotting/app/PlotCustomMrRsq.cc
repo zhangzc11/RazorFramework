@@ -67,6 +67,7 @@ int main ( int argc, char* argv[] )
 	  if ( option == "stack" )
 	    {
 	      stack->Add( h_s, "histo" );
+	      AddLegend( h_s, leg, process );
 	    }
 	}
       else if ( histoName == "ptgg" )
@@ -76,6 +77,7 @@ int main ( int argc, char* argv[] )
 	  if ( option == "stack" )
 	    {
 	      stack->Add( h_s, "histo" );
+	      AddLegend( h_s, leg, process );
 	    }
 	}
       else if ( histoName == "mr" )
@@ -95,6 +97,7 @@ int main ( int argc, char* argv[] )
 	  if ( option == "stack" )
 	    {
 	      stack->Add( h_s, "histo" );
+	      AddLegend( h_s, leg, process );
 	    }
 	}
     }

@@ -49,6 +49,7 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
 TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString mggCut = "mGammaGamma > 103. && mGammaGamma < 160.";
 
 #define _debug 0
 
@@ -90,7 +91,7 @@ int main ( int argc, char* argv[] )
 	  TFile* tmp = new TFile("tmp","recreate");
 	  //A p p l y i n g  C u t s
 	  //------------------------
-	  cutTree = (TTree*)chain->CopyTree( cut );
+	  cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut );
 	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
@@ -112,7 +113,7 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[WARNING]: Undefined box->" << std::endl;
 	    }
 	  hggclass->Loop();
-	  hggclass->WriteOutput( boxName );
+	  hggclass->WriteOutput( boxName + "_mggCut" );
 	}
     }
   return 0;
