@@ -10,6 +10,8 @@
 #include <TH2F.h>
 #include <THStack.h>
 #include <TLegend.h>
+#include <TCanvas.h>
+#include <TLatex.h>
 //LOCAL INCLUDES
 #include "HggAux.hh"
 
@@ -23,6 +25,7 @@ bool SetHistoStyle( TH1F* h, Process process );
 
 
 //Legend
-bool AddLegend( TH1F*h, TLegend* leg, Process process );
+bool AddLegend( TH1F* h, TLegend* leg, Process process );
+bool AddCMS( TCanvas* C );
 
 #endif

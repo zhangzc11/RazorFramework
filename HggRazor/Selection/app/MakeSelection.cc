@@ -12,19 +12,23 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 38;
+int HggRazorClass::n_mgg = 19;
 float HggRazorClass::mgg_l = 103.;
 float HggRazorClass::mgg_h = 160.;
-
+/*
+int HggRazorClass::n_mgg = 5;
+float HggRazorClass::mgg_l = 117.5;
+float HggRazorClass::mgg_h = 132.5;
+*/
 int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
 
-int HggRazorClass::n_mr = 160;
+int HggRazorClass::n_mr = 80;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
 
-int HggRazorClass::n_rsq = 250;
+int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 
@@ -49,7 +53,8 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
 TString cut = "MR > 100. && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
-TString mggCut = "mGammaGamma > 103. && mGammaGamma < 160.";
+//TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
+TString mggCut = "1";
 
 #define _debug 0
 
@@ -113,7 +118,7 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[WARNING]: Undefined box->" << std::endl;
 	    }
 	  hggclass->Loop();
-	  hggclass->WriteOutput( boxName + "_mggCut" );
+	  hggclass->WriteOutput( boxName );
 	}
     }
   return 0;

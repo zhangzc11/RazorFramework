@@ -13,10 +13,15 @@ const float axisTitleSize = 0.06;
 const float axisTitleOffset = .8;
 //Margins
 const float leftMargin   = 0.12;
-const float rightMargin  = 0.12;
+const float rightMargin  = 0.05;
 const float topMargin    = 0.07;
 const float bottomMargin = 0.12;
-  
+
+//CMS STANDARD
+TString CMSText = "CMS";
+TString extraText   = "Preliminary";
+ TString lumiText = "5 fb^{-1} (13 TeV)";
+
 bool MakeCustomMrRsq( TH2F* h, TString outName )
 {
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
@@ -68,28 +73,37 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   s->Draw();
   s->GetXaxis()->SetTitleSize( axisTitleSize );
   s->GetXaxis()->SetTitleOffset( axisTitleOffset );
-  
+  s->GetYaxis()->SetTitleSize( axisTitleSize );
+  s->GetYaxis()->SetTitleOffset( axisTitleOffset );
   if( var == "rsq" )
     {
       s->GetXaxis()->SetRangeUser(0.0, 1.0);
       s->GetXaxis()->SetTitle("R^{2}");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.04");
+      c->SetLogy();
+      c->Update();
     }
   else if ( var == "mr" )
     {
-      s->GetXaxis()->SetRangeUser(0.0, 4000.0);
+      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
       s->GetXaxis()->SetTitle("M_{R} (GeV)");
+      s->GetYaxis()->SetTitle("events / 100 (GeV)");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      c->SetLogy();
+      c->Update();
     }
   else if ( var == "mgg" )
     {
       s->GetXaxis()->SetRangeUser( 103., 160. );
       s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 3 (GeV)");
+      s->SetMinimum( 0 );
+      s->SetMaximum( 2*s->GetMaximum() );
     }
     
-  if ( var == "mr" || var == "rsq" )
-    {
-      c->SetLogy();
-      
-    }
   if ( leg != NULL )
     {
       leg->SetBorderSize(0);
@@ -101,8 +115,10 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
       leg->SetFillStyle(1001);
       leg->Draw();
     }
+  AddCMS( c );
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
+  delete c;
   return true;
 };
 
@@ -117,8 +133,8 @@ bool SetHistoStyle( TH1F* h, Process process )
 {
   if ( process == Process::gammaJet )
     {
-      h->SetFillColor( kBlue - 7 );
-      h->SetLineColor( kBlue - 7 );
+      h->SetFillColor( kAzure + 7 );
+      h->SetLineColor( kAzure + 7 );
     }
   else if ( process == Process::ttH )
     {
@@ -127,18 +143,18 @@ bool SetHistoStyle( TH1F* h, Process process )
     }
   else if ( process == Process::ggH )
     {
-      h->SetFillColor( kGreen + 2 );
-      h->SetLineColor( kGreen + 2 );
+      h->SetFillColor( kGreen + 1 );
+      h->SetLineColor( kGreen + 1 );
     }
   else if ( process == Process::vH )
     {
-      h->SetFillColor( kMagenta - 3 );
-      h->SetLineColor( kMagenta - 3 );
+      h->SetFillColor( kOrange + 7 );
+      h->SetLineColor( kOrange + 7 );
     }
   else if ( process == Process::vbfH )
     {
-      h->SetFillColor( kAzure + 7 );
-      h->SetLineColor( kAzure + 7 );
+      h->SetFillColor( kOrange - 2 );
+      h->SetLineColor( kOrange - 2 );
     }
   else
     {
@@ -186,5 +202,43 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
       return false;
     }
   
+  return true;
+};
+
+bool AddCMS( TCanvas* C )
+{
+  C->cd();
+  float lumix = 0.955;
+  float lumiy = 0.945;
+  float lumifont = 42;
+  
+  float cmsx = 0.33;
+  float cmsy = 0.875;
+  float cmsTextFont   = 61;  // default is helvetic-bold
+  float extrax = cmsx + 0.078;
+  float extray = cmsy - 0.04;
+  float extraTextFont = 52;  // default is helvetica-italics
+  // ratio of "CMS" and extra text size
+  float extraOverCmsTextSize  = 0.76;
+  float cmsSize = 0.06;
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  float extraTextSize = extraOverCmsTextSize*cmsSize;
+  latex.SetTextFont(lumifont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);    
+  latex.DrawLatex(lumix, lumiy,lumiText);
+
+  latex.SetTextFont(cmsTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);
+  latex.DrawLatex(cmsx, cmsy, CMSText);
+   
+  latex.SetTextFont(extraTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(extraTextSize);
+  latex.DrawLatex(extrax, extray, extraText);
   return true;
 };
