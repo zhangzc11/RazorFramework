@@ -56,7 +56,7 @@ TString cut = "MR > 100. && Rsq > 0.0 && abs( Pho1Eta ) < 1.44 && abs( Pho2Eta )
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
 
-#define _debug 0
+#define _debug 1
 
 int main ( int argc, char* argv[] )
 {
