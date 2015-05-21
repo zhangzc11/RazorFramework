@@ -1,0 +1,12 @@
+19.27	/Users/cmorgoth/Work/data/HggRazorRun1/MC/ggH_8TeV.root
+1.578	/Users/cmorgoth/Work/data/HggRazorRun1/MC/vbfH_8TeV.root
+1.1199	/Users/cmorgoth/Work/data/HggRazorRun1/MC/vH_8TeV.root
+0.1293	/Users/cmorgoth/Work/data/HggRazorRun1/MC/ttH_8TeV.root
+5212.0	/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-100To200_8TeV.root
+960.5	/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-200To400_8TeV.root
+107.5	/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-400ToInf_8TeV.root
+75.39	/Users/cmorgoth/Work/data/HggRazorRun1/MC/DiPhotonJets_8TeV.root
+xx.xx	/Users/cmorgoth/Work/data/HggRazorRun1/MC/DiPhotonBox_Pt10_25_8TeV.root
+xx.xx	/Users/cmorgoth/Work/data/HggRazorRun1/MC/DiPhotonBox_Pt25_250_8TeV.root
+xx.xx	/Users/cmorgoth/Work/data/HggRazorRun1/MC/DiPhotonBox_Pt250_Inf_8TeV.root
+

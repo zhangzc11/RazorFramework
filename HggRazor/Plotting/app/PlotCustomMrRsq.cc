@@ -71,7 +71,7 @@ int main ( int argc, char* argv[] )
 	    {
 	      h = (TH1F*)f->Get( "mgg" );
 	      TH1F* h_s = GetStyledHisto( h, process );
-	      if ( process == Process::gammaJet ) h_s->Smooth( 1 );
+	      //if ( process == Process::gammaJet ) h_s->Smooth( 1 );
 	      if ( option == "stack" )
 		{
 		  stack->Add( h_s, "histo" );
