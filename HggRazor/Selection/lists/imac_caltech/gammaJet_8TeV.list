@@ -1,3 +1,6 @@
-/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-100To200_8TeV_Normalized.root
-/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-200To400_8TeV_Normalized.root
-/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-400ToInf_8TeV_Normalized.root
+#/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-40To100_8TeV_Normalized.root
+#/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-100To200_8TeV_Normalized.root
+#/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-200To400_8TeV_Normalized.root
+#/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJets_HT-400ToInf_8TeV_Normalized.root
+/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJet_Pt-20to40_doubleEMEnriched_TuneZ2star_8TeV-pythia6_Normalized.root
+/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJet_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6_Normalized.root

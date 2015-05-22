@@ -15,6 +15,11 @@ bool AddTChain( TChain* chain, std::string fileList )
 	{
 	  if ( ifs.eof() ) break;
 	  ifs >> tmpRootFile;
+	  if ( tmpRootFile.at( 0 ) == '#' )
+	    {
+	      std::cout << "[INFO]: skipping-> " << tmpRootFile << std::endl;
+	      continue;
+	    }
 	  std::cout << "[INFO]: chaininig-> " << tmpRootFile << std::endl;
 	  chain->Add( tmpRootFile.c_str() );
 	}

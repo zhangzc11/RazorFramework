@@ -20,7 +20,8 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
- TString lumiText = "5 fb^{-1} (13 TeV)";
+//TString lumiText = "5 fb^{-1} (13 TeV)";
+TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
 {
@@ -99,7 +100,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
     {
       s->GetXaxis()->SetRangeUser( 103., 160. );
       s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 3 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1 (GeV)");
       s->SetMinimum( 0 );
       s->SetMaximum( 2*s->GetMaximum() );
     }
@@ -135,6 +136,11 @@ bool SetHistoStyle( TH1F* h, Process process )
     {
       h->SetFillColor( kAzure + 7 );
       h->SetLineColor( kAzure + 7 );
+    }
+  else if ( process == Process::diphoton )
+    {
+      h->SetFillColor( kAzure - 9 );
+      h->SetLineColor( kAzure - 9 );
     }
   else if ( process == Process::ttH )
     {
@@ -173,6 +179,11 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
   if ( process == Process::gammaJet )
     {
       leg->AddEntry( h, "#gamma + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::diphoton )
+    {
+      leg->AddEntry( h, "#gamma#gamma + jets", "f" );
       return true;
     }
   else if ( process == Process::ttH )
