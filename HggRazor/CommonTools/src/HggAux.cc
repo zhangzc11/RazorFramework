@@ -62,6 +62,10 @@ std::string GetProcessString( Process process )
     {
       return "vbfH";
     }
+  else if( process == Process::qcd )
+    {
+      return "qcd";
+    }
   else if( process == Process::diphoton )
     {
       return "diphoton";
@@ -69,6 +73,10 @@ std::string GetProcessString( Process process )
   else if( process == Process::gammaJet )
     {
       return "gammaJet";
+    }
+  else if( process == Process::data )
+    {
+      return "data";
     }
   else
     {

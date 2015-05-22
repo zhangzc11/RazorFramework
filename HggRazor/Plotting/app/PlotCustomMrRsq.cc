@@ -36,6 +36,7 @@ int main ( int argc, char* argv[] )
   TFile* f;
   TH2F* h_mr_rsq;
   TH1F* h;
+  TH1F* data;
   THStack* stack = new THStack( "hs" , "Hgg Stack " );
   TLegend* leg = new TLegend( 0.73, 0.7, 0.93, 0.89, NULL, "brNDC" );
   
@@ -71,11 +72,18 @@ int main ( int argc, char* argv[] )
 	    {
 	      h = (TH1F*)f->Get( "mgg" );
 	      TH1F* h_s = GetStyledHisto( h, process );
-	      if ( process == Process::gammaJet || process == Process::diphoton ) h_s->Scale( 1.3 );
+	      //if ( process == Process::gammaJet || process == Process::diphoton ) h_s->Scale( 1.3 );
 	      //if ( process == Process::gammaJet ) h_s->Smooth( 1 );
 	      if ( option == "stack" )
 		{
-		  stack->Add( h_s, "histo" );
+		  if ( process != Process::data )
+		    {
+		      stack->Add( h_s, "histo" );
+		    }
+		  else
+		    {
+		      data = h_s;
+		    }
 		  AddLegend( h_s, leg, process );
 		}
 	    }
@@ -113,11 +121,13 @@ int main ( int argc, char* argv[] )
       
       if ( outDir != "" )
 	{
-	  MakeStackPlot( stack, histoName, outDir + "/" + histoName + "_" + boxName, leg );
+	  //MakeStackPlot( stack, histoName, outDir + "/" + histoName + "_" + boxName, leg );
+	  MakeStackPlot( stack, data, data, histoName, outDir + "/" + histoName + "_" + boxName, leg );
 	}
       else
 	{
-	  MakeStackPlot( stack, histoName, histoName + "_" + boxName, leg ); 
+	  //MakeStackPlot( stack, histoName, histoName + "_" + boxName, leg );
+	  MakeStackPlot( stack, data, data, histoName, histoName + "_" + boxName, leg );
 	}
     }
   else

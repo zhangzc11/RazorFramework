@@ -4,3 +4,4 @@ ggH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighPt/Hi
 ttH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_tth.root
 vH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_vH.root
 vbfH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_vbfH.root
+data		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_data.root

@@ -123,6 +123,74 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   return true;
 };
 
+bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outName, TLegend* leg )
+{
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+  
+  s->SetTitle("");
+  s->Draw();
+  s->GetXaxis()->SetTitleSize( axisTitleSize );
+  s->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  s->GetYaxis()->SetTitleSize( axisTitleSize );
+  s->GetYaxis()->SetTitleOffset( axisTitleOffset );
+  if( var == "rsq" )
+    {
+      s->GetXaxis()->SetRangeUser(0.0, 1.0);
+      s->GetXaxis()->SetTitle("R^{2}");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.04");
+      c->SetLogy();
+      c->Update();
+    }
+  else if ( var == "mr" )
+    {
+      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      s->GetXaxis()->SetTitle("M_{R} (GeV)");
+      s->GetYaxis()->SetTitle("events / 100 (GeV)");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      c->SetLogy();
+      c->Update();
+    }
+  else if ( var == "mgg" )
+    {
+      s->GetXaxis()->SetRangeUser( 103., 160. );
+      s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->SetMinimum( 0 );
+      s->SetMaximum( 2*s->GetMaximum() );
+    }
+    
+  if ( leg != NULL )
+    {
+      leg->SetBorderSize(0);
+      //leg->SetTextSize(0.03);
+      leg->SetLineColor(1);
+      leg->SetLineStyle(1);
+      leg->SetLineWidth(1);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(1001);
+      leg->Draw();
+    }
+  data->Draw("sameE");
+  AddCMS( c );
+  c->SaveAs( outName+".pdf" );
+  c->SaveAs( outName+".C" );
+  delete c;
+  return true;
+};
+
 TH1F* GetStyledHisto( TH1F* h, Process process )
 {
   TH1F* h_n = new TH1F( *h );
@@ -141,6 +209,11 @@ bool SetHistoStyle( TH1F* h, Process process )
     {
       h->SetFillColor( kAzure - 9 );
       h->SetLineColor( kAzure - 9 );
+    }
+  else if ( process == Process::qcd )
+    {
+      h->SetFillColor( kOrange - 9 );
+      h->SetLineColor( kOrange - 9 );
     }
   else if ( process == Process::ttH )
     {
@@ -161,6 +234,12 @@ bool SetHistoStyle( TH1F* h, Process process )
     {
       h->SetFillColor( kOrange - 2 );
       h->SetLineColor( kOrange - 2 );
+    }
+  else if ( process == Process::data )
+    {
+      h->SetMarkerStyle( 20 );
+      h->SetMarkerColor( kBlack );
+      h->SetLineColor( kBlack );
     }
   else
     {
@@ -186,6 +265,11 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
       leg->AddEntry( h, "#gamma#gamma + jets", "f" );
       return true;
     }
+  else if ( process == Process::qcd )
+    {
+      leg->AddEntry( h, "fake-fake", "f" );
+      return true;
+    }
   else if ( process == Process::ttH )
     {
       leg->AddEntry( h, "t#bar{t}H + jets", "f" );
@@ -204,6 +288,11 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
   else if ( process == Process::vbfH )
     {
       leg->AddEntry( h, "VBFH + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::data )
+    {
+      leg->AddEntry( h, "data", "lep" );
       return true;
     }
   else

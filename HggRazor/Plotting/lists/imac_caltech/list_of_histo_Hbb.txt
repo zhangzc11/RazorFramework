@@ -4,3 +4,4 @@ ggH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_g
 ttH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_tth.root
 vH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_vH.root
 vbfH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_vbfH.root
+data            /Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_data.root

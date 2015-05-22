@@ -41,15 +41,23 @@ int main ( int argc, char* argv[] )
 	{
 	  ifs >> xsec >> rootFile;
 	  if ( ifs.eof() ) break;
-	  
+	  float sf = -99.0;
 	  f = new TFile( rootFile.c_str() );
-	  h_ngen = (TH1F*)f->Get("NEvents");
-	  double ngen = h_ngen->Integral();
-	  float sf = GetXsecSF( lumi , xsec, ngen );
 	  outRootFile = rootFile.substr( 0, rootFile.find( ".root" ) ) + "_Normalized.root";
+	  if ( xsec > .0 )
+	    {
+	      h_ngen = (TH1F*)f->Get("NEvents");
+	      double ngen = h_ngen->Integral();
+	      sf = GetXsecSF( lumi , xsec, ngen );
+	      std::cout << "[INFO]: Normalizing file -> " << outRootFile << std::endl;
+	      std::cout << "[INFO]: xsec -> " << xsec << " ngen-> " << ngen << " sf-> " << sf << std::endl;
+	    }
+	  else
+	    {
+	      sf = 1.0;
+	      std::cout << "[INFO]: Data detected, using xsecSF = 1.0 in -> " << outRootFile << std::endl;
+	    }
 	  fout = new TFile( outRootFile.c_str(), "recreate" );
-	  std::cout << "[INFO]: Normalizing file -> " << outRootFile << std::endl;
-	  std::cout << "[INFO]: xsec -> " << xsec << " ngen-> " << ngen << " sf-> " << sf << std::endl;
 	  // L o o p i n g   o v e r   b o x e s
 	  //------------------------------------
 	  for ( const auto& box : Boxes() )
