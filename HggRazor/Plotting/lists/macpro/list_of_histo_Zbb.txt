@@ -1,4 +1,5 @@
 gammaJet	/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_gammaJet.root
+diphoton        /Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_diphoton.root
 ggH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_ggH.root
 ttH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_tth.root
 vH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_vH.root

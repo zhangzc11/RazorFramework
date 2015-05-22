@@ -71,6 +71,7 @@ int main ( int argc, char* argv[] )
 	    {
 	      h = (TH1F*)f->Get( "mgg" );
 	      TH1F* h_s = GetStyledHisto( h, process );
+	      if ( process == Process::gammaJet || process == Process::diphoton ) h_s->Scale( 1.3 );
 	      //if ( process == Process::gammaJet ) h_s->Smooth( 1 );
 	      if ( option == "stack" )
 		{

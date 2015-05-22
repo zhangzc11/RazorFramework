@@ -1,3 +1,4 @@
+diphoton	/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/LowRes/LowRes_diphoton.root
 gammaJet	/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/LowRes/LowRes_gammaJet.root
 ggH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/LowRes/LowRes_ggH.root
 ttH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/LowRes/LowRes_tth.root

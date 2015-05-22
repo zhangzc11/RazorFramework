@@ -12,7 +12,7 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 19;
+int HggRazorClass::n_mgg = 57;
 float HggRazorClass::mgg_l = 103.;
 float HggRazorClass::mgg_h = 160.;
 /*
