@@ -52,7 +52,8 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-TString cut = "MR > 100. && t1Rsq > 0.0 && abs( Pho1Eta ) < 1.44 && abs( Pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString cut = "MR > .0 && t1Rsq > 0.0 && abs( Pho1Eta ) < 1.44 && abs( Pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString CUT = "MR > .0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
 
@@ -96,7 +97,9 @@ int main ( int argc, char* argv[] )
 	  TFile* tmp = new TFile("tmp","recreate");
 	  //A p p l y i n g  C u t s
 	  //------------------------
-	  cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut );
+	  if ( process != Process::data ) cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut );
+	  if ( process == Process::data ) cutTree = (TTree*)chain->CopyTree( CUT + " && " + mggCut );
+	  
 	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------

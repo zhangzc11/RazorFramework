@@ -3,6 +3,7 @@
 //ROOT INCLUDES
 #include <TBranch.h>
 #include <TCanvas.h>
+#include <TPad.h>
 #include <TStyle.h>
 //LOCAL INCLUDES
 #include "PlotCosmetics.hh"
@@ -136,6 +137,11 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   c->SetBottomMargin( bottomMargin );
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);
+
+  TPad *pad1 = new TPad("pad1","pad1",0,0.25,1,1);
+  pad1->SetBottomMargin(0);
+  pad1->Draw();
+  pad1->cd();
   
   s->SetTitle("");
   s->Draw();
@@ -183,8 +189,29 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
       leg->SetFillStyle(1001);
       leg->Draw();
     }
+  
   data->Draw("sameE");
   AddCMS( c );
+
+  TPad *pad2 = new TPad("pad2","pad2",0,0.0,1,0.25);
+  pad2->SetTopMargin(0);
+  pad2->SetTopMargin(0.008);
+  pad2->SetBottomMargin(0.25);
+  pad2->SetGridy();
+  pad2->Draw();
+  pad2->cd();
+
+  std::cout << "deb" << std::endl;
+  //TH1F* MC = (TH1F*)s->GetHistogram();
+  TH1F* ratio = new TH1F( *data );
+  ratio->Divide( mc );
+  ratio->SetMarkerStyle( 20 );
+  ratio->SetMarkerColor( kBlue );
+  ratio->SetLineColor( kBlue );
+  ratio->GetYaxis()->SetRangeUser( 0.0, 3.0 );
+  ratio->SetTitle("");
+  ratio->SetStats( 0 );
+  ratio->Draw("E");
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
   delete c;
