@@ -66,6 +66,11 @@ int main ( int argc, char* argv[] )
   //Map Containing the lists for different processes 
   std::map< std::string, std::string > mapList;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+  if (  inputFile == "" )
+    {
+      std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
+      return -1;
+    }
   FillMapList( mapList, inputFile );
   if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
   
