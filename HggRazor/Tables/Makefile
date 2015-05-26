@@ -15,7 +15,7 @@ CPPFLAGS += -g -std=c++11
 
 TARGET = TableMaker
 
-SRC = app/TableMaker.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/TableMakerAux.cc
+SRC = app/TableMaker.cc $(CommonTools)/src/HggAux.cc $(Selection)/src/HggRazorClass.cc $(Selection)/src/HggTree.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/TableMakerAux.cc $(Aux)/src/TChainTools.cc
 
 OBJ = $(SRC:.cc=.o)
 

@@ -17,6 +17,28 @@
 #define _debug 1
 #define TYPES 4
 
+// D e f i n e  B i n n i n g
+//---------------------------
+int HggRazorClass::n_mgg = 57;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
+/*
+int HggRazorClass::n_mgg = 5;
+float HggRazorClass::mgg_l = 117.5;
+float HggRazorClass::mgg_h = 132.5;
+*/
+int HggRazorClass::n_ptgg = 70;
+float HggRazorClass::ptgg_l = 20.;
+float HggRazorClass::ptgg_h = 720.;
+
+int HggRazorClass::n_mr = 80;
+float HggRazorClass::mr_l = 130.;
+float HggRazorClass::mr_h = 8130.;
+
+int HggRazorClass::n_rsq = 125;
+float HggRazorClass::rsq_l = .0;
+float HggRazorClass::rsq_h = 5.0;
+
 std::string plots[TYPES] = { "mgg", "ptgg", "mr", "rsq" };
 
 TString cut = "MR > 150.0 && t1Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
@@ -84,7 +106,7 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  hggclass->Loop();
+	  //hggclass->Loop();
 	  hggclass->WriteOutput( boxName );
 	}
     }
