@@ -1,2 +1,1 @@
--1	/Users/cmorgoth/Work/data/HggRazorRun1/data/Data_Photon_RunABCD_New_Filtered.root
 -1	/Users/cmorgoth/Work/data/HggRazorRun1/data/DoublePhotonDataRunABCD_Trigger_GoodLumi.root

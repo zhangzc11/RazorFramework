@@ -199,11 +199,11 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0.25, 3.75 );
+  ratio->GetYaxis()->SetRangeUser( 0., 2.0 );
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
-  ratio->GetYaxis()->SetNdivisions( 6, false );
+  //ratio->GetYaxis()->SetNdivisions( 6, false );
   ratio->SetStats( 0 );
   ratio->Draw("E");
 
@@ -221,7 +221,8 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "mr" )
     {
-      //s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
       s->GetXaxis()->SetTitle("M_{R} (GeV)");
       s->GetYaxis()->SetTitle("events / 100 (GeV)");
       s->SetMinimum( 1e-1 );

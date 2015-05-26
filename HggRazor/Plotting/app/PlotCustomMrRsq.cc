@@ -39,7 +39,7 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc = NULL;
   THStack* stack = new THStack( "hs" , "Hgg Stack " );
-  TLegend* leg = new TLegend( 0.73, 0.7, 0.93, 0.89, NULL, "brNDC" );
+  TLegend* leg = new TLegend( 0.7, 0.58, 0.95, 0.89, NULL, "brNDC" );
   
   for( auto& myMap : mapList )
     {

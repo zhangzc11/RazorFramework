@@ -9,6 +9,7 @@
 #include <TString.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
+#include "HggAux.hh"
 
 class HggRazorClass : public HggTree
 {
@@ -24,6 +25,7 @@ public:
   bool InitMrRsqHisto( );
   bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
   void Loop();
+  void GetYields();
   bool WriteOutput( TString outName = "default" );
   static float GetHggBF( );
 private:
@@ -34,6 +36,8 @@ private:
   bool _info;
   TString processName;
   TString boxName;
+  Yields incYield;
+  Yields signalYield;
   // D e f i n e   B i n n i n g
   //----------------------------
   static int   n_mgg;

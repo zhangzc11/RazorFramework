@@ -6,13 +6,22 @@
 #include <TH1F.h>
 #include <TFile.h>
 //LOCAL INCLUDES
+#include "HggTree.hh"
+#include "HggRazorClass.hh"
+#include "CommandLineInput.hh"
 #include "HggAux.hh"
 #include "CommandLineInput.hh"
-#include "TableMakerAux.hh"
+#include "TChainTools.hh"
+//#include "TableMakerAux.hh"
 
 #define _debug 1
 #define TYPES 4
+
 std::string plots[TYPES] = { "mgg", "ptgg", "mr", "rsq" };
+
+TString cut = "MR > 150.0 && t1Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
+//TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
+TString mggCut = "1";
 
 struct FullBkg
 {
@@ -26,69 +35,58 @@ struct FullBkg
 int main ( int argc, char* argv[] )
 {
   std::cout << "[INFO]: Initializing program" << std::endl;
+  std::cout << "[INFO]: Hgg Branching Fraction = " << HggRazorClass::GetHggBF() << std::endl;
+  //Map Containing the lists for different processes 
+  std::map< std::string, std::string > mapList;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
-  std::string tableMake = ParseCommandLine( argc, argv, "-histoMake=" );
-  std::string outDir    = ParseCommandLine( argc, argv, "-outDir=" );
-  std::string option    = ParseCommandLine( argc, argv, "-option=" );
-  std::string boxName   = ParseCommandLine( argc, argv, "-boxName=" );
-  if ( inputFile == "" )
+  if (  inputFile == "" )
     {
-      std::cerr << "[ERROR]: Please provide an input file using --inputFile=<your_input_file>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
-  std::map< std::string, std::string > mapList;
   FillMapList( mapList, inputFile );
   if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
   
-  TFile* f;
-  TH1F* h;
-  FullBkg fb;
+  for( auto& myMap : mapList )
+    {
+      if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
+    }
   
-  for ( const auto& process : Process() )
+  TFile* f;
+  TTree* tree;
+  TChain* chain;
+  TTree* cutTree;
+  HggRazorClass* hggclass;
+  
+  for( const auto& process : Process() )
     {
       std::string processName = GetProcessString( process );
       std::cout << "[INFO]: process name: " << processName << std::endl;
-      if ( mapList.find( processName ) == mapList.end() )
+      for( const auto& box : Boxes() )
 	{
-	  std::cout << "[WARNING]: missing process-> " << processName << std::endl;
-	  continue;
-	}
-      // R e t r i e v i n g  H i s t o
-      //-------------------------------
-      f = new TFile( mapList[processName].c_str() );
-      h = (TH1F*)f->Get("mr");
-      // A s s i g n   h i s t o g r a m   t o   s t r u c t
-      //----------------------------------------------------
-      if ( process == Process::ggH )
-	{
-	  fb.ggH = h;
-	}
-      else if ( process == Process::vbfH )
-	{
-	  fb.vbfH = h;
-	}
-      else if ( process == Process::vH )
-	{
-	  fb.vH = h;
-	}
-      else if ( process == Process::ttH )
-	{
-	  fb.ttH = h;
-	}
-      else if ( process == Process::gammaJet )
-	{
-	  fb.gammaJet = h;
-	}
-      else
-	{
-	  std::cout << "[WARNING]: Unknown category" << std::endl;
+	  std::string boxName = GetBoxString( box );
+	  // R e t r i e v i n g  T r e e
+	  //-----------------------------
+	  chain   = new TChain( boxName.c_str() );
+	  AddTChain( chain, mapList[processName] );
+	  
+	  //need to create temporary root file to store cutTree
+	  TFile* tmp = new TFile("tmp","recreate");
+	  //A p p l y i n g  C u t s
+	  //------------------------
+	  cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut );
+	  if ( cutTree == NULL )
+	    {
+	      std::cout << "[WARNING]: Empty selected tree: " << boxName << std::endl;
+	      continue;
+	    }
+	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
+	  //C r e a t in g   S e l e c t i o n   O b j e c t
+	  //------------------------------------------------
+	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
+	  hggclass->Loop();
+	  hggclass->WriteOutput( boxName );
 	}
     }
-
-  std::cout << "[TEST]: ttH-> " << fb.ttH->Integral() << std::endl;
-  std::cout << "[TEST]: vH-> " << fb.vH->Integral() << std::endl;
-  std::cout << "[TEST]: vbfH-> " << fb.vbfH->Integral() << std::endl;
-  std::cout << "[TEST]: ggH-> " << fb.ggH->Integral() << std::endl;
-  std::cout << "[TEST]: gammaJet-> " << fb.gammaJet->Integral() << std::endl;
   return 0;
 }

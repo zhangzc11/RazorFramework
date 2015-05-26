@@ -52,7 +52,7 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
+TString cut = "MR > 150.0 && t1Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
 
