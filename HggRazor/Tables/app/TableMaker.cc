@@ -80,13 +80,17 @@ int main ( int argc, char* argv[] )
   TTree* cutTree;
   HggRazorClass* hggclass;
   
-  for( const auto& process : Process() )
+  Yields incYield;
+  Yields signalYield;
+
+  for( const auto& box : Boxes() )
     {
-      std::string processName = GetProcessString( process );
-      std::cout << "[INFO]: process name: " << processName << std::endl;
-      for( const auto& box : Boxes() )
+      std::string boxName = GetBoxString( box );
+      std::cout << "[INFO]: Box name: " << boxName << std::endl;
+      for( const auto& process : Process() )
 	{
-	  std::string boxName = GetBoxString( box );
+	  std::string processName = GetProcessString( process );
+	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
 	  chain   = new TChain( boxName.c_str() );
@@ -106,8 +110,9 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
+	  std::cout << "[INFO]: Selected events: " << hggclass->GetYields( 400., 0.05, 122., 129. ) << std::endl;
 	  //hggclass->Loop();
-	  hggclass->WriteOutput( boxName );
+	  //hggclass->WriteOutput( boxName );
 	}
     }
   return 0;

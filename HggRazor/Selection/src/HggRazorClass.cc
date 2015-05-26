@@ -152,6 +152,30 @@ void HggRazorClass::Loop()
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
+float HggRazorClass::GetYields( float mr, float rsq, float mgg_l, float mgg_h )
+{
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  float sel_events = .0;
+  
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      // if (Cut(ientry) < 0) continue;
+      if (  MR > mr && t1Rsq > rsq
+	    && mGammaGamma > mgg_l && mGammaGamma < mgg_h
+	    && fabs( pho1Eta ) < 1.44 && fabs( pho2Eta ) < 1.44 && pho1Pt > 25. && pho2Pt > 25.
+	    && ( pho1Pt > 40. || pho1Pt > 40. ) && pTGammaGamma > 20. )
+	{
+	  sel_events += xsecSF;
+	}
+    }
+  if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
+  return sel_events;
+};
+
 bool HggRazorClass::WriteOutput( TString outName )
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering WriteOutput" << std::endl;

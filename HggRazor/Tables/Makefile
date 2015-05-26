@@ -32,4 +32,4 @@ $(TARGET) : $(OBJ)
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(Selection)/src/*.o *~

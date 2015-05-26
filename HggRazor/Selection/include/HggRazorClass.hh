@@ -25,7 +25,7 @@ public:
   bool InitMrRsqHisto( );
   bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
   void Loop();
-  void GetYields();
+  float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
   bool WriteOutput( TString outName = "default" );
   static float GetHggBF( );
 private:
@@ -36,8 +36,7 @@ private:
   bool _info;
   TString processName;
   TString boxName;
-  Yields incYield;
-  Yields signalYield;
+  
   // D e f i n e   B i n n i n g
   //----------------------------
   static int   n_mgg;
