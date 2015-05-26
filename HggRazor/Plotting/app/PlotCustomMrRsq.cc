@@ -62,7 +62,6 @@ int main ( int argc, char* argv[] )
 	  // R e t r i e v i n g  H i s t o
 	  //-------------------------------
 	  f = new TFile( mapList[processName].c_str() );
-	  std::cout << "deb 0" << std::endl;
 	  if ( histoName == "" || histoName == "MrRsqCustom" )
 	    {
 	      h_mr_rsq = (TH2F*)f->Get( "mr_rsq_custom" );
@@ -100,7 +99,22 @@ int main ( int argc, char* argv[] )
 	      TH1F* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
-		  stack->Add( h_s, "histo" );
+		  if ( process != Process::data )
+		    {
+		      stack->Add( h_s, "histo" );
+		      if ( mc == NULL )
+			{
+			  mc = new TH1F( *h );
+			}
+		      else
+			{
+			  mc->Add( h );
+			}
+		    }
+		  else
+		    {
+		      data = h_s;
+		    }
 		  AddLegend( h_s, leg, process );
 		}
 	    }
@@ -110,7 +124,22 @@ int main ( int argc, char* argv[] )
 	      TH1F* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
-		  stack->Add( h_s, "histo" );
+		  if ( process != Process::data )
+		    {
+		      stack->Add( h_s, "histo" );
+		      if ( mc == NULL )
+			{
+			  mc = new TH1F( *h );
+			}
+		      else
+			{
+			  mc->Add( h );
+			}
+		    }
+		  else
+		    {
+		      data = h_s;
+		    }
 		  AddLegend( h_s, leg, process );
 		}
 	    }
@@ -120,7 +149,22 @@ int main ( int argc, char* argv[] )
 	      TH1F* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
-		  stack->Add( h_s, "histo" );
+		  if ( process != Process::data )
+		    {
+		      stack->Add( h_s, "histo" );
+		      if ( mc == NULL )
+			{
+			  mc = new TH1F( *h );
+			}
+		      else
+			{
+			  mc->Add( h );
+			}
+		    }
+		  else
+		    {
+		      data = h_s;
+		    }
 		  AddLegend( h_s, leg, process );
 		}
 	    }

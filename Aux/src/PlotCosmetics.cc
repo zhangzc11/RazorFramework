@@ -12,6 +12,15 @@ const float lumi = 5;
 //Axis
 const float axisTitleSize = 0.06;
 const float axisTitleOffset = .8;
+
+const float axisTitleSizeRatioX   = 0.18;
+const float axisLabelSizeRatioX   = 0.12;
+const float axisTitleOffsetRatioX = 0.84;
+
+const float axisTitleSizeRatioY   = 0.15;
+const float axisLabelSizeRatioY   = 0.108;
+const float axisTitleOffsetRatioY = 0.32;
+
 //Margins
 const float leftMargin   = 0.12;
 const float rightMargin  = 0.05;
@@ -138,8 +147,10 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);
 
-  TPad *pad1 = new TPad("pad1","pad1",0,0.25,1,1);
+  TPad *pad1 = new TPad("pad1","pad1", .0, 0.25, 1., 1.);
   pad1->SetBottomMargin(0);
+  pad1->SetRightMargin( rightMargin );
+  pad1->SetLeftMargin( leftMargin );
   pad1->Draw();
   pad1->cd();
   
@@ -149,34 +160,6 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   s->GetXaxis()->SetTitleOffset( axisTitleOffset );
   s->GetYaxis()->SetTitleSize( axisTitleSize );
   s->GetYaxis()->SetTitleOffset( axisTitleOffset );
-  if( var == "rsq" )
-    {
-      s->GetXaxis()->SetRangeUser(0.0, 1.0);
-      s->GetXaxis()->SetTitle("R^{2}");
-      s->SetMinimum( 1e-1 );
-      s->SetMaximum( 1e1*s->GetMaximum() );
-      s->GetYaxis()->SetTitle("events / 0.04");
-      c->SetLogy();
-      c->Update();
-    }
-  else if ( var == "mr" )
-    {
-      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
-      s->GetXaxis()->SetTitle("M_{R} (GeV)");
-      s->GetYaxis()->SetTitle("events / 100 (GeV)");
-      s->SetMinimum( 1e-1 );
-      s->SetMaximum( 1e1*s->GetMaximum() );
-      c->SetLogy();
-      c->Update();
-    }
-  else if ( var == "mgg" )
-    {
-      s->GetXaxis()->SetRangeUser( 103., 160. );
-      s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1 (GeV)");
-      s->SetMinimum( 0 );
-      s->SetMaximum( 2*s->GetMaximum() );
-    }
     
   if ( leg != NULL )
     {
@@ -193,10 +176,12 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   data->Draw("sameE");
   AddCMS( c );
 
-  TPad *pad2 = new TPad("pad2","pad2",0,0.0,1,0.25);
+  TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.25);
   pad2->SetTopMargin(0);
   pad2->SetTopMargin(0.008);
-  pad2->SetBottomMargin(0.25);
+  pad2->SetBottomMargin(0.35);
+  pad2->SetRightMargin( rightMargin );
+  pad2->SetLeftMargin( leftMargin );
   pad2->SetGridy();
   pad2->Draw();
   pad2->cd();
@@ -206,12 +191,53 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   TH1F* ratio = new TH1F( *data );
   ratio->Divide( mc );
   ratio->SetMarkerStyle( 20 );
+  ratio->GetXaxis()->SetTitleSize( axisTitleSizeRatioX );
+  ratio->GetXaxis()->SetLabelSize( axisLabelSizeRatioX );
+  ratio->GetXaxis()->SetTitleOffset( axisTitleOffsetRatioX );
+  ratio->GetYaxis()->SetTitleSize( axisTitleSizeRatioY );
+  ratio->GetYaxis()->SetLabelSize( axisLabelSizeRatioY );
+  ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0.0, 3.0 );
+  ratio->GetYaxis()->SetRangeUser( 0.25, 3.75 );
   ratio->SetTitle("");
+  ratio->GetYaxis()->SetTitle("data / mc");
+  ratio->GetYaxis()->CenterTitle( true );
+  ratio->GetYaxis()->SetNdivisions( 6, false );
   ratio->SetStats( 0 );
   ratio->Draw("E");
+
+  if( var == "rsq" )
+    {
+      s->GetXaxis()->SetRangeUser(0.0, 1.0);
+      ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
+      s->GetXaxis()->SetTitle("R^{2}");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.04");
+      pad1->SetLogy();
+      pad1->Update();
+      pad2->Update();
+    }
+  else if ( var == "mr" )
+    {
+      //s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      s->GetXaxis()->SetTitle("M_{R} (GeV)");
+      s->GetYaxis()->SetTitle("events / 100 (GeV)");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "mgg" )
+    {
+      s->GetXaxis()->SetRangeUser( 103., 160. );
+      ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->SetMinimum( 0 );
+      s->SetMaximum( 2*s->GetMaximum() );
+    }
+  
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
   delete c;

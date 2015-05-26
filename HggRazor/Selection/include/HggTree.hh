@@ -26,6 +26,7 @@ public :
   UInt_t          run;
   UInt_t          lumi;
   UInt_t          event;
+  bool            trigger;
   Int_t           nLooseBTaggedJets;
   Int_t           nMediumBTaggedJets;
   Int_t           nLooseMuons;
@@ -43,7 +44,7 @@ public :
   Float_t         pTGammaGamma;
   Float_t         pho1E;
   Float_t         pho1Pt;
-  Float_t         Pho1Eta;
+  Float_t         pho1Eta;
   Float_t         pho1Phi;
   Float_t         pho1SigmaIetaIeta;
   Float_t         pho1R9;
@@ -56,7 +57,7 @@ public :
   Bool_t          pho1passIso;
   Float_t         pho2E;
   Float_t         pho2Pt;
-  Float_t         Pho2Eta;
+  Float_t         pho2Eta;
   Float_t         pho2Phi;
   Float_t         pho2SigmaIetaIeta;
   Float_t         pho2R9;
@@ -80,6 +81,7 @@ public :
   TBranch        *b_run;   //!
   TBranch        *b_lumi;   //!
   TBranch        *b_event;   //!
+  TBranch        *b_trigger;   //!
   TBranch        *b_nLooseBTaggedJets;   //!
   TBranch        *b_nMediumBTaggedJets;   //!
   TBranch        *b_nLooseMuons;   //!
@@ -206,6 +208,7 @@ void HggTree::Init(TTree *tree)
   fChain->SetBranchAddress("run", &run, &b_run);
   fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
   fChain->SetBranchAddress("event", &event, &b_event);
+  fChain->SetBranchAddress("trigger", &trigger, &b_trigger);
   fChain->SetBranchAddress("nLooseBTaggedJets", &nLooseBTaggedJets, &b_nLooseBTaggedJets);
   fChain->SetBranchAddress("nMediumBTaggedJets", &nMediumBTaggedJets, &b_nMediumBTaggedJets);
   fChain->SetBranchAddress("nLooseMuons", &nLooseMuons, &b_nLooseMuons);
@@ -223,7 +226,7 @@ void HggTree::Init(TTree *tree)
   fChain->SetBranchAddress("pTGammaGamma", &pTGammaGamma, &b_pTGammaGamma);
   fChain->SetBranchAddress("pho1E", &pho1E, &b_pho1E);
   fChain->SetBranchAddress("pho1Pt", &pho1Pt, &b_pho1Pt);
-  fChain->SetBranchAddress("Pho1Eta", &Pho1Eta, &b_pho1Eta);
+  fChain->SetBranchAddress("pho1Eta", &pho1Eta, &b_pho1Eta);
   fChain->SetBranchAddress("pho1Phi", &pho1Phi, &b_pho1Phi);
   fChain->SetBranchAddress("pho1SigmaIetaIeta", &pho1SigmaIetaIeta, &b_pho1SigmaIetaIeta);
   fChain->SetBranchAddress("pho1R9", &pho1R9, &b_pho1R9);
@@ -236,7 +239,7 @@ void HggTree::Init(TTree *tree)
   fChain->SetBranchAddress("pho1passIso", &pho1passIso, &b_pho1passIso);
   fChain->SetBranchAddress("pho2E", &pho2E, &b_pho2E);
   fChain->SetBranchAddress("pho2Pt", &pho2Pt, &b_pho2Pt);
-  fChain->SetBranchAddress("Pho2Eta", &Pho2Eta, &b_pho2Eta);
+  fChain->SetBranchAddress("pho2Eta", &pho2Eta, &b_pho2Eta);
   fChain->SetBranchAddress("pho2Phi", &pho2Phi, &b_pho2Phi);
   fChain->SetBranchAddress("pho2SigmaIetaIeta", &pho2SigmaIetaIeta, &b_pho2SigmaIetaIeta);
   fChain->SetBranchAddress("pho2R9", &pho2R9, &b_pho2R9);
