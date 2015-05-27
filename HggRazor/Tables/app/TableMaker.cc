@@ -1,6 +1,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <map>
+#include <math.h>
 //ROOT INCLUDES
 #include <TString.h>
 #include <TH1F.h>
@@ -86,7 +87,7 @@ int main ( int argc, char* argv[] )
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
-      std::cout << "[INFO]: Box name: " << boxName << std::endl;
+      
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
@@ -106,14 +107,29 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[WARNING]: Empty selected tree: " << boxName << std::endl;
 	      continue;
 	    }
-	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  std::cout << "[INFO]: Selected events: " << hggclass->GetYields( 400., 0.05, 122., 129. ) << std::endl;
+	  float n_events = hggclass->GetYields( 400., 0.05, 122., 129. );
+	  if ( process == Process::gammaJet ) signalYield.gammaJet = n_events;
+	  if ( process == Process::diphoton ) signalYield.diphoton = n_events;
+	  if ( process == Process::ttH ) signalYield.ttH = n_events;
+	  if ( process == Process::ggH ) signalYield.ggH = n_events;
+	  if ( process == Process::vbfH ) signalYield.vbfH = n_events;
+	  if ( process == Process::vH ) signalYield.vH = n_events;
+	  if ( process == Process::data ) signalYield.data = n_events;
 	  //hggclass->Loop();
 	  //hggclass->WriteOutput( boxName );
 	}
+      std::cout << "[INFO]: Box name: " << boxName << std::endl;
+      std::cout << "gammaJet: " << signalYield.gammaJet << std::endl;
+      std::cout << "diphoton: " << signalYield.diphoton << std::endl;
+      std::cout << "ttH: " << signalYield.ttH << std::endl;
+      std::cout << "ggH: " << signalYield.ggH << std::endl;
+      std::cout << "vH: " << signalYield.vH << std::endl;
+      std::cout << "vbfH: " << signalYield.vbfH << std::endl;
+      std::cout << "data: " << signalYield.data << std::endl;
     }
+
   return 0;
 }

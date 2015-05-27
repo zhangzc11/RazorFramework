@@ -1,5 +1,6 @@
 //C++ INCLUDES
 #include <iostream>
+#include <math.h>
 //ROOT INCLUDES
 //LOCAL INCLUDES
 #include "HggRazorClass.hh"
