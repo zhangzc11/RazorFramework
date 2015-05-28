@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <math.h>
+#include <fstream>
 //ROOT INCLUDES
 #include <TString.h>
 #include <TH1F.h>
@@ -87,7 +88,6 @@ int main ( int argc, char* argv[] )
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
-      
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
@@ -110,7 +110,7 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  float n_events = hggclass->GetYields( 400., 0.05, 122., 129. );
+	  float n_events = hggclass->GetYields( 400., 0.035, 121., 131. );
 	  if ( process == Process::gammaJet ) signalYield.gammaJet = n_events;
 	  if ( process == Process::diphoton ) signalYield.diphoton = n_events;
 	  if ( process == Process::ttH ) signalYield.ttH = n_events;
@@ -121,6 +121,17 @@ int main ( int argc, char* argv[] )
 	  //hggclass->Loop();
 	  //hggclass->WriteOutput( boxName );
 	}
+      std::string tmp_s = boxName+"_yields.txt";
+      std::ofstream ofs ( tmp_s.c_str(), std::fstream::out );
+
+      ofs << "gammaJet: " << signalYield.gammaJet << std::endl;
+      ofs << "diphoton: " << signalYield.diphoton << std::endl;
+      ofs << "ttH: " << signalYield.ttH << std::endl;
+      ofs << "ggH: " << signalYield.ggH << std::endl;
+      ofs << "vH: " << signalYield.vH << std::endl;
+      ofs << "vbfH: " << signalYield.vbfH << std::endl;
+      ofs << "data: " << signalYield.data << std::endl;
+      ofs.close();
       std::cout << "[INFO]: Box name: " << boxName << std::endl;
       std::cout << "gammaJet: " << signalYield.gammaJet << std::endl;
       std::cout << "diphoton: " << signalYield.diphoton << std::endl;
