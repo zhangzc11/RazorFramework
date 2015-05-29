@@ -110,7 +110,7 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  float n_events = hggclass->GetYields( 400., 0.035, 121., 131. );
+	  float n_events = hggclass->GetYields( 350., 0.035, 121., 131. );
 	  if ( process == Process::gammaJet ) signalYield.gammaJet = n_events;
 	  if ( process == Process::diphoton ) signalYield.diphoton = n_events;
 	  if ( process == Process::ttH ) signalYield.ttH = n_events;
@@ -124,13 +124,20 @@ int main ( int argc, char* argv[] )
       std::string tmp_s = boxName+"_yields.txt";
       std::ofstream ofs ( tmp_s.c_str(), std::fstream::out );
 
-      ofs << "gammaJet: " << signalYield.gammaJet << std::endl;
-      ofs << "diphoton: " << signalYield.diphoton << std::endl;
-      ofs << "ttH: " << signalYield.ttH << std::endl;
-      ofs << "ggH: " << signalYield.ggH << std::endl;
-      ofs << "vH: " << signalYield.vH << std::endl;
-      ofs << "vbfH: " << signalYield.vbfH << std::endl;
-      ofs << "data: " << signalYield.data << std::endl;
+      ofs << "\\begin{center}\n";
+      ofs << "\\begin{tabular}{|c|c|}\n";
+      ofs << "\\hline\n";
+      ofs << "process & yield \\\\ \\hline\n";
+      ofs << "gammaJet & " << signalYield.gammaJet << " \\\\ \\hline\n";
+      ofs << "diphoton & " << signalYield.diphoton << "\\\\ \\hline\n";
+      ofs << "ttH & " << signalYield.ttH << "\\\\ \\hline\n";
+      ofs << "ggH & " << signalYield.ggH << "\\\\ \\hline\n";
+      ofs << "vH & " << signalYield.vH << "\\\\ \\hline\n";
+      ofs << "vbfH &" << signalYield.vbfH << "\\\\ \\hline\n";
+      ofs << "observed &" << signalYield.data << "\\\\ \\hline\n";
+      ofs << "\\end{tabular}\n";
+      ofs << "\\end{center}\n";
+      
       ofs.close();
       std::cout << "[INFO]: Box name: " << boxName << std::endl;
       std::cout << "gammaJet: " << signalYield.gammaJet << std::endl;
