@@ -165,10 +165,10 @@ float HggRazorClass::GetYields( float mr, float rsq, float mgg_l, float mgg_h )
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
-      if (  MR > mr && Rsq > rsq
+      if (  MR > mr && t1Rsq > rsq
 	    && mGammaGamma > mgg_l && mGammaGamma < mgg_h
 	    && fabs( pho1Eta ) < 1.48 && fabs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt > 25.
-	    && ( pho1Pt > 40. && pho2Pt > 40. ) && pTGammaGamma > 20. )
+	    && ( pho1Pt > 40. || pho2Pt > 40. ) && pTGammaGamma > 20. )
 	{
 	  sel_events += xsecSF;
 	}

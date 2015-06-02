@@ -44,7 +44,7 @@ float HggRazorClass::rsq_h = 5.0;
 
 std::string plots[TYPES] = { "mgg", "ptgg", "mr", "rsq" };
 
-TString cut = "MR > 150.0 && Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString cut = "MR > 150.0 && Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20.";
 //TString cut = "MR > 150.0 && t1Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
@@ -117,15 +117,17 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  float n_events = hggclass->GetYields( 350., 0.035, 121., 131. );
+	  float n_events = hggclass->GetYields( 150., 0.05, 122., 129. );
 	  //13/8TeV R A T I O S (remove if running @ 8 TeV)
-	  n_events *= 0.2525252525;
+	  //n_events *= 0.2525252525;
+	  /*
 	  if ( process == Process::gammaJet || process == Process::diphoton || process == Process::qcd )
 	    {
 	      if ( box == Boxes::HighPt ) n_events *= 9.688840e-01;
 	      if ( box == Boxes::HighRes ) n_events *= 6.244856e-01;
 	      if ( box == Boxes::LowRes ) n_events *= 6.361398e-01;
 	    }
+	  */
 	  if ( process == Process::gammaJet ) signalYield.gammaJet = n_events;
 	  if ( process == Process::diphoton ) signalYield.diphoton = n_events;
 	  if ( process == Process::ttH ) signalYield.ttH = n_events;
