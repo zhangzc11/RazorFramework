@@ -14,7 +14,7 @@ CPPFLAGS += -g -std=c++11
 
 TARGET = MakeFit
 
-SRC = app/testapp.cc src/makeInvertedANFit_v2.cc
+SRC = app/testapp.cc src/makeInvertedANFit_v2.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ = $(SRC:.cc=.o)
 
