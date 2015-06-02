@@ -30,6 +30,10 @@
 
 #include <vector>
 
+//LOCAL INCLUDES
+#include "makeInvertedANFit_v2.hh"
+
+/*
 TString makeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makeSingleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makeTripleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
@@ -38,7 +42,7 @@ TString makeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w);
-
+*/
 const int nTags=8;
 TString alltags[nTags] = {"dexp","sexp","texp","mexp","spow","dpow","pol2","pol3"};
 
@@ -116,7 +120,7 @@ RooWorkspace* makeInvertedANFit(TTree* tree, float forceSigma=-1, bool constrain
     RooFIter iter = vars->fwdIterator();
     RooAbsArg* a;
     while( (a = iter.next()) ){
-      if(string(a->GetName()).compare(mggName.Data())==0) continue;
+      if(std::string(a->GetName()).compare(mggName.Data())==0) continue;
       static_cast<RooRealVar*>(a)->setConstant(kTRUE);
     }
 
