@@ -33,16 +33,7 @@
 //LOCAL INCLUDES
 #include "makeInvertedANFit_v2.hh"
 
-/*
-TString makeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makeSingleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makeTripleExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w);
-TString makePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w);
-*/
+
 const int nTags=8;
 TString alltags[nTags] = {"dexp","sexp","texp","mexp","spow","dpow","pol2","pol3"};
 
@@ -435,4 +426,17 @@ TString makePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w) {
   w.import(*(new RooExtendPdf(tag+"_pol3_ext","",*bern,*Nbkg)));
 
   return "pol3";
+}
+
+TString makeGauss(TString tag, RooRealVar& mgg,RooWorkspace& w) {
+  RooRealVar* mu = new RooRealVar( tag+"_gauss_mu", "#mu", 125, 100., 160. );
+  RooRealVar* sigma = new RooRealVar( tag+"_gauss_sigma", "#sigma", 1.5, .0, 50. );
+  
+  RooRealVar* Nbkg   = new RooRealVar( tag+"_gauss_Nbkg", "N_{bkg}", 10, 1, 1E9 );
+
+  RooGaussian* gauss = new RooGaussian( tag+"_gauss", "", mgg, *mu, *sigma );
+
+  w.import( *( new RooExtendPdf( tag+"_gaus_ext", "", *gauss, *Nbkg ) ) );
+
+  return "gauss";
 }

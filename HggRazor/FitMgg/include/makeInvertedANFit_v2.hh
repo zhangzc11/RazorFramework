@@ -17,6 +17,7 @@ TString makeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString makePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString makeGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );
 
 RooWorkspace* makeInvertedANFit(TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
   
