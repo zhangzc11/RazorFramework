@@ -16,6 +16,12 @@ int main( int argc, char* argv[])
       return -1;
     }
 
+  std::string inputFile2 = ParseCommandLine( argc, argv, "-inputFile2=" );
+  if (  inputFile2 == "" )
+    {
+      std::cerr << "[INFO]: using a single root file, provide an second input file using --inputFile2=<path_to_file>" << std::endl;
+    }
+
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
   if (  treeName == "" )
     {
@@ -48,6 +54,14 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
   TFile* f = new TFile( inputFile.c_str() , "update");
   TTree* tree = (TTree*)f->Get( treeName.c_str() );
+
+ 
+  TTree* mc_tree;
+  if ( inputFile2 != "" )
+    {
+      f = new TFile( inputFile2.c_str(), "update" );
+      mc_tree = (TTree*)f->Get( treeName.c_str() );
+    }
   TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20";
   cut = cut + " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
 
@@ -56,6 +70,7 @@ int main( int argc, char* argv[])
   float forceMu    = -1;
   TString mggName  = "mGammaGamma";
   RooWorkspace* w;
+  RooWorkspace* w2;
   if ( dataMode == "data" )
     {
       w = makeInvertedANFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
@@ -64,19 +79,21 @@ int main( int argc, char* argv[])
     {
       w = makeMCFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
     }
+  else if ( dataMode == "hybrid" && inputFile2 != "" )
+    {
+      w = makeInvertedANFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      w2 = makeMCFit( mc_tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+    }
   else
     {
       std::cout << "[ERROR]: please provide a valid dataMode, i.e data or mc" << std::endl;
       return -1;
     }
 
-  std::cout << "test0" << std::endl;
   TFile* fout = new TFile( "test_out.root", "recreate" );
-  std::cout << "test1" << std::endl;
-  w->Write("myws");
-  std::cout << "test2" << std::endl;
+  w->Write("w1");
+  w2->Write("w2");
   fout->Close();
-  std::cout << "test3" << std::endl;
-  
+    
   return 0;	
 }
