@@ -46,7 +46,7 @@ int main( int argc, char* argv[])
   
   std::cout << "[INFO]: tree name is :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
-  TFile* f = new TFile( inputFile.c_str() );
+  TFile* f = new TFile( inputFile.c_str() , "update");
   TTree* tree = (TTree*)f->Get( treeName.c_str() );
   TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20";
   cut = cut + " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
