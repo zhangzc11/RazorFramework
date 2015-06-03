@@ -75,8 +75,13 @@ RooWorkspace* makeMCFit( TTree* tree, float forceSigma, bool constrainMu, float 
   ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   //  fitModel.plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   //fitModel.plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("signal"),RooFit::NormRange("signal"));
-  fmgg->SetName(tag+"_frame");
-  ws->import(*fmgg);
+  fmgg->SetName( tag + "_frame" );
+  ws->import( *fmgg );
+
+   RooPlot* pdfFrame = mgg.frame();
+   ws->pdf( tag3 )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
+   pdfFrame->SetName( tag+"_pdfframe" );
+   ws->import( *pdfFrame );
   
   return ws;
 };
