@@ -12,7 +12,8 @@
 #include "TChainTools.hh"
 #include "HggAux.hh"
 
-const float lumi = 19.8e3;
+//const float lumi = 19.8e3;
+const float lumi = 5.0e3;  
 
 int main ( int argc, char* argv[] )
 {

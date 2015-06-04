@@ -196,3 +196,34 @@ float HggRazorClass::GetHggBF( )
 {
   return hggBF;
 };
+
+TH1F HggRazorClass::GetMr()
+{
+  return *h_mr;
+};
+
+TH1F HggRazorClass::GetRsq()
+{
+  return *h_rsq;
+};
+
+TH1F HggRazorClass::GetMgg()
+{
+  return *h_mgg;
+};
+
+TH1F HggRazorClass::GetPtgg()
+{
+  return *h_ptgg;
+};
+
+TH1F HggRazorClass::GetHisto( HistoTypes htype )
+{
+  TH1F h;
+  if ( htype == HistoTypes::mr )   return *h_mr;
+  if ( htype == HistoTypes::rsq )  return *h_rsq;
+  if ( htype == HistoTypes::mgg )  return *h_mgg;
+  if ( htype == HistoTypes::ptgg ) return *h_ptgg;
+
+  return h;
+};

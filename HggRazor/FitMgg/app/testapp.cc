@@ -52,9 +52,19 @@ int main( int argc, char* argv[])
   
   std::cout << "[INFO]: tree name is :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
-  TFile* f = new TFile( inputFile.c_str() , "update");
-  TTree* tree = (TTree*)f->Get( treeName.c_str() );
 
+  TTree* tree;
+  TFile* f;
+  if ( dataMode == "data" )
+    {
+      f = new TFile( inputFile.c_str() );
+      tree = (TTree*)f->Get( treeName.c_str() );
+    }
+  else if ( dataMode == "mc" )
+    {
+      f = new TFile( inputFile.c_str() , "update");
+      tree = (TTree*)f->Get( treeName.c_str() );
+    }
  
   TTree* mc_tree;
   if ( inputFile2 != "" )

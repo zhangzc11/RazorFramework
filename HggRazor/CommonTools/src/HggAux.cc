@@ -15,6 +15,32 @@ Process operator*( Process process ){ return process; };
 Process begin( Process process ){ return Process::gammaJet; };
 Process end( Process process ){ return Process::Last; };
 
+HistoTypes& operator++( HistoTypes& htype ){ return htype = (HistoTypes)( std::underlying_type<HistoTypes>::type( htype ) + 1 ); };
+HistoTypes operator*( HistoTypes htype ){ return htype; };
+HistoTypes begin( HistoTypes htype ){ return HistoTypes:: mr; };
+HistoTypes end( HistoTypes htype ){ return HistoTypes::Last; };
+
+bool Histos::AssignHisto( HistoTypes htype, TH1F h )
+{
+  if ( htype == HistoTypes::mr ) mr = h;
+  if ( htype == HistoTypes::rsq ) rsq = h;
+  if ( htype == HistoTypes::mgg ) mgg = h;
+  if ( htype == HistoTypes::ptgg ) ptgg = h;
+
+  return true;
+};
+
+TH1F Histos::GetHisto( HistoTypes htype )
+{
+  TH1F h;
+  if ( htype == HistoTypes::mr ) return mr;
+  if ( htype == HistoTypes::rsq ) return rsq;
+  if ( htype == HistoTypes::mgg ) return mgg;
+  if ( htype == HistoTypes::ptgg ) return ptgg;
+  
+  return h;
+};
+
 std::string GetBoxString( Boxes box )
 {
   if ( box == Boxes::HighPt )
@@ -83,6 +109,31 @@ std::string GetProcessString( Process process )
       std::cerr << "[ERROR]: Process not found" << std::endl;
     }
   return "";
+};
+
+std::string GetHistoTypesString( HistoTypes htype )
+{
+if ( htype == HistoTypes::mr )
+  {
+      return "mr";
+    }
+  else if ( htype == HistoTypes::rsq )
+    {
+      return "rsq";
+    }
+  else if ( htype == HistoTypes::mgg )
+    {
+      return "mgg";
+    }
+  else if ( htype == HistoTypes::ptgg )
+    {
+      return "ptgg";
+    }
+  else
+    {
+      std::cerr << "[ERROR]: Htype not found" << std::endl;
+    }
+ return "";
 };
 
 //Fill map with input lists

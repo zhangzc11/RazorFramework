@@ -27,6 +27,11 @@ public:
   void Loop();
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
   bool WriteOutput( TString outName = "default" );
+  TH1F GetMr();
+  TH1F GetRsq();
+  TH1F GetMgg();
+  TH1F GetPtgg();
+  TH1F GetHisto( HistoTypes htype );
   static float GetHggBF( );
 private:
 

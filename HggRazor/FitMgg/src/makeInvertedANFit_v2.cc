@@ -47,40 +47,28 @@ RooWorkspace* makeMCFit( TTree* tree, float forceSigma, bool constrainMu, float 
   mgg.setBins(38);
   mgg.setRange("sideband_low", 103,120);
   mgg.setRange("sideband_high",131,160);
-  mgg.setRange("signal",110,140);
+  mgg.setRange("signal",115,135);
 
-  RooRealVar w( "xsecSF", "w", 0, 100 );
+  RooRealVar w( "xsecSF", "w", 0, 10000 );
 
-  TString tag  = makeGauss( "mc_g1", mgg, *ws );
-  TString tag2 = makeGauss( "mc_g2", mgg, *ws );
   TString tag3 = makeDoubleGauss( "mc_dg", mgg, *ws );
-  RooAddPdf fitModel( "fitModel", "fitModel", RooArgList( *(ws->pdf( tag )), *(ws->pdf( tag2 )) ) );
-  std::cout << "tag: " << tag << std::endl;
   //RooDataSet data( "data", "", tree, RooArgSet(mgg) );
   RooDataSet data( "data", "", RooArgSet(mgg, w), RooFit::WeightVar(w), RooFit::Import(*tree) );
-  //  data.setWeightVar( w );
-  //ws->pdf( tag )->fitTo(data,RooFit::Strategy(0),RooFit::Extended(kTRUE),RooFit::Range("Full"));
-  //RooFitResult* bres = ws->pdf( tag )->fitTo(data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   ws->pdf( tag3 )->fitTo(data,RooFit::Strategy(0),RooFit::Extended(kTRUE),RooFit::Range("signal"));
   RooFitResult* bres = ws->pdf( tag3 )->fitTo(data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("signal") );
-  //fitModel.fitTo(data,RooFit::Strategy(0),RooFit::Extended(kTRUE),RooFit::Range("signal"));
-  //RooFitResult* bres = fitModel.fitTo(data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("signal") );
-  
-  bres->SetName( tag+"_b_fitres" );
+    
+  bres->SetName( tag3 + "_b_fitres" );
   ws->import( *bres );
 
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
-  //ws->pdf( tag )->plotOn(fmgg, RooFit::LineColor(kViolet), RooFit::Range("signal"),RooFit::NormRange("signal") );
   ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
-  //  fitModel.plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
-  //fitModel.plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("signal"),RooFit::NormRange("signal"));
-  fmgg->SetName( tag + "_frame" );
+  fmgg->SetName( tag3 + "_frame" );
   ws->import( *fmgg );
 
    RooPlot* pdfFrame = mgg.frame();
    ws->pdf( tag3 )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
-   pdfFrame->SetName( tag+"_pdfframe" );
+   pdfFrame->SetName( tag3+"_pdfframe" );
    ws->import( *pdfFrame );
   
   return ws;
@@ -491,13 +479,13 @@ TString makeGauss(TString tag, RooRealVar& mgg,RooWorkspace& w) {
 
 TString makeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* mu = new RooRealVar( tag+"_gauss_mu", "#mu", 125, 120., 135. );
-  RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 1.0, .0, 50. );
-  RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 1.0, .0, 50. );
+  RooRealVar* mu = new RooRealVar( tag+"_gauss_mu", "#mu", 125, 0., 1000. );
+  RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 1.0, .0, 5000. );
+  RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 1.0, .0, 5000. );
   
   RooRealVar* frac = new RooRealVar( tag+"_frac", "frac", 0.5, .0, 1.0 );
   
-  RooRealVar* Nbkg   = new RooRealVar( tag+"_gauss_Nbkg", "N_{bkg}", 100, 0.0, 1E9 );
+  RooRealVar* Nbkg   = new RooRealVar( tag+"_gauss_Nbkg", "N_{bkg}", 1, 1e-10, 1e8 );
 
   RooGaussian* gauss1 = new RooGaussian( tag+"_gauss1", "", mgg, *mu, *sigma1 );
   RooGaussian* gauss2 = new RooGaussian( tag+"_gauss2", "", mgg, *mu, *sigma2 );

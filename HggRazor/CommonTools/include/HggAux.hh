@@ -6,6 +6,7 @@
 //ROOT INCLUDES
 #include <TString.h>
 #include <TLegend.h>
+#include <TH1F.h>
 //LOCAL INCLUDES
 
 
@@ -37,8 +38,26 @@ Process begin( Process process );
 Process end( Process process );
 Process& operator++( Process& process );
 Process operator*( Process process );
-
 std::string GetProcessString( Process process );
+
+enum class HistoTypes{ mr, rsq, mgg, ptgg, Last};
+HistoTypes begin( HistoTypes htype );
+HistoTypes end( HistoTypes htype );
+HistoTypes& operator++( HistoTypes& htype );
+HistoTypes operator*( HistoTypes htype );
+
+std::string GetHistoTypesString( HistoTypes htype );
+
+struct Histos
+{
+  Process process;
+  TH1F mr;
+  TH1F rsq;
+  TH1F mgg;
+  TH1F ptgg;
+  bool AssignHisto( HistoTypes htype, TH1F h );
+  TH1F GetHisto( HistoTypes htype );
+};
 
 bool FillMapList( std::map< std::string, std::string >& thisMap, std::string inputList );
 #endif
