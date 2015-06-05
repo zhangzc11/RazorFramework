@@ -14,7 +14,7 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 57;
+int HggRazorClass::n_mgg = 38;
 float HggRazorClass::mgg_l = 103.;
 float HggRazorClass::mgg_h = 160.;
 /*
@@ -54,7 +54,7 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-TString cut = "MR > 250.0 && Rsq > 0.04 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString cut = "MR > 350.0 && t1Rsq > 0.035 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. && pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
 
@@ -119,6 +119,7 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[INFO]: run2 will skip data category" << std::endl;
 	      continue;
 	    }
+	  //if ( process == Process::qcd ) continue;
 	  std::cout << "====================================" << std::endl;
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  std::cout << "====================================" << std::endl;
@@ -169,6 +170,8 @@ int main ( int argc, char* argv[] )
       //Plotting
       for ( const auto& htmp : HistoTypes() )
 	{
+	  std::string histoName = GetHistoTypesString( htmp );
+	  std::cout << "making " <<  histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.95, 0.89, NULL, "brNDC" );
 	  for (  int i  = 0; i < nprocesses; i++ )
@@ -184,6 +187,7 @@ int main ( int argc, char* argv[] )
 		  stack->Add( h_s, "histo" );
 		  if ( mc == NULL )
 		    {
+		      std::cout << "creating mc" << std::endl;
 		      mc = new TH1F( *h_s );
 		    }
 		  else
@@ -194,13 +198,12 @@ int main ( int argc, char* argv[] )
 	      std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
 	      AddLegend( h_s, leg, histos[i].process );
 	    }
-	  std::string histoName = GetHistoTypesString( htmp );
-	  std::cout << "making " <<  histoName << std::endl;
 	  MakeStackPlot( stack, data, mc, histoName, histoName + "_" + boxName, leg );
 	  std::cout << "leaving " <<  histoName << std::endl;
 	  delete leg;
 	  delete stack;
 	  delete mc;
+	  mc = NULL;
 	  delete data;
 	}
     }
