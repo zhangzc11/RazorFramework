@@ -2,8 +2,8 @@
   gROOT->Reset();
 
   const int nhistos = 3;
-  TString treeName = "HighRes";
-  TString cut = "xsecSF*(MR > 200.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.)";
+  TString treeName = "HighPt";
+  TString cut = "xsecSF*(MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.)";
   
   TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJet_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6_Normalized.root");
   TTree* t0 = (TTree*)f0->Get( treeName );
@@ -24,9 +24,11 @@
   h_t1[0] = (TH1F*)gDirectory->Get("t1_mr");
   h_t1[1] = (TH1F*)gDirectory->Get("t1_rsq");
   h_t1[2] = (TH1F*)gDirectory->Get("t1_mgg");
-
-  std::cout << "Box: " << treeName << ", mr 13TeV/8TeV: " <<   h_t1[0]->Integral()/h_t0[0]->Integral() << std::endl;
-
+  
+  double n0, n1, err0, err1;
+  n0 = h_t0[2]->IntegralAndError( 1, h_t0[2]->GetNbinsX(), err0, "" );
+  n1 = h_t1[2]->IntegralAndError( 1, h_t1[2]->GetNbinsX(), err1, "" );
+  std::cout << "Box: " << treeName << ", mgg 13TeV/8TeV -> " <<   n1/n0 << " \\pm " << (n1/n0)*sqrt( err1*err1/(n1*n1) + err0*err0/(n0*n0) ) <<  std::endl;
   //Normalizing to unit integral;
   for (  int i = 0; i < nhistos; i++ )
     {
@@ -42,12 +44,28 @@
       h_t1[i]->SetMarkerColor( kBlue );
     }
 
-  h_t0[2]->SetTitle("");
-  h_t0[2]->SetXTitle("m_{#gamma#gamma} (GeV)");
+  const int i_histo = 2;
+  h_t0[i_histo]->SetTitle("");
+  h_t0[i_histo]->GetXaxis()->SetTitleSize( 0.06 );
+  h_t0[i_histo]->GetXaxis()->SetTitleOffset( 0.7 );
+  h_t0[i_histo]->SetXTitle("m_{#gamma#gamma} (GeV)");
 
-  h_t0[2]->SetYTitle("a.u");
-  h_t0[2]->Draw();
-  h_t0[2]->GetYaxis()->SetRangeUser(0.0, 2.0*h_t0[2]->GetMaximum() );
-  h_t1[2]->Draw("same");
+  h_t0[i_histo]->GetYaxis()->SetTitleSize( 0.06 );
+  h_t0[i_histo]->GetYaxis()->SetTitleOffset( 0.8 );
+  h_t0[i_histo]->SetYTitle("a.u");
+  h_t0[i_histo]->Draw();
+  h_t0[i_histo]->GetYaxis()->SetRangeUser(0.0, 2.0*h_t0[2]->GetMaximum() );
+  h_t1[i_histo]->Draw("same");
+
+  TLegend* leg = new TLegend( 0.7, 0.58, 0.89, 0.89, NULL, "brNDC" );
+  leg->SetBorderSize(0);
+  leg->SetLineColor(1);
+  leg->SetLineStyle(1);
+  leg->SetLineWidth(1);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(1001);
+  leg->AddEntry( h_t0[i_histo], "8 TeV", "lep" );
+  leg->AddEntry( h_t1[i_histo], "13 TeV", "lep" );
+  leg->Draw();
   
 }
