@@ -30,8 +30,8 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-//TString lumiText = "5 fb^{-1} (13 TeV)";
-TString lumiText = "19.8 fb^{-1} (8 TeV)";
+TString lumiText = "5 fb^{-1} (13 TeV)";
+//TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
 {
@@ -100,7 +100,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
     {
       s->GetXaxis()->SetRangeUser(0.0, 2000.0);
       s->GetXaxis()->SetTitle("M_{R} (GeV)");
-      s->GetYaxis()->SetTitle("events / 100 (GeV)");
+      s->GetYaxis()->SetTitle("events / 50 (GeV)");
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1e1*s->GetMaximum() );
       c->SetLogy();
@@ -110,9 +110,19 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
     {
       s->GetXaxis()->SetRangeUser( 103., 160. );
       s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );
       s->SetMaximum( 2*s->GetMaximum() );
+    }
+  else if ( var == "ptgg" )
+    {
+      //s->GetXaxis()->SetRangeUser( 103., 160. );
+      s->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      c->SetLogy();
+      c->Update();
     }
     
   if ( leg != NULL )
@@ -224,7 +234,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
       s->GetXaxis()->SetRangeUser(0.0, 2000.0);
       ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
       s->GetXaxis()->SetTitle("M_{R} (GeV)");
-      s->GetYaxis()->SetTitle("events / 100 (GeV)");
+      s->GetYaxis()->SetTitle("events / 50 (GeV)");
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1e1*s->GetMaximum() );
       pad1->SetLogy();
@@ -234,9 +244,18 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       s->GetXaxis()->SetRangeUser( 103., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );
       s->SetMaximum( 2*s->GetMaximum() );
+    }
+  else if ( var == "ptgg" )
+    {
+      s->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
     }
   
   c->SaveAs( outName+".pdf" );

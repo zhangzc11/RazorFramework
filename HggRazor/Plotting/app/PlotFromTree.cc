@@ -26,7 +26,7 @@ int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
 
-int HggRazorClass::n_mr = 80;
+int HggRazorClass::n_mr = 160;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
 
@@ -54,7 +54,10 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-TString cut = "MR > 350.0 && t1Rsq > 0.035 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. && pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015";
+//TString cut = "MR > 350.0 && t1Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
+
+TString cut = "MR > 350.0 && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
 
@@ -104,7 +107,7 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc;
 
-  const int nprocesses = 8;
+  const int nprocesses = 4;
   const int nplots = 4;
   for( const auto& box : Boxes() )
     {
@@ -120,6 +123,7 @@ int main ( int argc, char* argv[] )
 	      continue;
 	    }
 	  //if ( process == Process::qcd ) continue;
+	  if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
 	  std::cout << "====================================" << std::endl;
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  std::cout << "====================================" << std::endl;
@@ -164,7 +168,7 @@ int main ( int argc, char* argv[] )
 	  histos[ctr].process = process;
 	  for ( const auto& htmp : HistoTypes() ) histos[ctr].AssignHisto( htmp, hggclass->GetHisto( htmp ) );
 	  ctr++;
-	  hggclass->WriteOutput( boxName );
+	  //hggclass->WriteOutput( boxName );
 	  //Cosmetics
 	}
       //Plotting
@@ -174,37 +178,52 @@ int main ( int argc, char* argv[] )
 	  std::cout << "making " <<  histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.95, 0.89, NULL, "brNDC" );
+	  bool _isFirstMC = true;
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
+	      std::cout << "DEB "<< std::endl;
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
+	      std::cout << "DEB "<< std::endl;
 	      TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
+	      std::cout << "DEB "<< std::endl;
 	      if ( histos[i].process == Process::data )
 		{
+		  std::cout << "DEBdata "<< std::endl;
 		  data = new TH1F ( *h_s ); 
 		}
 	      else
 		{
 		  stack->Add( h_s, "histo" );
-		  if ( mc == NULL )
+		  if ( mc == NULL || _isFirstMC )
 		    {
 		      std::cout << "creating mc" << std::endl;
 		      mc = new TH1F( *h_s );
+		      _isFirstMC = false;
 		    }
 		  else
 		    {
+		      std::cout << "DEBmc "<< std::endl;
 		      mc->Add( h_s );
 		    }
 		}
 	      std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
 	      AddLegend( h_s, leg, histos[i].process );
 	    }
-	  MakeStackPlot( stack, data, mc, histoName, histoName + "_" + boxName, leg );
+	  if ( run == "run2" )
+	    {
+	      MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive", leg );
+	    }
+	  else
+	    {
+	      //MakeStackPlot( stack, data, mc, histoName, "plots/8TeV/" + histoName + "_" + boxName + "_Mr250_Rsq0p035", leg );
+	      MakeStackPlot( stack, data, mc, histoName, "plots/8TeV/" + histoName + "_" + boxName + "_Inclusive", leg );
+	    }
 	  std::cout << "leaving " <<  histoName << std::endl;
 	  delete leg;
 	  delete stack;
 	  delete mc;
-	  mc = NULL;
-	  delete data;
+	  //mc = NULL;
+	  if ( run != "run2" ) delete data;
 	}
     }
   return 0;
