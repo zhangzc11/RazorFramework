@@ -109,7 +109,7 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc;
 
-  const int nprocesses = 6;
+  const int nprocesses = 4;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 0.253; // (5./19.8)
@@ -129,7 +129,7 @@ int main ( int argc, char* argv[] )
 	      continue;
 	    }
 	  if ( process == Process::qcd ) continue;
-	  //if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
+	  if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
 	  std::cout << "====================================" << std::endl;
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  std::cout << "====================================" << std::endl;
