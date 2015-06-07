@@ -44,7 +44,7 @@ float HggRazorClass::rsq_h = 5.0;
 
 std::string plots[TYPES] = { "mgg", "ptgg", "mr", "rsq" };
 
-TString cut = "MR > 150.0 && Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20.";
+TString cut = "MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20.";
 //TString cut = "MR > 150.0 && t1Rsq > 0.01 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
@@ -57,7 +57,11 @@ struct FullBkg
   TH1F* ttH;
   TH1F* gammaJet;
 };
-  
+
+float hpt_k[2]  = { 0.89, 1.03};
+float hres_k[2] = { 0.57, 0.67};
+float lres_k[2] = { 0.58, 0.77};
+
 int main ( int argc, char* argv[] )
 {
   //std::cout.unsetf ( std::ios::floatfield );
@@ -75,6 +79,20 @@ int main ( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
+
+   std::string run = ParseCommandLine( argc, argv, "-run=" );
+  if (  run == "" )
+    {
+      std::cout << "[WARNING]: please provide a valid run, use --run=<run1/run2>" << std::endl;
+      run = "run1";
+    }
+
+  std::cout << "=================================" << std::endl;
+  std::cout << "===========set parameters========" << std::endl;
+  std::cout << "[INFO]: input file: " << inputFile << std::endl;
+  std::cout << "[INFO]: run: " << run << std::endl;
+  std::cout << "=================================" << std::endl;
+  
   FillMapList( mapList, inputFile );
   if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
   
@@ -91,13 +109,34 @@ int main ( int argc, char* argv[] )
   
   Yields incYield;
   Yields signalYield;
-
+  
+  double k_f = 1.0;
+  const double lumi_frac = 0.253; // (5./19.8)
+  const int mod = 1; 
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
+	  if ( process == Process::data && run == "run2" )
+	    {
+	      std::cout << "[INFO]: run2 will skip data category" << std::endl;
+	      continue;
+	    }
+	  if ( process == Process::qcd ) continue;
+	  //if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
+	  std::cout << "====================================" << std::endl;
+	  std::cout << "[INFO]: process name: " << processName << std::endl;
+	  std::cout << "====================================" << std::endl;
+	  if ( run == "run2" && (process == Process::gammaJet || process == Process::diphoton || process == Process::qcd) )
+	    {
+	      //13/8 TeV
+	      k_f = hres_k[mod]*lumi_frac;
+	      if ( box == Boxes::HighPt ) k_f = hpt_k[mod]*lumi_frac;
+	      if ( box == Boxes::LowRes ) k_f = lres_k[mod]*lumi_frac;
+	    }
+	  
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
@@ -117,7 +156,7 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  float n_events = hggclass->GetYields( 150., 0.05, 122., 129. );
+	  float n_events = hggclass->GetYields( 0., 0.0, 122., 129. );
 	  //13/8TeV R A T I O S (remove if running @ 8 TeV)
 	  //n_events *= 0.2525252525;
 	  /*

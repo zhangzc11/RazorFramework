@@ -58,7 +58,7 @@ float lres_k[2] = { 0.58, 0.77};
 //-----------------------------------
 //TString cut = "MR > 350.0 && t1Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
 
-TString cut = "MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
+TString cut = "MR > 250.0 && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
 
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
@@ -109,11 +109,11 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc;
 
-  const int nprocesses = 4;
+  const int nprocesses = 6;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 0.253; // (5./19.8)
-  const int mod = 0; 
+  const int mod = 1; 
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
@@ -129,7 +129,7 @@ int main ( int argc, char* argv[] )
 	      continue;
 	    }
 	  if ( process == Process::qcd ) continue;
-	  if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
+	  //if ( process == Process::qcd || process == Process::gammaJet || process == Process::diphoton ) continue;
 	  std::cout << "====================================" << std::endl;
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  std::cout << "====================================" << std::endl;
@@ -231,7 +231,10 @@ int main ( int argc, char* argv[] )
 	    }
 	  if ( run == "run2" )
 	    {
-	      MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive", leg );
+	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
+	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant", leg );
+	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
+	      MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant_mod1", leg );
 	    }
 	  else
 	    {
