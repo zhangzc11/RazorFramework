@@ -122,6 +122,8 @@ int main ( int argc, char* argv[] )
 	  if ( process == Process::data && run == "run2" )
 	    {
 	      std::cout << "[INFO]: run2 will skip data category" << std::endl;
+	      signalYield.data[0] = 0.0;
+	      signalYield.data[1] = 0.0;
 	      continue;
 	    }
 	  if ( process == Process::qcd ) continue;
@@ -129,6 +131,7 @@ int main ( int argc, char* argv[] )
 	  std::cout << "====================================" << std::endl;
 	  std::cout << "[INFO]: process name: " << processName << std::endl;
 	  std::cout << "====================================" << std::endl;
+	  k_f = 1.0;
 	  if ( run == "run2" && (process == Process::gammaJet || process == Process::diphoton || process == Process::qcd) )
 	    {
 	      //13/8 TeV
@@ -156,27 +159,59 @@ int main ( int argc, char* argv[] )
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
 	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  float n_events = hggclass->GetYields( 0., 0.0, 122., 129. );
-	  //13/8TeV R A T I O S (remove if running @ 8 TeV)
-	  //n_events *= 0.2525252525;
-	  /*
-	  if ( process == Process::gammaJet || process == Process::diphoton || process == Process::qcd )
+	  double err;
+	  float n_events = hggclass->GetYields( 250.0, 0.05, 121., 129., err );
+	  n_events *= k_f;
+	  
+	  //[0] -> yields, [1] -> error
+	  if ( process == Process::gammaJet )
 	    {
-	      if ( box == Boxes::HighPt ) n_events *= 9.688840e-01;
-	      if ( box == Boxes::HighRes ) n_events *= 6.244856e-01;
-	      if ( box == Boxes::LowRes ) n_events *= 6.361398e-01;
+	      signalYield.gammaJet[0] = n_events;
+	      signalYield.gammaJet[1] = err;
 	    }
-	  */
-	  if ( process == Process::gammaJet ) signalYield.gammaJet = n_events;
-	  if ( process == Process::diphoton ) signalYield.diphoton = n_events;
-	  if ( process == Process::ttH ) signalYield.ttH = n_events;
-	  if ( process == Process::ggH ) signalYield.ggH = n_events;
-	  if ( process == Process::vbfH ) signalYield.vbfH = n_events;
-	  if ( process == Process::vH ) signalYield.vH = n_events;
-	  if ( process == Process::data ) signalYield.data = n_events;
+	  if ( process == Process::diphoton )
+	    {
+	      signalYield.diphoton[0] = n_events;
+	      signalYield.diphoton[1] = err;
+	    }
+	  if ( process == Process::ttH )
+	    {
+	      signalYield.ttH[0] = n_events;
+	      signalYield.ttH[1] = err;
+	    }
+	  if ( process == Process::ggH )
+	    {
+	      signalYield.ggH[0] = n_events;
+	      signalYield.ggH[1] = err;
+	    }
+	  if ( process == Process::vbfH )
+	    {
+	      signalYield.vbfH[0] = n_events;
+	      signalYield.vbfH[1] = err;
+	    }
+	  if ( process == Process::vH )
+	    {
+	      signalYield.vH[0] = n_events;
+	      signalYield.vH[1] = err;
+	    }
+	  if ( process == Process::data )
+	    {
+	      signalYield.data[0] = n_events;
+	      signalYield.data[1] = err;
+	    }
 	  //hggclass->Loop();
 	  //hggclass->WriteOutput( boxName );
 	}
+      double nonRes[2];
+      double Res[2];
+      double totalMC[2];
+      nonRes[0] = signalYield.gammaJet[0] + signalYield.diphoton[0];
+      nonRes[1] = sqrt( signalYield.gammaJet[1]*signalYield.gammaJet[1] + signalYield.diphoton[1]*signalYield.diphoton[1] );
+      Res[0] = signalYield.ggH[0] + signalYield.vbfH[0] + signalYield.vH[0] + signalYield.ttH[0];
+      Res[1] = sqrt( signalYield.ggH[1]*signalYield.ggH[1] + signalYield.vbfH[1]*signalYield.vbfH[1]
+		     + signalYield.vH[1]*signalYield.vH[1] + signalYield.ttH[1]*signalYield.ttH[1] );
+      totalMC[0] = nonRes[0] + Res[0];
+      totalMC[1] = sqrt( nonRes[1]*nonRes[1] + Res[1]*Res[1] );
       std::string tmp_s = boxName+"_yields.txt";
       std::ofstream ofs ( tmp_s.c_str(), std::fstream::out );
       ofs.precision(2);
@@ -185,25 +220,30 @@ int main ( int argc, char* argv[] )
       ofs << "\\begin{tabular}{|c|c|}\n";
       ofs << "\\hline\n";
       ofs << "process & yield \\\\ \\hline\n";
-      ofs << "gammaJet & " << signalYield.gammaJet << " \\\\ \\hline\n";
-      ofs << "diphoton & " << signalYield.diphoton << "\\\\ \\hline\n";
-      ofs << "ttH & " << signalYield.ttH << "\\\\ \\hline\n";
-      ofs << "ggH & " << signalYield.ggH << "\\\\ \\hline\n";
-      ofs << "vH & " << signalYield.vH << "\\\\ \\hline\n";
-      ofs << "vbfH &" << signalYield.vbfH << "\\\\ \\hline\n";
-      ofs << "observed &" << signalYield.data << "\\\\ \\hline\n";
+      ofs << "gammaJet & " << signalYield.gammaJet[0] << " \\pm " << signalYield.gammaJet[1] << " \\\\ \\hline\n";
+      ofs << "diphoton & " << signalYield.diphoton[0] << " \\pm " << signalYield.diphoton[1] << "\\\\ \\hline\n";
+      ofs << "non-resonant& " << nonRes[0] << " \\pm " << nonRes[1] << "\\\\ \\hline\n";
+      ofs << "\\hline\n";
+      ofs << "ttH & " << signalYield.ttH[0] << " \\pm "<< signalYield.ttH[1] << "\\\\ \\hline\n";
+      ofs << "ggH & " << signalYield.ggH[0] << " \\pm " << signalYield.ggH[1] << "\\\\ \\hline\n";
+      ofs << "vH & " << signalYield.vH[0] << " \\pm " << signalYield.vH[1] << "\\\\ \\hline\n";
+      ofs << "vbfH &" << signalYield.vbfH[0] << " \\pm " << signalYield.vbfH[1] << "\\\\ \\hline\n";
+      ofs << "resonant& " << Res[0] << " \\pm " << Res[1] << "\\\\ \\hline\n";
+      ofs << "\\hline\n";
+      ofs << "total MC & " << totalMC[0] << " \\pm " << totalMC[1] << "\\\\ \\hline\n";
+      ofs << "observed &" << signalYield.data[0] << "\\\\ \\hline\n";
       ofs << "\\end{tabular}\n";
       ofs << "\\end{center}\n";
       
       ofs.close();
       std::cout << "[INFO]: Box name: " << boxName << std::endl;
-      std::cout << "gammaJet: " << signalYield.gammaJet << std::endl;
-      std::cout << "diphoton: " << signalYield.diphoton << std::endl;
-      std::cout << "ttH: " << signalYield.ttH << std::endl;
-      std::cout << "ggH: " << signalYield.ggH << std::endl;
-      std::cout << "vH: " << signalYield.vH << std::endl;
-      std::cout << "vbfH: " << signalYield.vbfH << std::endl;
-      std::cout << "data: " << signalYield.data << std::endl;
+      std::cout << "gammaJet: " << signalYield.gammaJet[0] << " +- " << signalYield.gammaJet[1] << std::endl;
+      std::cout << "diphoton: " << signalYield.diphoton[0] << " +- " << signalYield.diphoton[1] << std::endl;
+      std::cout << "ttH: " << signalYield.ttH[0] << " +- " << signalYield.ttH[1] << std::endl;
+      std::cout << "ggH: " << signalYield.ggH[0] << " +- " << signalYield.ggH[1] << std::endl;
+      std::cout << "vH: " << signalYield.vH[0] << " +- " << signalYield.vH[1] << std::endl;
+      std::cout << "vbfH: " << signalYield.vbfH[0] << " +-" << signalYield.vbfH[1] << std::endl;
+      std::cout << "data: " << signalYield.data[0] << std::endl;
     }
 
   return 0;
