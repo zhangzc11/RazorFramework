@@ -26,6 +26,7 @@ public:
   bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
   void Loop();
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
+  float GetYields( float mr, float rsq, float mgg_l, float mgg_h, double& err );
   bool WriteOutput( TString outName = "default" );
   TH1F GetMr();
   TH1F GetRsq();

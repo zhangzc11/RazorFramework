@@ -23,14 +23,14 @@ std::string GetBoxString( Boxes box );
 enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, data, Last };
 struct Yields
 {
-  float gammaJet;
-  float diphoton;
-  float qcd;
-  float ggH;
-  float vbfH;
-  float vH;
-  float ttH;
-  float data;
+  float gammaJet[2];
+  float diphoton[2];
+  float qcd[2];
+  float ggH[2];
+  float vbfH[2];
+  float vH[2];
+  float ttH[2];
+  float data[2];
 };
 // R e d e f i n i n g   O p e r a t o r   t o   L o o p   O v e r   P r o c e s s
 //--------------------------------------------------------------------------------
