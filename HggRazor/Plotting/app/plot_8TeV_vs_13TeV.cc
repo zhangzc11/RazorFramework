@@ -1,30 +1,38 @@
 {
   gROOT->Reset();
 
-  const int nhistos = 3;
+  const int nhistos = 4;
   TString treeName = "HighPt";
   TString cut = "xsecSF*(MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.)";
   
+  //TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/ttH_8TeV_Normalized.root");
   TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJet_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6_Normalized.root");
+  
   TTree* t0 = (TTree*)f0->Get( treeName );
   t0->Draw("MR>>t0_mr(40, 0, 2000.)", cut, "goff");
   t0->Draw("Rsq>>t0_rsq(30, 0, 1.5)", cut, "goff");
   t0->Draw("mGammaGamma>>t0_mgg(19, 103, 160.)", cut, "goff");
+  t0->Draw("pho2sigmaEOverE>>t0_pho1seoe(500, 0, 0.1)", cut, "goff");
   TH1F* h_t0[nhistos];
   h_t0[0] = (TH1F*)gDirectory->Get("t0_mr");
   h_t0[1] = (TH1F*)gDirectory->Get("t0_rsq");
   h_t0[2] = (TH1F*)gDirectory->Get("t0_mgg");
+  h_t0[3] = (TH1F*)gDirectory->Get("t0_pho1seoe");
 
-  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/GJet_Pt40_DoubleEMEnriched_13TeV_Normalized.root");
+  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/test_splitTree_fixedEres_13TeV_Normalized.root");
+  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/GJet_Pt40_DoubleEMEnriched_13TeV_newID_Normalized.root");
+  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/test_gjets_splitTree_fixedEres_13TeV_Normalized.root");
   TTree* t1 = (TTree*)f1->Get( treeName );
   t1->Draw("MR>>t1_mr(40, 0, 2000.)", cut, "goff");
   t1->Draw("Rsq>>t1_rsq(30, 0, 1.5)", cut, "goff");
   t1->Draw("mGammaGamma>>t1_mgg(19, 103, 160.)", cut, "goff");
+  t1->Draw("pho2sigmaEOverE>>t1_pho1seoe(500, 0, 0.1)", cut, "goff");
   TH1F* h_t1[nhistos];
   h_t1[0] = (TH1F*)gDirectory->Get("t1_mr");
   h_t1[1] = (TH1F*)gDirectory->Get("t1_rsq");
   h_t1[2] = (TH1F*)gDirectory->Get("t1_mgg");
-  
+  h_t1[3] = (TH1F*)gDirectory->Get("t1_pho1seoe");
+
   double n0, n1, err0, err1;
   n0 = h_t0[2]->IntegralAndError( 1, h_t0[2]->GetNbinsX(), err0, "" );
   n1 = h_t1[2]->IntegralAndError( 1, h_t1[2]->GetNbinsX(), err1, "" );
@@ -44,7 +52,7 @@
       h_t1[i]->SetMarkerColor( kBlue );
     }
 
-  const int i_histo = 2;
+  const int i_histo = 3;
   h_t0[i_histo]->SetTitle("");
   h_t0[i_histo]->GetXaxis()->SetTitleSize( 0.06 );
   h_t0[i_histo]->GetXaxis()->SetTitleOffset( 0.7 );
