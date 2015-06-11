@@ -24,6 +24,19 @@ int main ( int argc, char* argv[] )
       std::cerr << "[ERROR]: Please provide a valid input list" << std::endl;
       return -1;
     }
+
+  std::string treeOpt = ParseCommandLine( argc, argv, "-treeOpt=" );
+  bool splitTrees = true;
+  if ( treeOpt == "" )
+    {
+      std::cout << "[INFO]: tree Option not provided, using split trees" << std::endl;
+    }
+  
+  if ( treeOpt == "FullTree" )
+    {
+      std::cout << "[INFO]: FullTree option provided, running on HggRazor TTree" << std::endl;
+      splitTrees = false;
+    }
   
   TFile* f;
   TFile* fout;
@@ -59,17 +72,26 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[INFO]: Data detected, using xsecSF = 1.0 in -> " << outRootFile << std::endl;
 	    }
 	  fout = new TFile( outRootFile.c_str(), "recreate" );
-	  // L o o p i n g   o v e r   b o x e s
-	  //------------------------------------
-	  for ( const auto& box : Boxes() )
+	  if ( splitTrees )
 	    {
-	      std::string boxName = GetBoxString( box );
-	      std::cout << "[INFO]: box = " << boxName << std::endl;
-  	      tree   = (TTree*)f->Get( boxName.c_str() );
+	      // L o o p i n g   o v e r   b o x e s
+	      //------------------------------------
+	      for ( const auto& box : Boxes() )
+		{
+		  std::string boxName = GetBoxString( box );
+		  std::cout << "[INFO]: box = " << boxName << std::endl;
+		  tree   = (TTree*)f->Get( boxName.c_str() );
+		  newTree = CloneAndAddSF( tree, sf );
+		  newTree->Write();
+		}
+	    }
+	  else
+	    {
+	      std::cout << "[INFO]: TTree = HggRazor" << std::endl;
+	      tree   = (TTree*)f->Get( "HggRazor" );
 	      newTree = CloneAndAddSF( tree, sf );
 	      newTree->Write();
 	    }
-	  
 	  delete fout;
 	}
     }

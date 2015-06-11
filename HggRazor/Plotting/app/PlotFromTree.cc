@@ -51,13 +51,13 @@ const int N_Hbb = 2;
 float MR_Hbb[N_Hbb+1] = {150,300,3000};
 float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
-float hpt_k[2]  = { 0.89, 1.03};
-float hres_k[2] = { 0.57, 0.67};
-float lres_k[2] = { 0.58, 0.77};
+float hpt_k[2]  = { 1.44, 1.69};
+float hres_k[2] = { 1.03, 1.14};
+float lres_k[2] = { 1.02, 1.45};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
-//TString cut = "MR > 350.0 && t1Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
+//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
+TString cut = "MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160";
 
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";

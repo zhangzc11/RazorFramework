@@ -2,10 +2,11 @@
   gROOT->Reset();
 
   const int nhistos = 4;
-  TString treeName = "HighPt";
-  TString cut = "xsecSF*(MR > 0.0 && Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.)";
+  TString treeName = "LowRes";
+  TString cut = "xsecSF*(MR > 200.0 && Rsq > 0.02 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160)";
   
   //TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/ttH_8TeV_Normalized.root");
+  //TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HybridData/GJet_Pt40_FullTree_8TeV_Normalized.root");
   TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/GJet_Pt-40_doubleEMEnriched_TuneZ2star_8TeV-pythia6_Normalized.root");
   
   TTree* t0 = (TTree*)f0->Get( treeName );
@@ -20,8 +21,9 @@
   h_t0[3] = (TH1F*)gDirectory->Get("t0_pho1seoe");
 
   //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/test_splitTree_fixedEres_13TeV_Normalized.root");
-  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun2/MC/GJet_Pt40_DoubleEMEnriched_13TeV_newID_Normalized.root");
-  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/MC/test_gjets_splitTree_fixedEres_13TeV_Normalized.root");
+  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HybridData/test_gjets_splitTree_fixedEres_13TeV_Normalized.root");
+  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HybridData/gjets_FullTree_Normalized.root");
+  
   TTree* t1 = (TTree*)f1->Get( treeName );
   t1->Draw("MR>>t1_mr(40, 0, 2000.)", cut, "goff");
   t1->Draw("Rsq>>t1_rsq(30, 0, 1.5)", cut, "goff");
@@ -52,7 +54,7 @@
       h_t1[i]->SetMarkerColor( kBlue );
     }
 
-  const int i_histo = 3;
+  const int i_histo = 2;
   h_t0[i_histo]->SetTitle("");
   h_t0[i_histo]->GetXaxis()->SetTitleSize( 0.06 );
   h_t0[i_histo]->GetXaxis()->SetTitleOffset( 0.7 );
