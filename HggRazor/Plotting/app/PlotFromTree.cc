@@ -112,7 +112,7 @@ int main ( int argc, char* argv[] )
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 0.253; // (5./19.8)
-  const int mod = 1; 
+  const int mod = 0; 
   for( const auto& box : Boxes() )
     {
       std::string boxName = GetBoxString( box );
@@ -233,7 +233,9 @@ int main ( int argc, char* argv[] )
 	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
 	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant", leg );
 	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
-	      MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant_mod1", leg );
+	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Resonant/" + histoName + "_" + boxName + "_Mr400_Rsq0p05_Resonant", leg );
+	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + boxName + "_Mr200_Rsq0p02_Full", leg );
+	      MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + boxName + "_Inclusive_Full", leg );
 	    }
 	  else
 	    {
