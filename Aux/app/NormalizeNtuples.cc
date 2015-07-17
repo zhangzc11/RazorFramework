@@ -22,6 +22,7 @@ int main ( int argc, char* argv[] )
   if ( inputFile == "" )
     {
       std::cerr << "[ERROR]: Please provide a valid input list" << std::endl;
+      std::cout << "[INFOR]: options are:\n --inputFile=<your_xsec_file>\n --treeName=<yourTTree>\n (optional) --treeOpt=FullTree, runs on HggRazor\n";
       return -1;
     }
 
