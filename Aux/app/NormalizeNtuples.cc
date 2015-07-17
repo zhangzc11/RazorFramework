@@ -27,6 +27,8 @@ int main ( int argc, char* argv[] )
 
   std::string treeOpt = ParseCommandLine( argc, argv, "-treeOpt=" );
   bool splitTrees = true;
+  std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
+  
   if ( treeOpt == "" )
     {
       std::cout << "[INFO]: tree Option not provided, using split trees" << std::endl;
@@ -35,6 +37,14 @@ int main ( int argc, char* argv[] )
   if ( treeOpt == "FullTree" )
     {
       std::cout << "[INFO]: FullTree option provided, running on HggRazor TTree" << std::endl;
+      splitTrees = false;
+      if ( treeName == "" ) treeName = "HggRazor";
+    }
+  
+  //checks for a particular TTree name
+  if ( treeName != "" )
+    {
+      std::cout << "[INFO]: Using a Tree named: " << treeName << std::endl;
       splitTrees = false;
     }
   
@@ -87,8 +97,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  else
 	    {
-	      std::cout << "[INFO]: TTree = HggRazor" << std::endl;
-	      tree   = (TTree*)f->Get( "HggRazor" );
+	      std::cout << "[INFO]: TTree = " << treeName << std::endl;
+	      tree   = (TTree*)f->Get( treeName.c_str() );
 	      newTree = CloneAndAddSF( tree, sf );
 	      newTree->Write();
 	    }
