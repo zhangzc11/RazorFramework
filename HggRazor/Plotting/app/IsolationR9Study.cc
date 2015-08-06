@@ -9,12 +9,14 @@
   
   const int nhistos = 4;
   TString treeName = "HighRes";
-  TString cut = "(MR > 400.0 && Rsq > 0.05 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && trigger==1)";
-  //TString extra_string = "_HighRes_Inclusive_Normalized";
-  TString extra_string = "_HighRes_Inclusive_Mr400Rsq0.05";
-  bool _normalize = false;
+  TString cut = "(MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && trigger==1)";
   
-  TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonNewIso_GoodLumi.root");
+  TString beginning = "R9_";
+  //TString extra_string = "_HighRes_Mr250Rsq0p05";
+  TString extra_string = "_HighRes_Inclusive_Normalized";
+  bool _normalize = true;
+  
+  TFile* f0 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonDoubleCheck_GoodLumi.root");
   
   TTree* t0 = (TTree*)f0->Get( treeName );
   t0->Draw("MR>>t0_mr(40, 0, 2000.)", cut, "goff");
@@ -27,8 +29,9 @@
   h_t0[2] = (TH1F*)gDirectory->Get("t0_mgg");
   h_t0[3] = (TH1F*)gDirectory->Get("t0_pho1seoe");
 
-  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonVLIso_GoodLumi.root");
-  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonMedIso_GoodLumi.root");
+  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonMediumIso_DoubleChecked_GoodLumi.root");
+  //TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonVeryLooseIso_DoubleChecked_GoodLumi.root");
+  TFile* f1 = new TFile("/Users/cmorgoth/Work/data/HggRazorRun1/data/DataPhotonR9_DoubleChecked_GoodLumi.root");
   
   TTree* t1 = (TTree*)f1->Get( treeName );
   t1->Draw("MR>>t1_mr(40, 0, 2000.)", cut, "goff");
@@ -101,10 +104,13 @@
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(.03);
-  leg->AddEntry( h_t0[i_histo], "defaul isolation", "lep" );
-  leg->AddEntry( h_t1[i_histo], "very loose isolation", "lep" );
+  //leg->AddEntry( h_t0[i_histo], "defaul isolation", "lep" );
+  //leg->AddEntry( h_t1[i_histo], "very loose isolation", "lep" );
+  //leg->AddEntry( h_t1[i_histo], "medium isolation", "lep" );
+  leg->AddEntry( h_t0[i_histo], "#sigma_{E}/E", "lep" );
+  leg->AddEntry( h_t1[i_histo], "R_{9}", "lep" );
   leg->Draw();
 
-  c->SaveAs("mgg" + extra_string + ".pdf");
-  c->SaveAs("mgg" + extra_string + ".C")
+  c->SaveAs( beginning + "mgg" + extra_string + ".pdf");
+  c->SaveAs( beginning + "mgg" + extra_string + ".C")
 }

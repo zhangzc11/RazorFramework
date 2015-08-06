@@ -72,7 +72,11 @@ int main( int argc, char* argv[])
       f = new TFile( inputFile2.c_str(), "update" );
       mc_tree = (TTree*)f->Get( treeName.c_str() );
     }
-  TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20";
+  
+  TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1 && pho1R9>0.9 && pho2R9>0.9 && pTGammaGamma < 110.";
+  
+  //TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && p	\
+TGammaGamma > 20 && trigger == 1";
   cut = cut + " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
 
   float forceSigma = 1.5;
