@@ -53,11 +53,12 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: tree name is :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
 
-  TTree* tree;
+  
   TFile* f;
+  TTree* tree;
   if ( dataMode == "data" )
     {
-      f = new TFile( inputFile.c_str() , "READ");
+      f = new TFile( inputFile.c_str() , "update");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
@@ -76,7 +77,7 @@ int main( int argc, char* argv[])
   TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1 && pho1R9>0.9 && pho2R9>0.9 && pTGammaGamma < 110.";
   if ( treeName == "SusyHggTree" )
     {
-      cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100";
+      cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160";
     }
   //TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1";
   cut = cut + " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
