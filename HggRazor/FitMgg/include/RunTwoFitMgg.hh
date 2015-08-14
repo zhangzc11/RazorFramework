@@ -10,6 +10,6 @@
 //LOCAL INCLUDES
 
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
-
+void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName );
 
 #endif

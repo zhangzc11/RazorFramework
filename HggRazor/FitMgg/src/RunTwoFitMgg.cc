@@ -41,9 +41,9 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(57);
-  mgg.setRange("low", 103,120);
-  mgg.setRange("high",131,160);
-  mgg.setRange("signal",103,160);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 131, 160);
+  mgg.setRange("signal", 103, 160);
   
   RooRealVar w( "xsecSF", "w", 0, 10000 );
 
@@ -51,12 +51,14 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   TString tag3 = MakeDoubleExpN1N2( "sideband_fit", mgg, *ws ); 
   
   //RooDataSet data( "data", "", RooArgSet(mgg, w), RooFit::WeightVar(w), RooFit::Import(*tree) );
+  //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   //Full Fit
   //ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+
   mgg.setRange("sregion", 122.04, 128.96);
   RooAbsReal* sint = ws->pdf( tag3 )->createIntegral( mgg, RooFit::NormSet(mgg), RooFit::Range("sregion") ) ; 
   RooAbsReal* Nfit = ws->pdf( tag3 )->createIntegral( mgg, RooFit::Range("Full") ) ;
@@ -65,11 +67,13 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   double n1 = ws->var("sideband_fitNbkg1")->getVal();
   double n2 = ws->var("sideband_fitNbkg2")->getVal();
   double Nbkg = n1*n1 + n2*n2; 
-  //std::cout << "Nbkg: " << ws->var("sideband_fitNbkg1")->getVal() << std::endl;
+
+  std::cout << "-----------------------------------" << std::endl;
   std::cout << "Ntotal: " << data.sumEntries( ) << std::endl;
   std::cout << "Nfit: " << Nfit->getVal() << std::endl;
   std::cout << "Nbkg: " << Nbkg << std::endl;
   std::cout << "sf: "  << Nbkg*sint->getVal()/N_sideband << std::endl;
+  std::cout << "-----------------------------------" << std::endl;
   
   bres->SetName( tag3 + "_b_fitres" );
   ws->import( *bres );
@@ -87,4 +91,20 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
    ws->import( *pdfFrame );
   
   return ws;
+};
+
+void MakePlot( TTree* tree,  RooWorkspace w, TString pdfName, TString mggName )
+{
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  mgg.setBins(57);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 131, 160);
+  mgg.setRange("signal", 103, 160);
+
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  RooPlot *fmgg = mgg.frame();
+  data.plotOn(fmgg);
+  w.pdf( pdfName )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  fmgg->SetName( "pdf_goldenbin_test" );
+  w.import( *fmgg );
 };

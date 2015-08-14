@@ -92,6 +92,8 @@ int main( int argc, char* argv[])
   if ( dataMode == "data" )
     {
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      cut = cut + " && MR > 400. && t1Rsq > 0.05";
+      //MakePlot( tree->CopyTree( cut ),  *w, "hi", mggName );
     }
   else if ( dataMode == "mc" )
     {
