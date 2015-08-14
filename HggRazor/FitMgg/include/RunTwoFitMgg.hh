@@ -9,4 +9,7 @@
 #include <RooWorkSpace.h>
 //LOCAL INCLUDES
 
+RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
+
+
 #endif
