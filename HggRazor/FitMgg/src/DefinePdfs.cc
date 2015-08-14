@@ -65,15 +65,15 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
-  RooRealVar* alpha1 = new RooRealVar( tag + "_dexp_alpha1", "#alpha_{1}", -0.03, -10, 10 );
-  RooRealVar* alpha2 = new RooRealVar( tag + "_dexp_alpha2", "#alpha_{2}", -0.03, -10, 10 );
+  RooRealVar* alpha1 = new RooRealVar( tag + "_dexp_alpha1", "#alpha_{1}", 0.6, -10, 10 );
+  RooRealVar* alpha2 = new RooRealVar( tag + "_dexp_alpha2", "#alpha_{2}", 0.00001, -10, 10 );
   //--------------------------------------------
   //Square variables to avoid rising exponential
   //--------------------------------------------
-  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_dexp_alpha1Sq", "#alpha^{2}_{1}", "-1*@0^2", *alpha1);
-  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_dexp_alpha2Sq", "#alpha^{2}_{2}", "-1*@0^2", *alpha2);
-  RooRealVar* frac    = new RooRealVar( tag+"_dexp_frac", "frac", 0.5, .0, 1.0 );
-  RooRealVar* Nbkg    = new RooRealVar( tag+"_dexp_Nbkg", "N_{bkg}", 1, 1e-10, 1e8 );
+  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_dexp_alpha1Sq", "#alpha^{2}_{1}", "-1*@0*@0", *alpha1);
+  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_dexp_alpha2Sq", "#alpha^{2}_{2}", "-1*@0*@0", *alpha2);
+  RooRealVar* frac    = new RooRealVar( tag+"_dexp_frac", "frac", 0.99, .0, 1.0 );
+  RooRealVar* Nbkg    = new RooRealVar( tag+"_dexp_Nbkg", "N_{bkg}", 10, 1e-10, 1e8 );
   
   //------------------
   //C r e a t e  p.d.f
@@ -90,4 +90,27 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
   w.import( *ex_doubleExp );
   
   return ex_pdf_name;
+};
+
+TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  RooRealVar* a1 = new RooRealVar( tag + "_a1", "", 0.6,-1.,1.);
+  RooRealVar* a2 = new RooRealVar( tag + "_a2", "", 0.4/150,-1/150.,1/150.);
+  
+  RooFormulaVar* a1sq = new RooFormulaVar( tag + "a1sq","","-1*@0*@0", *a1);
+  RooFormulaVar* a2sq = new RooFormulaVar( tag + "a2sq","","-1*@0*@0", *a2);
+  
+  RooRealVar* NBkg1 = new RooRealVar( tag + "Nbkg1","",10,-1e5,1e5);
+  RooRealVar* NBkg2 = new RooRealVar( tag + "Nbkg2","",1,-1e5,1e5);
+  
+  RooFormulaVar* NBkg1Sq = new RooFormulaVar( tag + "Nbkg1Sq","","@0*@0", *NBkg1);
+  RooFormulaVar* NBkg2Sq = new RooFormulaVar( tag + "Nbkg2Sq","","@0*@0", *NBkg2);
+
+  RooExponential* e1 = new RooExponential( tag + "_e1","", mgg, *a1sq);
+  RooExponential* e2 = new RooExponential( tag + "_e2","", mgg, *a2sq);
+
+  TString pdfName = tag+"pdf_dExp_N1N2";
+  RooAddPdf* pdf = new RooAddPdf( pdfName,"", RooArgSet( *e1, *e2), RooArgSet( *NBkg1Sq, *NBkg2Sq) );
+  w.import( *pdf );
+  return pdfName;
 };

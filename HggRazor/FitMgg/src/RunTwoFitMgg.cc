@@ -43,23 +43,33 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   mgg.setBins(57);
   mgg.setRange("low", 103,120);
   mgg.setRange("high",131,160);
-  mgg.setRange("signal",120,131);
+  mgg.setRange("signal",103,160);
   
   RooRealVar w( "xsecSF", "w", 0, 10000 );
 
-  TString tag3 = MakeDoubleExp( "sideband_fit", mgg, *ws );
+  //TString tag3 = MakeDoubleExp( "sideband_fit", mgg, *ws );
+  TString tag3 = MakeDoubleExpN1N2( "sideband_fit", mgg, *ws ); 
   
   //RooDataSet data( "data", "", RooArgSet(mgg, w), RooFit::WeightVar(w), RooFit::Import(*tree) );
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
-  //ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  //RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //Full Fit
+  //ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   mgg.setRange("sregion", 122.04, 128.96);
   RooAbsReal* sint = ws->pdf( tag3 )->createIntegral( mgg, RooFit::NormSet(mgg), RooFit::Range("sregion") ) ; 
+  RooAbsReal* Nfit = ws->pdf( tag3 )->createIntegral( mgg, RooFit::Range("Full") ) ;
   std::cout << sint->getVal() << std::endl;
   float N_sideband = data.sumEntries(Form("(mgg>%0.2f && mgg <120) || (mgg>131 && mgg<%0.2f)",103.,160.));
-  std::cout << "sf: "  << ws->var("sideband_fit_dexp_Nbkg")->getVal()*sint->getVal()/N_sideband << std::endl;
+  double n1 = ws->var("sideband_fitNbkg1")->getVal();
+  double n2 = ws->var("sideband_fitNbkg2")->getVal();
+  double Nbkg = n1*n1 + n2*n2; 
+  //std::cout << "Nbkg: " << ws->var("sideband_fitNbkg1")->getVal() << std::endl;
+  std::cout << "Ntotal: " << data.sumEntries( ) << std::endl;
+  std::cout << "Nfit: " << Nfit->getVal() << std::endl;
+  std::cout << "Nbkg: " << Nbkg << std::endl;
+  std::cout << "sf: "  << Nbkg*sint->getVal()/N_sideband << std::endl;
   
   bres->SetName( tag3 + "_b_fitres" );
   ws->import( *bres );
