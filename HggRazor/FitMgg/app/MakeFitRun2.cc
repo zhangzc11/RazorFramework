@@ -78,6 +78,7 @@ int main( int argc, char* argv[])
   if ( treeName == "SusyHggTree" )
     {
       cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160";
+      //cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && (pho1_sigEoE > 0.015 || pho2_sigEoE > 0.015) && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160";
     }
   //TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1";
   cut = cut + " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
@@ -92,8 +93,10 @@ int main( int argc, char* argv[])
   if ( dataMode == "data" )
     {
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100 && mgg < 400.";
+      //cut = "abs(mbb-125)>=25 && abs(mbb-91.2)>=25 &&  ptgg > 20 && ptgg < 110 && (pho1_sigEoE > 0.015 || pho2_sigEoE > 0.015) && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100 && mgg < 400.";
       cut = cut + " && MR > 400. && t1Rsq > 0.05";
-      //MakePlot( tree->CopyTree( cut ),  *w, "hi", mggName );
+      MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
     }
   else if ( dataMode == "mc" )
     {

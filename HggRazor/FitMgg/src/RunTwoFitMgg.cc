@@ -93,10 +93,10 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   return ws;
 };
 
-void MakePlot( TTree* tree,  RooWorkspace w, TString pdfName, TString mggName )
+void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
 {
-  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
-  mgg.setBins(57);
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,400,"GeV");
+  mgg.setBins(30);
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 131, 160);
   mgg.setRange("signal", 103, 160);
@@ -104,7 +104,8 @@ void MakePlot( TTree* tree,  RooWorkspace w, TString pdfName, TString mggName )
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
-  w.pdf( pdfName )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  w.pdf( pdfName )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("low,high"));
   fmgg->SetName( "pdf_goldenbin_test" );
   w.import( *fmgg );
+  return;
 };
