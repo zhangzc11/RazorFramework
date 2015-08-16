@@ -95,33 +95,26 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
 
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
 {
-  RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,400,"GeV");
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,160,"GeV");
   mgg.setBins(30);
   mgg.setRange("low", 103, 120);
-  mgg.setRange("low_v2", 100, 120);
   mgg.setRange("high", 131, 160);
-  mgg.setRange("high_v2", 131, 180);
+  
+  mgg.setRange("low_v2", 100, 120);
+  mgg.setRange("high_v2", 131, 160);
+  
   mgg.setRange("signal", 103, 160);
-  mgg.setRange("sig", 131., 155.);
+  mgg.setRange("sig", 120., 130.);
 
   TString tag3 = MakeDoubleExpN1N2( "sideband_fit_v2", mgg, w );
-  
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  //fullFit
   //w.pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = w.pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //sidebandFit
   w.pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low_v2,high_v2") );
   RooFitResult* bres = w.pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("low_v2,high_v2") );
   
-  float Ndata = data.sumEntries( "mgg > 131 && mgg < 400." );
-  RooAbsReal* fitIntegral = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormRange("Full"));
-  RooAbsReal* fitIntegral2 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormSet(mgg));
-  RooAbsReal* fitIntegral3 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::NormRange("sig"));
-  RooAbsReal* fitIntegral4 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormRange("sig"));
-  fitIntegral->SetName("UnNormInt");
-  std::cout << "i1: " << fitIntegral->getVal()  << " " << mgg.getVal() << std::endl;
-  std::cout << "i2: " << fitIntegral2->getVal() << std::endl;
-  std::cout << "i3: " << fitIntegral3->getVal() << std::endl;
-  std::cout << "i4: " << fitIntegral4->getVal() << std::endl;
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
   //w.pdf( pdfName )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
@@ -132,4 +125,24 @@ void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
   w.import( *fmgg );
   
   return;
+};
+
+
+double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
+{
+  RooAbsPdf* NewModel = w.pdf( pdfName );
+  RooRealVar* mgg = w.var( mggName );
+  mgg->setRange("sig", 120, 130);
+  RooAbsReal* fIntegral = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg));
+  RooAbsReal* fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
+  std::cout << "test Int: " << fIntegral->getVal() << std::endl;
+  std::cout << "test Int2: " << fIntegral2->getVal() << std::endl;
+  mgg->setMax(400);
+  mgg->setMin(100);
+  mgg->setRange("sig", 131, 400);
+  fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
+  std::cout << "test Int2': " << fIntegral2->getVal() << std::endl;
+  
+  
+  
 };
