@@ -82,6 +82,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   data.plotOn(fmgg);
   ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("Full"));
   fmgg->SetName( tag3 + "_frame" );
   ws->import( *fmgg );
 
@@ -95,13 +96,13 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
 
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
 {
-  RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,160,"GeV");
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,400,"GeV");
   mgg.setBins(30);
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 131, 160);
   
   mgg.setRange("low_v2", 100, 120);
-  mgg.setRange("high_v2", 131, 160);
+  mgg.setRange("high_v2", 131, 400);
   
   mgg.setRange("signal", 103, 160);
   mgg.setRange("sig", 120., 130.);
@@ -132,8 +133,9 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
 {
   RooAbsPdf* NewModel = w.pdf( pdfName );
   RooRealVar* mgg = w.var( mggName );
-  mgg->setRange("sig", 120, 130);
-  RooAbsReal* fIntegral = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg));
+  mgg->setRange("sig", 122.08, 128.92);
+  //mgg->setRange("sig", 103.0, 160.);
+  RooAbsReal* fIntegral = NewModel->createIntegral(*mgg);
   RooAbsReal* fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
   std::cout << "test Int: " << fIntegral->getVal() << std::endl;
   std::cout << "test Int2: " << fIntegral2->getVal() << std::endl;
