@@ -81,7 +81,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
   ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
-  //ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("low,high"));
+  ws->pdf( tag3 )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( tag3 + "_frame" );
   ws->import( *fmgg );
 
@@ -89,7 +89,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
    ws->pdf( tag3 )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
    pdfFrame->SetName( tag3+"_pdfframe" );
    ws->import( *pdfFrame );
-  
+   ws->import( mgg );
   return ws;
 };
 
@@ -98,14 +98,38 @@ void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,400,"GeV");
   mgg.setBins(30);
   mgg.setRange("low", 103, 120);
+  mgg.setRange("low_v2", 100, 120);
   mgg.setRange("high", 131, 160);
+  mgg.setRange("high_v2", 131, 180);
   mgg.setRange("signal", 103, 160);
+  mgg.setRange("sig", 131., 155.);
 
+  TString tag3 = MakeDoubleExpN1N2( "sideband_fit_v2", mgg, w );
+  
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  //w.pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres = w.pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  w.pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low_v2,high_v2") );
+  RooFitResult* bres = w.pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("low_v2,high_v2") );
+  
+  float Ndata = data.sumEntries( "mgg > 131 && mgg < 400." );
+  RooAbsReal* fitIntegral = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormRange("Full"));
+  RooAbsReal* fitIntegral2 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormSet(mgg));
+  RooAbsReal* fitIntegral3 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::NormRange("sig"));
+  RooAbsReal* fitIntegral4 = w.pdf( tag3 )->createIntegral(mgg, RooFit::NormRange("sig"));
+  fitIntegral->SetName("UnNormInt");
+  std::cout << "i1: " << fitIntegral->getVal()  << " " << mgg.getVal() << std::endl;
+  std::cout << "i2: " << fitIntegral2->getVal() << std::endl;
+  std::cout << "i3: " << fitIntegral3->getVal() << std::endl;
+  std::cout << "i4: " << fitIntegral4->getVal() << std::endl;
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
-  w.pdf( pdfName )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("low,high"));
+  //w.pdf( pdfName )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
+  w.pdf( pdfName )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("Full"), RooFit::NormRange("low_v2,high_v2") );
+  w.pdf( pdfName )->plotOn( fmgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("low,high") );
+  w.pdf( tag3 )->plotOn( fmgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low_v2,high_v2") );
   fmgg->SetName( "pdf_goldenbin_test" );
   w.import( *fmgg );
+  
   return;
 };
