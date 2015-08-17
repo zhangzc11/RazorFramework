@@ -9,6 +9,7 @@
 #include <RooWorkSpace.h>
 //LOCAL INCLUDES
 
+double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName );
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName );
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 
