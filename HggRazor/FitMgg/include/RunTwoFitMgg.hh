@@ -6,7 +6,7 @@
 #include <TString.h>
 //ROOFIT INCLUDES
 #include <RooRealVar.h>
-#include <RooWorkSpace.h>
+#include <RooWorkspace.h>
 //LOCAL INCLUDES
 
 double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName );
