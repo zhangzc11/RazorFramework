@@ -144,8 +144,5 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
   mgg->setMin(100);
   mgg->setRange("sig", 131, 400);
   fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
-  std::cout << "test Int2': " << fIntegral2->getVal() << std::endl;
-  
-  
-  
+  std::cout << "test Int2': " << fIntegral2->getVal() << std::endl;  
 };

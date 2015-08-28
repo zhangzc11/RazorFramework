@@ -61,15 +61,13 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
   std::cout << "[INFO]: category mode :" << categoryMode << std::endl;
   std::cout << "[INFO]: outputfile :" << outputfilename << std::endl;
-
-
-
   
   TFile* f;
   TTree* tree;
   if ( dataMode == "data" )
     {
-      f = new TFile( inputFile.c_str() , "READ");
+      //f = new TFile( inputFile.c_str() , "READ");
+      f = new TFile( inputFile.c_str() , "UPDATE");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
@@ -89,6 +87,10 @@ int main( int argc, char* argv[])
   //MR-Rsq Bin Cut String
   //****************************************************  
   TString BinCutString = "";
+  if (  MRcut != "" || RSQcut != "" )
+    {
+      BinCutString = " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
+    }
   if (categoryMode == "highpt") {
     if (BinSelection == "0") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq < 0.05 ";
     if (BinSelection == "1") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq >= 0.05 && t1Rsq < 0.10 ";
@@ -156,9 +158,6 @@ int main( int argc, char* argv[])
   else if (categoryMode == "zbb") categoryCutString = " && ptgg < 110 && abs(mbb-91.2)<25 ";
   else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
   else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
-
-  
-
   
   TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1 && pho1R9>0.9 && pho2R9>0.9 && pTGammaGamma < 110.";
   if ( treeName == "SusyHggTree" )
@@ -166,7 +165,6 @@ int main( int argc, char* argv[])
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160" + categoryCutString + BinCutString;
     }
  
-
   float forceSigma = 1.5;
   bool constrainMu = false;
   float forceMu    = -1;
@@ -175,8 +173,10 @@ int main( int argc, char* argv[])
   RooWorkspace* w2;
   if ( dataMode == "data" )
     {
-      w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100 && mgg < 400." + categoryCutString + BinCutString;
+      std::cout << "[INFO]: cut -> " << cut << std::endl;
+      w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      
       MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
       GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
     }
