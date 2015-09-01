@@ -41,7 +41,7 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooRealVar* mu     = new RooRealVar( tag+"_gauss_mu", "#mu", 125, 0., 1000. );
   RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 1.0, .0, 5000. );
   RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 1.0, .0, 5000. );
-  RooRealVar* frac   = new RooRealVar( tag+"_frac", "frac", 0.5, .0, 1.0 );
+  RooRealVar* frac   = new RooRealVar( tag+"_frac", "frac", 0.1, .0, 1.0 );
   RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1, 1e-10, 1e8 );
   //------------------
   //C r e a t e  p.d.f

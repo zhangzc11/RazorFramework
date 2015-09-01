@@ -146,3 +146,82 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
   fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
   std::cout << "test Int2': " << fIntegral2->getVal() << std::endl;  
 };
+
+RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
+{
+  RooWorkspace* ws = new RooWorkspace( "wsb", "" );
+  
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  mgg.setBins(38);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 131, 160);
+  mgg.setRange("signal", 103, 160);
+
+  //--------------------------------
+  //I m p or t i n g   D a t a
+  //--------------------------------
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  
+  //------------------------------------
+  // C r e a t e   b k g  s h a p e
+  //------------------------------------
+  TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_bkg", mgg, *ws );
+  //------------------------------------
+  // C r e a t e   b k g  s h a p e
+  //------------------------------------
+  TString tag_signal = MakeDoubleGauss( "fullsb_fit_signal", mgg, *ws );
+
+  //RooAddPdf* model = new ( "model", "model", RooFit::RooArgList( *ws->pdf( tag_signal ), *ws->pdf( tag_bkg ) ) ) ;
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal ), *ws->pdf( tag_bkg ) ) ) ;
+
+  //--------------------------------------
+  //H i g g s   C o n s t r a i n s
+  //--------------------------------------
+  RooRealVar HiggsMass("HiggsMass","",128.7);
+  RooRealVar HiggsMassError("HiggsMassError","",0.4);
+  RooGaussian HiggsMassConstraint("HiggsMassConstraint","", *ws->var("fullsb_fit_signal_gauss_mu"),HiggsMass,HiggsMassError);
+
+  if( forceSigma != -1 ) {
+    ws->var("fullsb_fit_signal_gauss_sigma1")->setVal( forceSigma );
+    ws->var("fullsb_fit_signal_gauss_sigma1")->setConstant(true);
+    ws->var("fullsb_fit_signal_frac")->setVal( 1.0 );
+    ws->var("fullsb_fit_signal_frac")->setConstant(true);
+  }
+
+  //---------------------
+  //F i t   t o   D a t a
+  //---------------------
+  
+  model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+
+
+  //PROFILE
+  RooArgSet poi   = RooArgSet( *ws->var("fullsb_fit_signal_gauss_Ns") );
+  RooAbsReal* nll = model->createNLL(data);
+  RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
+  RooAbsReal* p2ll = n2ll.createProfile( poi );
+    
+  
+  /*
+  model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
+  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
+  */
+  RooPlot *fmgg = mgg.frame();
+  data.plotOn(fmgg);
+  model->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  model->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg->SetName( "fullsb_fit_frame" );
+  ws->import( *model );
+  ws->import( *bres );
+  ws->import( *fmgg );
+
+  RooPlot* fns = ws->var("fullsb_fit_signal_gauss_Ns")->frame( RooFit::Range(0,20, true) );
+  fns->SetMinimum(0);
+  fns->SetMaximum(6);
+  n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
+  p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
+  fns->SetName("nll_trick");
+  ws->import( *fns );
+  return ws;
+};

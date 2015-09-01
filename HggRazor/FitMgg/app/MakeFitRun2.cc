@@ -179,6 +179,7 @@ int main( int argc, char* argv[])
       
       MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
       GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
+      w2 = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
     }
   else if ( dataMode == "mc" )
     {
@@ -202,6 +203,7 @@ int main( int argc, char* argv[])
     fout = new TFile( outputfilename.c_str(), "recreate" );
   }
   w->Write("w1");
+  w2->Write("w2");
   fout->Close();
     
   return 0;	
