@@ -12,5 +12,6 @@
 TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w );
+TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
 
 #endif

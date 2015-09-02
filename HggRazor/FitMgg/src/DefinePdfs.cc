@@ -109,8 +109,23 @@ TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooExponential* e1 = new RooExponential( tag + "_e1","", mgg, *a1sq);
   RooExponential* e2 = new RooExponential( tag + "_e2","", mgg, *a2sq);
 
-  TString pdfName = tag+"pdf_dExp_N1N2";
+  TString pdfName = tag+"_pdf_dExp_N1N2";
   RooAddPdf* pdf = new RooAddPdf( pdfName,"", RooArgSet( *e1, *e2), RooArgSet( *NBkg1Sq, *NBkg2Sq) );
   w.import( *pdf );
+  return pdfName;
+};
+
+TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  RooRealVar* a = new RooRealVar( tag + "_se_a", "", 0.6,-1.,1.);
+  RooFormulaVar* asq = new RooFormulaVar( tag + "_se_asq","","-1*@0*@0", *a);
+  RooRealVar* NBkg = new RooRealVar( tag + "se_Nbkg","",10,-1e5,1e5);
+  RooFormulaVar* NBkg1Sq = new RooFormulaVar( tag + "se_Nbkg1Sq","","@0*@0", *NBkg);
+  
+  RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
+  
+  TString pdfName = tag+"_pdf_sExp_ext";
+  RooExtendPdf* ext_singleExp = new RooExtendPdf( pdfName, "extSexp", *se, *NBkg1Sq);
+  w.import( *ext_singleExp );
   return pdfName;
 };

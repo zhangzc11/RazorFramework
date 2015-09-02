@@ -54,9 +54,15 @@ int main( int argc, char* argv[])
       std::cerr << "[ERROR]: please provide the category. Use --category=<data/mc>" << std::endl;
       return -1;
     }
+
+  std::string AIC = ParseCommandLine( argc, argv, "-AIC=" );
+  if ( AIC == "" )
+    {
+      std::cerr << "[INFO]: AIC not provided. Use --category=<yes/no>. Using <no> in this execution" << std::endl;
+    }
   
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputfile=" );
-
+  
   std::cout << "[INFO]: tree name is :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
   std::cout << "[INFO]: category mode :" << categoryMode << std::endl;
@@ -171,15 +177,26 @@ int main( int argc, char* argv[])
   TString mggName  = "mgg";
   RooWorkspace* w;
   RooWorkspace* w2;
+  RooWorkspace* w3;
+  RooWorkspace* w4;
   if ( dataMode == "data" )
     {
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100 && mgg < 400." + categoryCutString + BinCutString;
       std::cout << "[INFO]: cut -> " << cut << std::endl;
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
-      
-      MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
-      GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
+      std::cout << "pass-3" << std::endl;
+      //MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
+      std::cout << "pass-2" << std::endl;
+      //GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
+      std::cout << "pass-1" << std::endl;
       w2 = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      std::cout << "pass-0" << std::endl;
+      if ( AIC == "yes" )
+	{
+	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "doubleExp" );
+	  //w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singleExp" );
+	}
+      std::cout << "pass" << std::endl;
     }
   else if ( dataMode == "mc" )
     {
@@ -204,6 +221,11 @@ int main( int argc, char* argv[])
   }
   w->Write("w1");
   w2->Write("w2");
+  if ( AIC == "yes" )
+    {
+      w3->Write("w3");
+      //w4->Write("w4");
+    }
   fout->Close();
     
   return 0;	

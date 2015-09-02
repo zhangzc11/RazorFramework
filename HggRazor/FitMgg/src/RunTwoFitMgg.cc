@@ -195,8 +195,12 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
 
-
-  //PROFILE
+  //-------------------------------------
+  //P r o f i l e d   L i k e l i h o o d 
+  //-------------------------------------
+  /*
+    profile in Ns to obtain significance.
+  */
   RooArgSet poi   = RooArgSet( *ws->var("fullsb_fit_signal_gauss_Ns") );
   RooAbsReal* nll = model->createNLL(data);
   RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
@@ -216,7 +220,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   ws->import( *bres );
   ws->import( *fmgg );
 
-  RooPlot* fns = ws->var("fullsb_fit_signal_gauss_Ns")->frame( RooFit::Range(0,20, true) );
+  RooPlot* fns = ws->var("fullsb_fit_signal_gauss_Ns")->frame( RooFit::Range(0, 20, true) );
   fns->SetMinimum(0);
   fns->SetMaximum(6);
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
@@ -225,3 +229,74 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   ws->import( *fns );
   return ws;
 };
+
+RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, TString ffName = "doubleExp" )
+{
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  mgg.setBins(57);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 131, 160);
+
+  TString tag;
+  if ( ffName == "doubleExp" )
+    {
+      tag = MakeDoubleExpN1N2( "sideband_fit_doubleExp", mgg, *ws );
+      std::cout << "[INFO]: Running double exponential fit" << std::endl; 
+    }
+  else if ( ffName == "singleExp" )
+    {
+      tag = MakeSingleExp( "sideband_fit_singleExp", mgg, *ws );
+      std::cout << "[INFO]: Running single exponential fit" << std::endl; 
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  //Sideband Fit
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+    
+  bres->SetName( tag + "_b_fitres" );
+  double minNll = bres->minNll();
+  std::cout << "minNll->" << minNll << std::endl;
+  ws->import( *bres );
+  
+  RooPlot *fmgg = mgg.frame();
+  data.plotOn(fmgg);
+  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  
+  fmgg->SetName( tag + "_frame" );
+  ws->import( *fmgg );
+
+  //---------------------
+  //g e t t i n g   n l l 
+  //---------------------
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data);
+  nll->SetName(tag+"_nll_sf");
+  RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
+  n2ll.SetName(tag+"_n2ll_sf");
+  
+  RooPlot* pdfFrame = mgg.frame();
+  ws->pdf( tag )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  pdfFrame->SetName( tag+"_pdfframe" );
+  ws->import( *pdfFrame );
+  ws->import( mgg );
+
+  
+  RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame(  RooFit::Range(0, 0.25, true) );
+  //fns->SetMinimum(0);
+  //fns->SetMaximum(6);
+  nll->plotOn( fns, RooFit::LineColor(kBlue) );
+  fns->SetName("nll_trick");
+  ws->import( *fns );
+  //ws->import( *nll );
+  //ws->import( n2ll );
+  return ws;
+};
+
