@@ -30,6 +30,7 @@
 #include <RooFormulaVar.h>
 #include <RooBernstein.h>
 #include <RooMinuit.h>
+#include <RooNLLVar.h>
 //#include <RealVar.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
@@ -259,11 +260,17 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
     
   bres->SetName( tag + "_b_fitres" );
   double minNll = bres->minNll();
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
+  RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame( );
+  nll->plotOn( fns, RooFit::LineColor(kBlue) );
+  fns->SetName("nll_trick");
+  ws->import( *fns );
   ws->import( *bres );
   
   RooPlot *fmgg = mgg.frame();
@@ -277,7 +284,7 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   //---------------------
   //g e t t i n g   n l l 
   //---------------------
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data);
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   nll->SetName(tag+"_nll_sf");
   RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
   n2ll.SetName(tag+"_n2ll_sf");
@@ -288,15 +295,6 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   ws->import( *pdfFrame );
   ws->import( mgg );
 
-  
-  RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame(  RooFit::Range(0, 0.25, true) );
-  //fns->SetMinimum(0);
-  //fns->SetMaximum(6);
-  nll->plotOn( fns, RooFit::LineColor(kBlue) );
-  fns->SetName("nll_trick");
-  ws->import( *fns );
-  //ws->import( *nll );
-  //ws->import( n2ll );
   return ws;
 };
 

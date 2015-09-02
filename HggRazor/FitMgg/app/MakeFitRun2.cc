@@ -181,7 +181,7 @@ int main( int argc, char* argv[])
   RooWorkspace* w4;
   if ( dataMode == "data" )
     {
-      cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 100 && mgg < 400." + categoryCutString + BinCutString;
+      cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
       std::cout << "[INFO]: cut -> " << cut << std::endl;
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
       std::cout << "pass-3" << std::endl;
@@ -189,7 +189,7 @@ int main( int argc, char* argv[])
       std::cout << "pass-2" << std::endl;
       //GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
       std::cout << "pass-1" << std::endl;
-      w2 = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      //w2 = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
       std::cout << "pass-0" << std::endl;
       if ( AIC == "yes" )
 	{
@@ -220,7 +220,7 @@ int main( int argc, char* argv[])
     fout = new TFile( outputfilename.c_str(), "recreate" );
   }
   w->Write("w1");
-  w2->Write("w2");
+  //w2->Write("w2");
   if ( AIC == "yes" )
     {
       w3->Write("w3");
