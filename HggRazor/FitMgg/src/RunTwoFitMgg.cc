@@ -263,15 +263,27 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
     
   bres->SetName( tag + "_b_fitres" );
+  //---------------------
+  //g e t t i n g   n l l 
+  //---------------------
   double minNll = bres->minNll();
   RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
+  RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
+  double K = floatPars->getSize();
+  std::cout << "K -> " << K << std::endl;
+  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>131 && mgg<160)");
+  std::cout << "n -> " << n << std::endl;
+  double AIC = 2*minNll + 2*K*(K+1)/(n-K-1);
+  std::cout << "AIC: " << AIC << std::endl;
+  /*
   RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame( );
   nll->plotOn( fns, RooFit::LineColor(kBlue) );
   fns->SetName("nll_trick");
   ws->import( *fns );
   ws->import( *bres );
+  */
   
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
@@ -280,14 +292,6 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   
   fmgg->SetName( tag + "_frame" );
   ws->import( *fmgg );
-
-  //---------------------
-  //g e t t i n g   n l l 
-  //---------------------
-  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  nll->SetName(tag+"_nll_sf");
-  RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
-  n2ll.SetName(tag+"_n2ll_sf");
   
   RooPlot* pdfFrame = mgg.frame();
   ws->pdf( tag )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );

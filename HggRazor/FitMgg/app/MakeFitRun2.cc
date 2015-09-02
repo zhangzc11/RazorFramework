@@ -194,7 +194,7 @@ int main( int argc, char* argv[])
       if ( AIC == "yes" )
 	{
 	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "doubleExp" );
-	  //w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singleExp" );
+	  w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singleExp" );
 	}
       std::cout << "pass" << std::endl;
     }
@@ -224,7 +224,7 @@ int main( int argc, char* argv[])
   if ( AIC == "yes" )
     {
       w3->Write("w3");
-      //w4->Write("w4");
+      w4->Write("w4");
     }
   fout->Close();
     
