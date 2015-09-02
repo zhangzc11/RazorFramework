@@ -129,3 +129,21 @@ TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
   w.import( *ext_singleExp );
   return pdfName;
 };
+
+
+TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *alpha1  = new RooRealVar(tag+"_dpow_alpha1","#alpha_{1}",-1,-10,-0.0001);
+  RooRealVar *alpha2  = new RooRealVar(tag+"_dpow_alpha2","#alpha_{2}",-2,-10,-0.0001);
+  RooRealVar *f       = new RooRealVar(tag+"_dpow_f","f",0.3,0.0001,0.9999);
+  RooRealVar *Nbkg    = new RooRealVar(tag+"_dpow_Nbkg","N_{bkg}",10,1,1E9);
+  
+  RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
+  RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
+  
+  RooAddPdf *add      = new RooAddPdf(tag+"_dpow","",*pow1,*pow2,*f);
+  
+  w.import( *(new RooExtendPdf(tag+"_dpow_ext","",*add,*Nbkg)) );
+  
+  return tag+"dpow_ext";
+}
