@@ -179,6 +179,7 @@ int main( int argc, char* argv[])
   RooWorkspace* w2;
   RooWorkspace* w3;
   RooWorkspace* w4;
+  RooWorkspace* w5;
   if ( dataMode == "data" )
     {
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
@@ -195,6 +196,7 @@ int main( int argc, char* argv[])
 	{
 	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "doubleExp" );
 	  w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singleExp" );
+	  w5 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singlePow" );
 	}
       std::cout << "pass" << std::endl;
     }
@@ -223,8 +225,9 @@ int main( int argc, char* argv[])
   //w2->Write("w2");
   if ( AIC == "yes" )
     {
-      w3->Write("w3");
-      w4->Write("w4");
+      //w3->Write("w3");
+      //w4->Write("w4");
+      w5->Write("w5");
     }
   fout->Close();
     

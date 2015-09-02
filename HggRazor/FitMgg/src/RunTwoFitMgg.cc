@@ -251,18 +251,31 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
       tag = MakeSingleExp( "sideband_fit_singleExp", mgg, *ws );
       std::cout << "[INFO]: Running single exponential fit" << std::endl; 
     }
+  else if ( ffName == "modExp" )
+    {
+      tag = MakeModExp( "sideband_fit_modExp", mgg, *ws );
+      std::cout << "[INFO]: Running modified exponential fit" << std::endl; 
+    }
+  else if ( ffName == "singlePow" )
+    {
+      tag = MakeSinglePow( "sideband_fit_singlePow", mgg, *ws );
+      std::cout << "[INFO]: Running single pow fit" << std::endl; 
+    }
   else
     {
       std::cout << "[ERROR]: fit option not recognized" << std::endl;
       exit (EXIT_FAILURE);
     }
   
+  std::cout << "[INFO]: ENTERING FIT" << std::endl;
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
     
   bres->SetName( tag + "_b_fitres" );
+
+  std::cout << "[INFO]: PASS FIT" << std::endl;
   //---------------------
   //g e t t i n g   n l l 
   //---------------------
