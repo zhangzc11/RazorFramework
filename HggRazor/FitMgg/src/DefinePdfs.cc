@@ -29,6 +29,7 @@
 #include <RooGenericPdf.h>
 #include <RooFormulaVar.h>
 #include <RooBernstein.h>
+#include <RooChebychev.h>
 #include <RooMinuit.h>
 //LOCAL INCLUDES
 #include "DefinePdfs.hh"
@@ -135,9 +136,11 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w) {
   RooRealVar *m1 = new RooRealVar(tag+"_mexp_m1","m_{1}",1.,0.,10.);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_mexp_Nbkg","N_{bkg}",10,1,1E9);
   RooGenericPdf *mexp1 = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*alpha1,mgg,*m1));
-  RooExtendPdf* modExp_Ext = new RooExtendPdf( tag+"_mexp_ext", "modExp", *mexp1, *Nbkg);
+  
+  TString pdfName = tag+"_mexp_ext";
+  RooExtendPdf* modExp_Ext = new RooExtendPdf( pdfName, "modExp", *mexp1, *Nbkg);
   w.import( *modExp_Ext );
-  return tag+"_mexp_Ext";
+  return pdfName;
 };
 
 TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w) 
@@ -145,8 +148,9 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooRealVar *alpha1 = new RooRealVar(tag+"_spow_alpha1","#alpha_{1}",-1,-10,-0.0001);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_spow_Nbkg","N_{bkg}",10,1,1E9);
   RooGenericPdf *pow1 = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*alpha1));
-  w.import(*(new RooExtendPdf(tag+"_spow_ext","",*pow1,*Nbkg)));;
-  return tag+"_spow_ext";
+  TString pdfName = tag+"_spow_ext";
+  w.import( *(new RooExtendPdf( pdfName,"",*pow1,*Nbkg)) );
+  return pdfName;
 };
 
 TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
@@ -159,9 +163,51 @@ TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
   RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
 
-  RooAddPdf *add      = new RooAddPdf(tag+"_dpow","",*pow1,*pow2,*f);
+  TString pdfName = tag+"_dpow_ext";
+  RooAddPdf *add      = new RooAddPdf( tag+"_dpow","",*pow1,*pow2,*f);  
+  w.import( *(new RooExtendPdf( pdfName,"",*add,*Nbkg)) );
 
-  w.import( *(new RooExtendPdf(tag+"_dpow_ext","",*add,*Nbkg)) );
+  return pdfName;
+};
 
-  return tag+"dpow_ext";
-}
+TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pol2_pC","C",1,-100,100);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol2_p0","p_0",1,-100,100);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol2_p1","p_1",1,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol2_Nbkg","N_{bkg}",100,1,1E9);
+
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol2_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol2_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol2_p1mod","@0*@0",*p1);
+
+  RooBernstein* bern = new RooBernstein(tag+"_pol2","",mgg,RooArgList(*pCmod,*p0mod,*p1mod));
+  //RooChebychev* chev = new RooChebychev(tag+"_pol2","",mgg,RooArgList(*pCmod,*p0mod,*p1mod));
+  TString pdfName = tag+"_pol2_ext";
+  w.import(*(new RooExtendPdf( pdfName,"",*bern,*Nbkg)));
+  //w.import(*(new RooExtendPdf( pdfName,"",*chev,*Nbkg)));
+  
+
+  return pdfName;
+};
+
+TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pol3_pC","C",1,-100,100);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol3_p0","p_0",1.0,-100,100);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol3_p1","p_1",0,-100,100);
+  RooRealVar *p2 = new RooRealVar(tag+"_pol3_p2","p_2",5,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol3_Nbkg","N_{bkg}",2000,1,1E9);
+  
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol3_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol3_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol3_p1mod","@0*@0",*p1);
+  RooFormulaVar *p2mod = new RooFormulaVar(tag+"_pol3_p2mod","@0*@0",*p2);
+
+  RooBernstein* bern = new RooBernstein(tag+"_pol3","",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod));
+
+  TString pdfName = tag+"_pol3_ext";
+  w.import( *(new RooExtendPdf( pdfName,"",*bern,*Nbkg)) );
+  
+  return pdfName;
+};

@@ -231,7 +231,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   return ws;
 };
 
-RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, TString ffName = "doubleExp" )
+RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, TString ffName = "doubleExp" )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -261,42 +261,60 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
       tag = MakeSinglePow( "sideband_fit_singlePow", mgg, *ws );
       std::cout << "[INFO]: Running single pow fit" << std::endl; 
     }
+  else if ( ffName == "doublePow" )
+    {
+      tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      std::cout << "[INFO]: Running double pow fit" << std::endl; 
+    }
+  else if ( ffName == "poly2" )
+    {
+      tag = MakePoly2( "sideband_fit_poly2", mgg, *ws );
+      std::cout << "[INFO]: Running poly2 fit" << std::endl; 
+    }
+  else if ( ffName == "poly3" )
+    {
+      tag = MakePoly3( "sideband_fit_poly3", mgg, *ws );
+      std::cout << "[INFO]: Running poly3 fit" << std::endl; 
+    }
   else
     {
-      std::cout << "[ERROR]: fit option not recognized" << std::endl;
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
       exit (EXIT_FAILURE);
     }
   
   std::cout << "[INFO]: ENTERING FIT" << std::endl;
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
-  ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
     
   bres->SetName( tag + "_b_fitres" );
-
   std::cout << "[INFO]: PASS FIT" << std::endl;
   //---------------------
   //g e t t i n g   n l l 
   //---------------------
   double minNll = bres->minNll();
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
   RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
-  double K = floatPars->getSize();
+  double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
   double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>131 && mgg<160)");
   std::cout << "n -> " << n << std::endl;
-  double AIC = 2*minNll + 2*K*(K+1)/(n-K-1);
+  AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
   std::cout << "AIC: " << AIC << std::endl;
   /*
   RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame( );
   nll->plotOn( fns, RooFit::LineColor(kBlue) );
   fns->SetName("nll_trick");
   ws->import( *fns );
-  ws->import( *bres );
   */
+  ws->import( *bres );
   
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);

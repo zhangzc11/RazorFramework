@@ -180,11 +180,16 @@ int main( int argc, char* argv[])
   RooWorkspace* w3;
   RooWorkspace* w4;
   RooWorkspace* w5;
+  RooWorkspace* w6;
+  RooWorkspace* w7;
+  RooWorkspace* w8;
+  RooWorkspace* w9;
+  double aic[7];
   if ( dataMode == "data" )
     {
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
       std::cout << "[INFO]: cut -> " << cut << std::endl;
-      w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      //w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
       std::cout << "pass-3" << std::endl;
       //MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
       std::cout << "pass-2" << std::endl;
@@ -194,9 +199,13 @@ int main( int argc, char* argv[])
       std::cout << "pass-0" << std::endl;
       if ( AIC == "yes" )
 	{
-	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "doubleExp" );
-	  w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singleExp" );
-	  w5 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, "singlePow" );
+	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], "doubleExp" );
+	  w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], "singleExp" );
+	  w5 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], "singlePow" );
+	  w6 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[3], "doublePow" );
+	  w7 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[4], "poly2" );
+	  w8 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[5], "poly3" );
+	  w9 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
 	}
       std::cout << "pass" << std::endl;
     }
@@ -221,13 +230,23 @@ int main( int argc, char* argv[])
   } else {
     fout = new TFile( outputfilename.c_str(), "recreate" );
   }
-  w->Write("w1");
+  //w->Write("w1");
   //w2->Write("w2");
   if ( AIC == "yes" )
     {
-      //w3->Write("w3");
-      //w4->Write("w4");
+      w3->Write("w3");
+      w4->Write("w4");
       w5->Write("w5");
+      w6->Write("w6");
+      w7->Write("w7");
+      w8->Write("w8");
+      w9->Write("w9");
+    }
+
+  std::cout.precision(10);
+  for ( int i = 0; i < 7; i++ )
+    {
+      std::cout << "AIC, i: " << aic[i] << std::endl;
     }
   fout->Close();
     

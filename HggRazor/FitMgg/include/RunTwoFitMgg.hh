@@ -13,6 +13,6 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName );
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName );
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
-RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, TString ffName );
+RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, TString ffName );
 
 #endif
