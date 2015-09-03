@@ -3,6 +3,7 @@
 //ROOT INCLUDES
 #include <TFile.h>
 #include <TTree.h>
+#include <TMath.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
 #include "CommandLineInput.hh"
@@ -51,7 +52,7 @@ int main( int argc, char* argv[])
   std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
   if (  categoryMode == "" )
     {
-      std::cerr << "[ERROR]: please provide the category. Use --category=<data/mc>" << std::endl;
+      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,highres,lowres>" << std::endl;
       return -1;
     }
 
@@ -61,12 +62,20 @@ int main( int argc, char* argv[])
       std::cerr << "[INFO]: AIC not provided. Use --category=<yes/no>. Using <no> in this execution" << std::endl;
     }
   
+  std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
+  if (  fitMode == "" )
+    {
+      std::cerr << "[ERROR]: please provide a fit mode, options are: sideband\nsb (signal+bkg)\nAIC" << std::endl;
+      return -1;
+    }
+  
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputfile=" );
   
-  std::cout << "[INFO]: tree name is :" << treeName << std::endl;
-  std::cout << "[INFO]: data/mc mode :" << dataMode << std::endl;
+  std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
+  std::cout << "[INFO]: data/mc mode  :" << dataMode << std::endl;
   std::cout << "[INFO]: category mode :" << categoryMode << std::endl;
-  std::cout << "[INFO]: outputfile :" << outputfilename << std::endl;
+  std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
+  std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   
   TFile* f;
   TTree* tree;
@@ -88,7 +97,7 @@ int main( int argc, char* argv[])
       f = new TFile( inputFile2.c_str(), "READ" );
       mc_tree = (TTree*)f->Get( treeName.c_str() );
     }
-
+  
   //****************************************************
   //MR-Rsq Bin Cut String
   //****************************************************  
@@ -170,57 +179,56 @@ int main( int argc, char* argv[])
     {
       cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160" + categoryCutString + BinCutString;
     }
- 
+  
   float forceSigma = 1.5;
   bool constrainMu = false;
   float forceMu    = -1;
   TString mggName  = "mgg";
   RooWorkspace* w;
   RooWorkspace* w2;
-  RooWorkspace* w3;
-  RooWorkspace* w4;
-  RooWorkspace* w5;
-  RooWorkspace* w6;
-  RooWorkspace* w7;
-  RooWorkspace* w8;
-  RooWorkspace* w9;
+
+  //---
+  //AIC
+  //---
+  RooWorkspace* w_aic[7];
   double aic[7];
-  if ( dataMode == "data" )
-    {
-      cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
-      std::cout << "[INFO]: cut -> " << cut << std::endl;
-      //w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
-      std::cout << "pass-3" << std::endl;
-      //MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
-      std::cout << "pass-2" << std::endl;
-      //GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
-      std::cout << "pass-1" << std::endl;
-      //w2 = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
-      std::cout << "pass-0" << std::endl;
-      if ( AIC == "yes" )
-	{
-	  w3 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], "doubleExp" );
-	  w4 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], "singleExp" );
-	  w5 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], "singlePow" );
-	  w6 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[3], "doublePow" );
-	  w7 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[4], "poly2" );
-	  w8 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[5], "poly3" );
-	  w9 = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
-	}
-      std::cout << "pass" << std::endl;
-    }
-  else if ( dataMode == "mc" )
+  std::map< std::string, double > aic_map;
+  //--------------------
+  //D e f i n e  c u t s
+  //--------------------
+  cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
+  std::cout << "[INFO]: cut -> " << cut << std::endl;
+  
+  if ( fitMode == "sideband" )
     {
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      MakePlot( tree->CopyTree( cut ),  *w, "sideband_fitpdf_dExp_N1N2", mggName );
+      GetIntegral( *w, "sideband_fitpdf_dExp_N1N2", mggName );
     }
-  else if ( dataMode == "hybrid" && inputFile2 != "" )
+  else if ( fitMode == "sb" )
     {
-      w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
-      w2 = MakeSideBandFit( mc_tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      w = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+    }
+  else if ( fitMode == "AIC" )
+    {
+      w_aic[0] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], "doubleExp" );
+      if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doubleExp",aic[0]));
+      w_aic[1] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], "singleExp" );
+      if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[1]));
+      w_aic[2] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], "singlePow" );
+      if( aic_map.find("singlePow") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singlePow",aic[2]));
+      w_aic[3] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[3], "doublePow" );
+      if( aic_map.find("doublePow") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doublePow",aic[3]));
+      w_aic[4] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[4], "poly2" );
+      if( aic_map.find("poly2") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly2",aic[4]));
+      w_aic[5] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[5], "poly3" );
+      if( aic_map.find("poly3") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly3",aic[5]));
+      w_aic[6] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
+      if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
     }
   else
     {
-      std::cout << "[ERROR]: please provide a valid dataMode, i.e data or mc" << std::endl;
+      std::cout << "[ERROR]: please provide a valid fitMode!!" << std::endl;
       return -1;
     }
 
@@ -232,22 +240,51 @@ int main( int argc, char* argv[])
   }
   //w->Write("w1");
   //w2->Write("w2");
-  if ( AIC == "yes" )
+  if ( fitMode == "AIC" )
     {
-      w3->Write("w3");
-      w4->Write("w4");
-      w5->Write("w5");
-      w6->Write("w6");
-      w7->Write("w7");
-      w8->Write("w8");
-      w9->Write("w9");
+      w_aic[0]->Write("w3");
+      w_aic[1]->Write("w4");
+      w_aic[2]->Write("w5");
+      w_aic[3]->Write("w6");
+      w_aic[4]->Write("w7");
+      w_aic[5]->Write("w8");
+      w_aic[6]->Write("w9");
+      std::cout.precision(10);
+      double min_aic = 99999999;
+      std::string func_min = "";
+      std::cout << "MIN AIC->" << min_aic << std::endl;
+      for ( auto tmp : aic_map )
+	{
+	  if (  tmp.second < min_aic )
+	    {
+	      min_aic  = tmp.second;
+	      func_min = tmp.first;
+	    }
+	}
+      std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func_min] << std::endl;
+      //------------------------------
+      //c o m p u t e   d e l t a  AIC
+      //------------------------------
+      std::map<std::string, double> delta_aic_map;
+      double sumweights = 0.0;
+      for ( auto tmp : aic_map )
+	{
+	  delta_aic_map[tmp.first] = tmp.second - min_aic;
+	  sumweights += TMath::Exp( -0.5*delta_aic_map[tmp.first] ); 
+	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
+	}
+      //------------------------------
+      //c o m p u t e   AIC  weights
+      //------------------------------
+      std::map<std::string, double> aic_weight_map;
+      for ( auto tmp : delta_aic_map )
+	{
+	  aic_weight_map[tmp.first] = TMath::Exp( -0.5*delta_aic_map[tmp.first] )/sumweights;
+	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
+	}
+      
     }
-
-  std::cout.precision(10);
-  for ( int i = 0; i < 7; i++ )
-    {
-      std::cout << "AIC, i: " << aic[i] << std::endl;
-    }
+  
   fout->Close();
     
   return 0;	
