@@ -145,10 +145,10 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w) {
 
 TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w) 
 {
-  RooRealVar *alpha1 = new RooRealVar(tag+"_spow_alpha1","#alpha_{1}",-1,-10,-0.0001);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_spow_Nbkg","N_{bkg}",10,1,1E9);
+  RooRealVar *alpha1  = new RooRealVar(tag+"_spow_alpha1","#alpha_{1}",-1,-10,-0.0001);
+  RooRealVar *Nbkg    = new RooRealVar(tag+"_spow_Nbkg","N_{bkg}",10,1,1E9);
   RooGenericPdf *pow1 = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*alpha1));
-  TString pdfName = tag+"_spow_ext";
+  TString pdfName     = tag+"_spow_ext";
   w.import( *(new RooExtendPdf( pdfName,"",*pow1,*Nbkg)) );
   return pdfName;
 };

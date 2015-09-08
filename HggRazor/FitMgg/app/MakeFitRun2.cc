@@ -198,6 +198,20 @@ int main( int argc, char* argv[])
   //--------------------
   cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
+
+
+  //-------------------------------
+  //O u t p u t   R O O T   f i l e
+  //-------------------------------
+  TFile* fout = 0;
+  if (outputfilename == "")
+    {
+      fout = new TFile( "test_out.root", "recreate" );
+    }
+  else
+    {
+      fout = new TFile( outputfilename.c_str(), "recreate" );
+    }
   
   if ( fitMode == "sideband" )
     {
@@ -226,18 +240,19 @@ int main( int argc, char* argv[])
       w_aic[6] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
     }
+  else if ( fitMode == "bias" )
+    {
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, "doubleExp", "poly2");
+      w_bias->Write("w_bias");
+    }
   else
     {
       std::cout << "[ERROR]: please provide a valid fitMode!!" << std::endl;
       return -1;
     }
 
-  TFile* fout = 0;
-  if (outputfilename == "") {
-    fout = new TFile( "test_out.root", "recreate" );
-  } else {
-    fout = new TFile( outputfilename.c_str(), "recreate" );
-  }
+
+  
   //w->Write("w1");
   //w2->Write("w2");
   if ( fitMode == "AIC" )
