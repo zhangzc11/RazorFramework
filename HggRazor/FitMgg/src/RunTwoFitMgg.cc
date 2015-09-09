@@ -333,7 +333,7 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   return ws;
 };
 
-RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2 )
+RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, int npoints )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -435,7 +435,6 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2 )
   RooAbsReal* f1Integral = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
   std::cout << "f1 Int: " << f1Integral->getVal() << std::endl;
   
-  int ntoys = 1e4;
   RooDataSet* data_toys;
   RooFitResult* bres_toys;
   double n; 
@@ -444,12 +443,12 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2 )
   RooRealVar bias("bias", "bias", -0.04, 0.04, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
   bias.setBins(100);
-  for ( int i = 0; i < 1000; i++ )
+  for ( int i = 0; i < ntoys; i++ )
     {
       //-----------------------------
       //G e n e r a t i n g   t o y s
       //-----------------------------
-      data_toys = GenerateToys( ws->pdf( tag1 ), mgg, ntoys );
+      data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
       //ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
       //RooFitResult* bres_toys = ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
@@ -471,6 +470,8 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2 )
   RooPlot* f_bias = bias.frame();
   f_bias->SetName("bias_plot");
   data_bias.plotOn( f_bias );
+  ws->import( mgg );
+  ws->import( data_bias );
   ws->import( *f_mgg );
   ws->import( *bres_toys );
   ws->import( *f_bias );

@@ -65,10 +65,25 @@ int main( int argc, char* argv[])
   std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
   if (  fitMode == "" )
     {
-      std::cerr << "[ERROR]: please provide a fit mode, options are: sideband\nsb (signal+bkg)\nAIC" << std::endl;
+      std::cerr << "[ERROR]: please provide a fit mode, options are: \nsideband\nsb (signal+bkg)\nAIC" << std::endl;
       return -1;
     }
+
+  std::string f1 = ParseCommandLine( argc, argv, "-f1=" );
+  if (  f1 == "" && fitMode == "bias" )
+    {
+      std::cerr << "[WARNING]: f1 name not provided, using singleExp. Options are: singleExp\ndoubleExp\nsinglePow\ndoublePow";
+      std::cerr << "\nmodExp\npoly2\npoly3" << std::endl;
+      f1 = "singleExp";
+    }
   
+  std::string f2 = ParseCommandLine( argc, argv, "-f2=" );
+  if (  f2 == "" && fitMode == "bias" )
+    {
+      std::cerr << "[WARNING]: f2 name not provided, using doubleExp. Options are: singleExp\ndoubleExp\nsinglePow\ndoublePow";
+      std::cerr << "\nmodExp\npoly2\npoly3" << std::endl;
+      f2 = "doubleExp";
+    }
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputfile=" );
   
   std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
@@ -77,6 +92,8 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   
+  if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
+  if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
   TFile* f;
   TTree* tree;
   if ( dataMode == "data" )
@@ -242,7 +259,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "bias" )
     {
-      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, "doubleExp", "poly2");
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e2, 1e4);
       w_bias->Write("w_bias");
     }
   else
