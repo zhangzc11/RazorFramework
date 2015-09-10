@@ -476,6 +476,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   f_bias->SetName("bias_plot");
   data_bias.plotOn( f_bias );
   ws->import( mgg );
+  ws->import( bias );
   ws->import( data_bias );
   ws->import( *f_mgg );
   ws->import( *bres_toys );
