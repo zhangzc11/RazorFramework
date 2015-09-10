@@ -84,7 +84,7 @@ int main( int argc, char* argv[])
       std::cerr << "\nmodExp\npoly2\npoly3" << std::endl;
       f2 = "doubleExp";
     }
-  std::string outputfilename = ParseCommandLine( argc, argv, "-outputfile=" );
+  std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
   std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode  :" << dataMode << std::endl;
