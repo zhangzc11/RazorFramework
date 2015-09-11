@@ -6,6 +6,7 @@
 #include <RooRealVar.h>
 #include <RooWorkspace.h>
 #include <RooDataSet.h>
+#include <RooPlot.h>
 
 void PlotBias(TString fname = "")
 {
