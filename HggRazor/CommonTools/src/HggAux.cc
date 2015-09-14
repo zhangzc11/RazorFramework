@@ -17,8 +17,13 @@ Process end( Process process ){ return Process::Last; };
 
 HistoTypes& operator++( HistoTypes& htype ){ return htype = (HistoTypes)( std::underlying_type<HistoTypes>::type( htype ) + 1 ); };
 HistoTypes operator*( HistoTypes htype ){ return htype; };
-HistoTypes begin( HistoTypes htype ){ return HistoTypes:: mr; };
+HistoTypes begin( HistoTypes htype ){ return HistoTypes::mr; };
 HistoTypes end( HistoTypes htype ){ return HistoTypes::Last; };
+
+FitFunction& operator++( FitFunction& fitf ){ return fitf = (FitFunction)(std::underlying_type<FitFunction>::type( fitf ) + 1 ); };
+FitFunction operator*( FitFunction fitf ){ return fitf; };
+FitFunction begin( FitFunction fitf ){ return FitFunction::singleExp; };
+FitFunction end( FitFunction fitf ){ return FitFunction::Last; };
 
 bool Histos::AssignHisto( HistoTypes htype, TH1F h )
 {
@@ -136,6 +141,42 @@ if ( htype == HistoTypes::mr )
  return "";
 };
 
+std::string GetFitFunctionString( FitFunction  fitf )
+{
+  if ( fitf == FitFunction::singleExp )
+    {
+      return "singleExp";
+    }
+  else if ( fitf == FitFunction::doubleExp )
+    {
+      return "doubleExp";
+    }
+  else if ( fitf == FitFunction::modExp )
+    {
+      return "modExp";
+    }
+  else if ( fitf == FitFunction::singlePow )
+    {
+      return "singlePow";
+    }
+  else if( fitf == FitFunction::doublePow )
+    {
+      return "doublePow";
+    }
+  else if( fitf == FitFunction::poly2 )
+    {
+      return "poly2";
+    }
+  else if( fitf == FitFunction::poly3 )
+    {
+      return "poly3";
+    }
+  else
+    {
+      std::cerr << "[ERROR]: FitFunction not found" << std::endl;
+    }
+  return "";
+};
 //Fill map with input lists
 bool FillMapList( std::map< std::string, std::string >& thisMap, std::string inputList )
 {
