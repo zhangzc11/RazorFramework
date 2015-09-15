@@ -65,7 +65,7 @@ int main( int argc, char* argv[])
   std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
   if (  fitMode == "" )
     {
-      std::cerr << "[ERROR]: please provide a fit mode, options are: \nsideband\nsb (signal+bkg)\nAIC" << std::endl;
+      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nbias\nsignalFit" << std::endl;
       return -1;
     }
 
@@ -261,6 +261,11 @@ int main( int argc, char* argv[])
     {
       RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e5);
       w_bias->Write("w_bias");
+    }
+  else if ( fitMode == "signalFit" )
+    {
+      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      w_sFit->Write("w_sFit");
     }
   else
     {

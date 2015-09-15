@@ -36,6 +36,33 @@
 #include "RunTwoFitMgg.hh"
 #include "DefinePdfs.hh"
 
+RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
+{
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  mgg.setBins(57);
+  mgg.setRange( "signal", 120, 130. );
+  //C r e a t e  doubleGaus
+  TString tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
+  
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
+  ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended( kTRUE ), RooFit::Range("signal") );
+  RooFitResult* sres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+
+  sres->SetName( tag + "_sres" );
+  ws->import( *sres );
+
+  RooPlot* frame = mgg.frame();
+  data.plotOn( frame );
+  ws->pdf( tag )->plotOn( frame, RooFit::LineColor( kBlue ), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  ws->import( mgg );
+  ws->import( data );
+  frame->SetName( tag + "_frame" );
+  ws->import( *frame );
+
+  return ws;
+};
+
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
@@ -55,7 +82,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   //Full Fit
   //ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
