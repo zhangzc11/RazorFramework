@@ -272,8 +272,6 @@ int main( int argc, char* argv[])
       std::cout << "[ERROR]: please provide a valid fitMode!!" << std::endl;
       return -1;
     }
-
-
   
   //w->Write("w1");
   //w2->Write("w2");
