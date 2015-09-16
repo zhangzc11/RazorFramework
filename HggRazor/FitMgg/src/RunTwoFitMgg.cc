@@ -624,7 +624,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double n; 
   RooAbsReal* fIntegral;
   RooAbsReal* fIntegral2;
-  RooRealVar bias("bias", "bias", -0.04, 0.04, "");
+  RooRealVar bias("bias", "bias", -0.06, 0.06, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
   bias.setBins(100);
   for ( int i = 0; i < ntoys; i++ )
