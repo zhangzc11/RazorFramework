@@ -661,7 +661,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double n; 
   RooAbsReal* fIntegral;
   RooAbsReal* fIntegral2;
-  RooRealVar bias("bias", "bias", -10.0, 10.0, "");
+  RooRealVar bias("bias", "bias", -2.0, 2.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
   bias.setBins(100);
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
@@ -688,13 +688,15 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       ws->var("doubleGauseSB_gauss_sigma2")->setConstant(kTRUE);
       
       //ws->var("sideband_fit_singleExpse_Nbkg")->setVal( sqrt(npoints) );
+      if ( f2 == "doubleExp" ) ws->var("sideband_fit_doubleExpNbkg2")->setVal(0.01);
       ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
       signal_toys = GenerateToys( signalPdf, mgg, stoys );
       data_toys->append( *signal_toys );
       
 
-      sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-      bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+      //sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+      //bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+      bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
       bres_toys->SetName("bres_toys");
       
       double Nsignal = pow(ws->var("doubleGauseSB_gauss_Ns")->getVal(), 2);

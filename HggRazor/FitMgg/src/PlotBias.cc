@@ -47,7 +47,7 @@ void PlotBias( std::string fname = "", std::string outDir = "bias_plots")
   
   TFile* f = new TFile( fname.c_str() , "READ" );
   //Getting Workspace
-  RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
   RooRealVar* bias = w->var("bias");
   //Getting data_bias RooDataSet
@@ -137,7 +137,8 @@ std::pair<double,double>GetMeanRms( std::string fname = "", std::string outDir =
   //-----------------------
   TFile* f = new TFile( fname.c_str() , "READ" );
   //Getting Workspace
-  RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
   RooRealVar* bias = w->var("bias");
   //Getting data_bias RooDataSet
