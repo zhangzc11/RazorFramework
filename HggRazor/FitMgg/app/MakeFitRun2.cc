@@ -262,6 +262,12 @@ int main( int argc, char* argv[])
       RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e0, 1e5);
       w_bias->Write("w_bias");
     }
+  else if ( fitMode == "biasSignal")
+    {
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e0, 1e5);
+      fout->cd();
+      w_biasSignal->Write("w_biasSignal");
+    }
   else if ( fitMode == "signalFit" )
     {
       RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
