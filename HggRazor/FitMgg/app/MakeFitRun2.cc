@@ -65,7 +65,7 @@ int main( int argc, char* argv[])
   std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
   if (  fitMode == "" )
     {
-      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nbias\nsignalFit" << std::endl;
+      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nbias\nsignalFit\nbiasSignal" << std::endl;
       return -1;
     }
 
@@ -98,8 +98,8 @@ int main( int argc, char* argv[])
   TTree* tree;
   if ( dataMode == "data" )
     {
-      //f = new TFile( inputFile.c_str() , "READ");
-      f = new TFile( inputFile.c_str() , "UPDATE");
+      f = new TFile( inputFile.c_str() , "READ");
+      //f = new TFile( inputFile.c_str() , "UPDATE");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
@@ -259,12 +259,12 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "bias" )
     {
-      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e0, 1e5);
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
       w_bias->Write("w_bias");
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e0, 1e5);
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
