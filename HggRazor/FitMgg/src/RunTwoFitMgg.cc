@@ -680,6 +680,12 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       ws->var("doubleGauseSB_gauss_mu")->setVal( gausMu );
       ws->var("doubleGauseSB_gauss_sigma1")->setVal( gausSigma1 );
       ws->var("doubleGauseSB_gauss_sigma2")->setVal( gausSigma2 );
+
+      
+      ws->var("doubleGauseSB_frac")->setConstant(kTRUE);
+      ws->var("doubleGauseSB_gauss_mu")->setConstant(kTRUE);
+      ws->var("doubleGauseSB_gauss_sigma1")->setConstant(kTRUE);
+      ws->var("doubleGauseSB_gauss_sigma2")->setConstant(kTRUE);
       
       //ws->var("sideband_fit_singleExpse_Nbkg")->setVal( sqrt(npoints) );
       ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
