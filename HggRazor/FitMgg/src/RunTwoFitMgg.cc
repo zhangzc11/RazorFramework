@@ -547,37 +547,37 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   TString tag1, tag2, tag2p;
   if ( f1 == "doubleExp" )
     {
-      tag1 = MakeDoubleExpN1N2( "sideband_fit_doubleExp", mgg, *ws );
+      tag1 = MakeDoubleExpN1N2( "sideband_fit_doubleExp1", mgg, *ws );
       std::cout << "[INFO]: Running double exponential fit" << std::endl; 
     }
   else if ( f1 == "singleExp" )
     {
-      tag1 = MakeSingleExp( "sideband_fit_singleExp", mgg, *ws );
+      tag1 = MakeSingleExp( "sideband_fit_singleExp1", mgg, *ws );
       std::cout << "[INFO]: Running single exponential fit" << std::endl; 
     }
   else if ( f1 == "modExp" )
     {
-      tag1 = MakeModExp( "sideband_fit_modExp", mgg, *ws );
+      tag1 = MakeModExp( "sideband_fit_modExp1", mgg, *ws );
       std::cout << "[INFO]: Running modified exponential fit" << std::endl; 
     }
   else if ( f1 == "singlePow" )
     {
-      tag1 = MakeSinglePow( "sideband_fit_singlePow", mgg, *ws );
+      tag1 = MakeSinglePow( "sideband_fit_singlePow1", mgg, *ws );
       std::cout << "[INFO]: Running single pow fit" << std::endl; 
     }
   else if ( f1 == "doublePow" )
     {
-      tag1 = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      tag1 = MakeDoublePow( "sideband_fit_doublePow2", mgg, *ws );
       std::cout << "[INFO]: Running double pow fit" << std::endl; 
     }
   else if ( f1 == "poly2" )
     {
-      tag1 = MakePoly2( "sideband_fit_poly2", mgg, *ws );
+      tag1 = MakePoly2( "sideband_fit_poly2_1", mgg, *ws );
       std::cout << "[INFO]: Running poly2 fit" << std::endl; 
     }
   else if ( f1 == "poly3" )
     {
-      tag1 = MakePoly3( "sideband_fit_poly3", mgg, *ws );
+      tag1 = MakePoly3( "sideband_fit_poly3_1", mgg, *ws );
       std::cout << "[INFO]: Running poly3 fit" << std::endl; 
     }
   else
@@ -688,8 +688,14 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       ws->var("doubleGauseSB_gauss_sigma2")->setConstant(kTRUE);
       
       //ws->var("sideband_fit_singleExpse_Nbkg")->setVal( sqrt(npoints) );
-      if ( f2 == "doubleExp" ) ws->var("sideband_fit_doubleExpNbkg2")->setVal(0.01);
-      ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+      //if ( f2 == "doubleExp" ) ws->var("sideband_fit_doubleExpNbkg2")->setVal(0.01);
+      /*
+	if ( f1 == "doubleExp" && f2 == "doubleExp" )
+      	{
+	
+	}
+      */
+      ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
       signal_toys = GenerateToys( signalPdf, mgg, stoys );
       data_toys->append( *signal_toys );
       
@@ -710,7 +716,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   data_toys->plotOn( f_mgg );
   ws->pdf( tag2 )->plotOn( f_mgg, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));
   ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  //ws->pdf( gaussTag )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("sig"));
+  ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("sig"));
   sbModel->plotOn( f_mgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
 
   RooPlot* f_bias = bias.frame();
