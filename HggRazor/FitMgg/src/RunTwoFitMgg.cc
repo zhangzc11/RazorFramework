@@ -663,7 +663,12 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* fIntegral2;
   RooRealVar bias("bias", "bias", -2.0, 2.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
+
+  RooRealVar NsignalError("NsignalError", "NsignalError", -.02, .02, "");
+  RooDataSet data_Nse( "data_Nse", "data_Nse", NsignalError);
+  
   bias.setBins(100);
+  NsignalError.setBins(100);
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
   ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   for ( int i = 0; i < ntoys; i++ )
@@ -672,7 +677,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //G e n e r a t i n g   t o y s
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-      double frac = 0.3;
+      double frac = 0.1;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
@@ -705,10 +710,13 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
       bres_toys->SetName("bres_toys");
       
-      double Nsignal = pow(ws->var("doubleGauseSB_gauss_Ns")->getVal(), 2);
+      double Nsignal  = pow(ws->var("doubleGauseSB_gauss_Ns")->getVal(), 2);
+      double Ns_Error = 2.0*ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
       bias =  (Nsignal - double(stoys))/(double)stoys;
+      NsignalError.setVal( Ns_Error );
       std::cout << "bias: " << bias.getVal() << std::endl;
-      data_bias.add(RooArgSet(bias));
+      data_bias.add( RooArgSet(bias) );
+      data_Nse.add( RooArgSet(NsignalError) );
     }
   
   RooPlot* f_mgg = mgg.frame();
@@ -722,13 +730,19 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooPlot* f_bias = bias.frame();
   f_bias->SetName("bias_plot");
   data_bias.plotOn( f_bias );
+
+  RooPlot* f_Nse = NsignalError.frame();
+  f_Nse->SetName("NsignalError");
+  data_Nse.plotOn( f_Nse );
+  
   ws->import( mgg );
   ws->import( bias );
   ws->import( data_bias );
   ws->import( *f_mgg );
   ws->import( *bres_toys );
   ws->import( *f_bias );
-
+  ws->import( *f_Nse );
+    
   return ws;
 };
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
