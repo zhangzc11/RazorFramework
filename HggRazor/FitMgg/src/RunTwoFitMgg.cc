@@ -526,7 +526,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double gausSigma1 =  wsignal->var("dGauss_signal_gauss_sigma1")->getVal();
   double gausSigma2 =  wsignal->var("dGauss_signal_gauss_sigma2")->getVal();
 
-  //delete fsignal;
+  delete fsignal;
   //fsignal->Close();
   
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
