@@ -526,7 +526,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double gausSigma1 =  wsignal->var("dGauss_signal_gauss_sigma1")->getVal();
   double gausSigma2 =  wsignal->var("dGauss_signal_gauss_sigma2")->getVal();
 
-  delete fsignal;
+  //delete fsignal;
   //fsignal->Close();
   
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
@@ -734,16 +734,15 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //G e n e r a t i n g   t o y s
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-      double frac = 0.1;
+      double frac = 1.0;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
-      /*
       ws->var("doubleGauseSB_frac")->setVal( gausFrac );
       ws->var("doubleGauseSB_gauss_mu")->setVal( gausMu );
       ws->var("doubleGauseSB_gauss_sigma1")->setVal( gausSigma1 );
       ws->var("doubleGauseSB_gauss_sigma2")->setVal( gausSigma2 );
-      */
+      
       
       ws->var("doubleGauseSB_frac")->setConstant(kTRUE);
       ws->var("doubleGauseSB_gauss_mu")->setConstant(kTRUE);
