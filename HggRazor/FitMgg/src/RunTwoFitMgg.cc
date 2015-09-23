@@ -677,6 +677,13 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   NsignalError.setBins(100);
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
   ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  RooPlot* pFrame = mgg.frame();
+  pFrame->SetName("pFitFrame");
+  data_toys->plotOn( pFrame );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low,high") );
+  ws->import( *pFrame );
+  
   double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
   double sE_N, sE_a;//singleExp
   double mE_N, mE_a, mE_m;//modExp
@@ -836,7 +843,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   f_mgg->SetName("toys_plot");
   data_toys->plotOn( f_mgg );
   ws->pdf( tag2 )->plotOn( f_mgg, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));
-  ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high"));
   ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("Full"));
   sbModel->plotOn( f_mgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
 
