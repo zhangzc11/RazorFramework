@@ -65,24 +65,52 @@ int main( int argc, char* argv[])
   std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
   if (  fitMode == "" )
     {
-      std::cerr << "[ERROR]: please provide a fit mode, options are: sideband\nsb (signal+bkg)\nAIC" << std::endl;
+      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nbias\nsignalFit\nbiasSignal" << std::endl;
       return -1;
     }
+
+  std::string f1 = ParseCommandLine( argc, argv, "-f1=" );
+  if (  f1 == "" && fitMode == "bias" )
+    {
+      std::cerr << "[WARNING]: f1 name not provided, using singleExp. Options are: singleExp\ndoubleExp\nsinglePow\ndoublePow";
+      std::cerr << "\nmodExp\npoly2\npoly3" << std::endl;
+      f1 = "singleExp";
+    }
   
-  std::string outputfilename = ParseCommandLine( argc, argv, "-outputfile=" );
+  std::string f2 = ParseCommandLine( argc, argv, "-f2=" );
+  if (  f2 == "" && fitMode == "bias" )
+    {
+      std::cerr << "[WARNING]: f2 name not provided, using doubleExp. Options are: singleExp\ndoubleExp\nsinglePow\ndoublePow";
+      std::cerr << "\nmodExp\npoly2\npoly3" << std::endl;
+      f2 = "doubleExp";
+    }
+
+  std::string invertIso = ParseCommandLine( argc, argv, "-invertedIso=" );
+  if ( invertIso != "yes" && invertIso != "no" )
+    {
+      std::cerr << "[WARNING]: invertedIso not provided, provide using: --invertedIso=<yes/no>" << std::endl;
+      std::cerr << "[WARNING]: deafault value is <no>" << std::endl;
+      invertIso = "no";
+    }
+  
+  
+  std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
   std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
   std::cout << "[INFO]: data/mc mode  :" << dataMode << std::endl;
   std::cout << "[INFO]: category mode :" << categoryMode << std::endl;
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
+  std::cout << "[INFO]: inverted Iso  :" << invertIso << std::endl;
   
+  if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
+  if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
   TFile* f;
   TTree* tree;
   if ( dataMode == "data" )
     {
-      //f = new TFile( inputFile.c_str() , "READ");
-      f = new TFile( inputFile.c_str() , "UPDATE");
+      f = new TFile( inputFile.c_str() , "READ");
+      //f = new TFile( inputFile.c_str() , "UPDATE");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
@@ -177,7 +205,14 @@ int main( int argc, char* argv[])
   TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1 && pho1R9>0.9 && pho2R9>0.9 && pTGammaGamma < 110.";
   if ( treeName == "SusyHggTree" )
     {
-      cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160" + categoryCutString + BinCutString;
+      if ( invertIso != "yes" )
+	{
+	  cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160" + categoryCutString + BinCutString;
+	}
+      else
+	{
+	  cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho2_pass_id == 1 && mgg > 103 && mgg < 160 && ( (pho1_pass_iso == 1 && pho2_pass_iso == 0) || (pho1_pass_iso == 0 && pho2_pass_iso == 1) )" + categoryCutString + BinCutString;
+	}
     }
   
   float forceSigma = 1.5;
@@ -196,8 +231,22 @@ int main( int argc, char* argv[])
   //--------------------
   //D e f i n e  c u t s
   //--------------------
-  cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
+  //cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
+
+
+  //-------------------------------
+  //O u t p u t   R O O T   f i l e
+  //-------------------------------
+  TFile* fout = 0;
+  if (outputfilename == "")
+    {
+      fout = new TFile( "test_out.root", "recreate" );
+    }
+  else
+    {
+      fout = new TFile( outputfilename.c_str(), "recreate" );
+    }
   
   if ( fitMode == "sideband" )
     {
@@ -226,18 +275,28 @@ int main( int argc, char* argv[])
       w_aic[6] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
     }
+  else if ( fitMode == "bias" )
+    {
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
+      w_bias->Write("w_bias");
+    }
+  else if ( fitMode == "biasSignal")
+    {
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e1, 1e4);
+      fout->cd();
+      w_biasSignal->Write("w_biasSignal");
+    }
+  else if ( fitMode == "signalFit" )
+    {
+      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      w_sFit->Write("w_sFit");
+    }
   else
     {
       std::cout << "[ERROR]: please provide a valid fitMode!!" << std::endl;
       return -1;
     }
-
-  TFile* fout = 0;
-  if (outputfilename == "") {
-    fout = new TFile( "test_out.root", "recreate" );
-  } else {
-    fout = new TFile( outputfilename.c_str(), "recreate" );
-  }
+  
   //w->Write("w1");
   //w2->Write("w2");
   if ( fitMode == "AIC" )

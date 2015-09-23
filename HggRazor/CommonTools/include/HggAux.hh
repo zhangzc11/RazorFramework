@@ -45,8 +45,16 @@ HistoTypes begin( HistoTypes htype );
 HistoTypes end( HistoTypes htype );
 HistoTypes& operator++( HistoTypes& htype );
 HistoTypes operator*( HistoTypes htype );
-
 std::string GetHistoTypesString( HistoTypes htype );
+
+enum class FitFunction{ singleExp, doubleExp, modExp, singlePow, doublePow, poly2, poly3, Last };
+// R e d e f i n i n g   O p e r a t o r   t o   L o o p   O v e r   F i t F u n c t i o n s
+//------------------------------------------------------------------------------------------
+FitFunction begin( FitFunction fitf );
+FitFunction end( FitFunction fitf );
+FitFunction& operator++( FitFunction& fitf );
+FitFunction operator*( FitFunction fitf );
+std::string GetFitFunctionString( FitFunction  fitf );
 
 struct Histos
 {
