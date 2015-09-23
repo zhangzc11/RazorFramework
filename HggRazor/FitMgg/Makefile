@@ -50,10 +50,10 @@ $(TARGET2) : $(OBJ2)
 	@echo $^
 
 $(TARGET3) : $(OBJ3)
-        $(LD) $(CPPFLAGS) -o $(TARGET3) $(OBJ3) $(LDFLAGS)
+	$(LD) $(CPPFLAGS) -o $(TARGET3) $(OBJ3) $(LDFLAGS)
 	@echo $@
-        @echo $<
-        @echo $^
+	@echo $<
+	@echo $^
 
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
