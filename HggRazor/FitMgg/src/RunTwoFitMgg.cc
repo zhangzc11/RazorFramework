@@ -681,7 +681,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   pFrame->SetName("pFitFrame");
   data_toys->plotOn( pFrame );
   ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low,high") );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(1e4, RooAbsReal::NumEvent) );
   ws->import( *pFrame );
   
   double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
@@ -842,9 +842,12 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooPlot* f_mgg = mgg.frame();
   f_mgg->SetName("toys_plot");
   data_toys->plotOn( f_mgg );
-  ws->pdf( tag2 )->plotOn( f_mgg, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));
-  ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high"));
-  ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  //ws->pdf( tag2 )->plotOn( f_mgg, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));
+  
+  ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(1e4, RooAbsReal::NumEvent) );  
+  ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(1e4, RooAbsReal::NumEvent) );
+  //Plotting background only component of s+b fit
+  sbModel->plotOn( f_mgg, RooFit::LineStyle(kDashed), RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Components(tag2));
   sbModel->plotOn( f_mgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
 
   RooPlot* f_bias = bias.frame();
@@ -868,4 +871,110 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
 {
   return pdf->generate( x, ntoys );
+};
+
+RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3, TString ffName = "doubleExp" )
+{
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  mgg.setBins(57);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 131, 160);
+
+  TString tag;
+  if ( ffName == "doubleExp" )
+    {
+      tag = MakeDoubleExpN1N2( "sideband_fit_doubleExp", mgg, *ws );
+      std::cout << "[INFO]: Running double exponential fit" << std::endl; 
+    }
+  else if ( ffName == "singleExp" )
+    {
+      tag = MakeSingleExp( "sideband_fit_singleExp", mgg, *ws );
+      std::cout << "[INFO]: Running single exponential fit" << std::endl; 
+    }
+  else if ( ffName == "modExp" )
+    {
+      tag = MakeModExp( "sideband_fit_modExp", mgg, *ws );
+      std::cout << "[INFO]: Running modified exponential fit" << std::endl; 
+    }
+  else if ( ffName == "singlePow" )
+    {
+      tag = MakeSinglePow( "sideband_fit_singlePow", mgg, *ws );
+      std::cout << "[INFO]: Running single pow fit" << std::endl; 
+    }
+  else if ( ffName == "doublePow" )
+    {
+      tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      std::cout << "[INFO]: Running double pow fit" << std::endl; 
+    }
+  else if ( ffName == "poly2" )
+    {
+      tag = MakePoly2( "sideband_fit_poly2", mgg, *ws );
+      std::cout << "[INFO]: Running poly2 fit" << std::endl; 
+    }
+  else if ( ffName == "poly3" )
+    {
+      tag = MakePoly3( "sideband_fit_poly3", mgg, *ws );
+      std::cout << "[INFO]: Running poly3 fit" << std::endl; 
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  std::cout << "[INFO]: ENTERING FIT" << std::endl;
+  //Sideband Fit
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
+  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+    
+  bres->SetName( tag + "_b_fitres" );
+  std::cout << "[INFO]: PASS FIT" << std::endl;
+  //---------------------
+  //g e t t i n g   n l l 
+  //---------------------
+  double minNll = bres->minNll();
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  std::cout << "nll_nll->" << nll->getVal() << std::endl;
+  std::cout << "minNll->" << minNll << std::endl;
+  RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
+  double K = floatPars->getSize() - 1.;
+  std::cout << "K -> " << K << std::endl;
+  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>131 && mgg<160)");
+  std::cout << "n -> " << n << std::endl;
+  AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
+  AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
+  AIC_3 = 2*minNll;// + 2*K + 2*K*(K+1)/(n-K-1);
+  std::cout << "AIC: " << AIC << std::endl;
+  std::cout << "AIC_2: " << AIC_2 << std::endl;
+  std::cout << "AIC_3: " << AIC_3 << std::endl;
+  /*
+  RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame( );
+  nll->plotOn( fns, RooFit::LineColor(kBlue) );
+  fns->SetName("nll_trick");
+  ws->import( *fns );
+  */
+  ws->import( *bres );
+  
+  RooPlot *fmgg = mgg.frame();
+  data.plotOn(fmgg);
+  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  
+  fmgg->SetName( tag + "_frame" );
+  ws->import( *fmgg );
+  
+  RooPlot* pdfFrame = mgg.frame();
+  ws->pdf( tag )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  pdfFrame->SetName( tag+"_pdfframe" );
+  ws->import( *pdfFrame );
+  ws->import( mgg );
+
+  return ws;
 };
