@@ -530,7 +530,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //fsignal->Close();
   
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(57);
+  mgg.setBins(38);
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 131, 160);
   mgg.setRange("sig", 122.08, 128.92);
