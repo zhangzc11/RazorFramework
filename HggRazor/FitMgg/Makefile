@@ -28,7 +28,7 @@ OBJ2 = $(SRC2:.cc=.o)
 OBJ3 = $(SRC3:.cc=.o)
 
 
-all : $(TARGET) $(TARGET1) $(TARGET2)
+all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
