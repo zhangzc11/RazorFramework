@@ -191,10 +191,10 @@ int main( int argc, char* argv[])
   //---
   //AIC
   //---
-  RooWorkspace* w_aic[7];
-  double aic[7];
-  double aic_2[7];
-  double aic_3[7];
+  RooWorkspace* w_aic[8];
+  double aic[8];
+  double aic_2[8];
+  double aic_3[8];
   std::map< std::string, double > aic_map;
   std::map< std::string, double > aic_map_2;
   std::map< std::string, double > aic_map_3;
@@ -230,7 +230,10 @@ int main( int argc, char* argv[])
       if( aic_map.find("poly3") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly3",aic[5]));
       w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], aic_2[6], aic_3[6], "modExp" );
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
+     w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], "poly4" );
+      if( aic_map.find("poly4") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly4",aic[7]));
     
+
 	  if( aic_map_2.find("doubleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doubleExp",aic_2[0]));
       if( aic_map_2.find("singleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singleExp",aic_2[1]));
       if( aic_map_2.find("singlePow") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singlePow",aic_2[2]));
@@ -238,6 +241,7 @@ int main( int argc, char* argv[])
       if( aic_map_2.find("poly2") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly2",aic_2[4]));
       if( aic_map_2.find("poly3") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly3",aic_2[5]));
       if( aic_map_2.find("modExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("modExp",aic_2[6]));
+      if( aic_map_2.find("poly4") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly4",aic_2[7]));
    
 	  if( aic_map_3.find("doubleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doubleExp",aic_3[0]));
       if( aic_map_3.find("singleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("singleExp",aic_3[1]));
@@ -246,6 +250,7 @@ int main( int argc, char* argv[])
       if( aic_map_3.find("poly2") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly2",aic_3[4]));
       if( aic_map_3.find("poly3") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly3",aic_3[5]));
       if( aic_map_3.find("modExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("modExp",aic_3[6]));
+      if( aic_map_3.find("poly4") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly4",aic_3[7]));
  }
   else
     {
@@ -270,6 +275,7 @@ int main( int argc, char* argv[])
       w_aic[4]->Write("w7");
       w_aic[5]->Write("w8");
       w_aic[6]->Write("w9");
+      w_aic[7]->Write("w10");
       std::cout.precision(10);
       double min_aic = 99999999;
       double min_aic_2 = 99999999;
@@ -322,7 +328,7 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	{
 	  delta_aic_map_2[tmp.first] = tmp.second - min_aic_2;
 	  sumweights_2 += TMath::Exp( -0.5*delta_aic_map_2[tmp.first] ); 
-	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
+	  std::cout << tmp.first << " deltaAICc2: " << delta_aic_map_2[tmp.first] << std::endl;
 	}
     for ( auto tmp : aic_map_3 )
 	{

@@ -9,7 +9,7 @@ void gen_list()
 	{
 		for(int i=0;i<7;i++)
 		{
-			fprintf(m_outfile,"./MakeFitAIC --inputFile=DoublePhoton_22Jan2013_Run2012ABCD_v9.root --treeName=SusyHggTree --MRcut=%s --RSQcut=%s --dataMode=data --category=highres --fitMode=AIC --outputfile=AIC_output/%s_%s.root \n", MRcut[i].c_str(),RSQcut[j].c_str(), MRcut[i].c_str(),RSQcut[j].c_str());
+			fprintf(m_outfile,"./MakeFitAIC --inputFile=DoublePhoton_22Jan2013_Run2012ABCD_v9.root --treeName=SusyHggTree --MRcut=%s --RSQcut=%s --dataMode=data --category=highres --fitMode=AIC --outputfile=AIC_output/%s_%s.root --invertedIso=yes \n", MRcut[i].c_str(),RSQcut[j].c_str(), MRcut[i].c_str(),RSQcut[j].c_str());
 		}
 	}
 }

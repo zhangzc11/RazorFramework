@@ -34,8 +34,8 @@
 #include "makeInvertedANFit_v2.hh"
 
 
-const int nTags=8;
-TString alltags[nTags] = {"dexp","sexp","texp","mexp","spow","dpow","pol2","pol3"};
+const int nTags=9;
+TString alltags[nTags] = {"dexp","sexp","texp","mexp","spow","dpow","pol2","pol3","pol4"};
 
 #define DEBUG 0
 
@@ -88,6 +88,7 @@ RooWorkspace* makeInvertedANFit(TTree* tree, float forceSigma=-1, bool constrain
   bkgPdfList.push_back(makePoly2);
 #endif
   bkgPdfList.push_back(makePoly3);
+  bkgPdfList.push_back(makePoly4);
 
 
 
@@ -461,6 +462,27 @@ TString makePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w) {
   w.import(*(new RooExtendPdf(tag+"_pol3_ext","",*bern,*Nbkg)));
 
   return "pol3";
+}
+TString makePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w) {
+  RooRealVar *pC = new RooRealVar(tag+"_pol4_pC","C",1,-10,10);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol4_p0","p_0",0,-10,10);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol4_p1","p_1",0,-10,10);
+  RooRealVar *p2 = new RooRealVar(tag+"_pol4_p2","p_2",0,-10,10);
+  RooRealVar *p3 = new RooRealVar(tag+"_pol4_p3","p_3",0,-10,10);
+
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol4_Nbkg","N_{bkg}",10,1,1E9);
+
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol4_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol4_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol4_p1mod","@0*@0",*p1);
+  RooFormulaVar *p2mod = new RooFormulaVar(tag+"_pol4_p2mod","@0*@0",*p2);
+  RooFormulaVar *p3mod = new RooFormulaVar(tag+"_pol4_p3mod","@0*@0",*p3);
+
+  RooBernstein* bern = new RooBernstein(tag+"_pol4","",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod,*p3mod));
+
+  w.import(*(new RooExtendPdf(tag+"_pol4_ext","",*bern,*Nbkg)));
+
+  return "pol4";
 }
 
 TString makeGauss(TString tag, RooRealVar& mgg,RooWorkspace& w) {
