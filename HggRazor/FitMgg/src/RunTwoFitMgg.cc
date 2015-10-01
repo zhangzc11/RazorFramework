@@ -670,7 +670,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooRealVar bias("bias", "bias", -2.0, 2.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
 
-  RooRealVar NsignalError("NsignalError", "NsignalError", -.02, .02, "");
+  RooRealVar NsignalError("NsignalError", "NsignalError", -1, 1, "");
   RooDataSet data_Nse( "data_Nse", "data_Nse", NsignalError);
   
   bias.setBins(100);
@@ -747,7 +747,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //G e n e r a t i n g   t o y s
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-      double frac = 1.0;
+      double frac = .2;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
@@ -821,9 +821,17 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
       bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
       bres_toys->SetName("bres_toys");
-      
+
+      /*
+	//Ns*Ns = real number of signal events
       double Nsignal  = pow(ws->var("doubleGauseSB_gauss_Ns")->getVal(), 2);
       double Ns_Error = 2.0*ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
+      bias =  (Nsignal - double(stoys))/(double)stoys;
+      NsignalError.setVal( Ns_Error );
+      */
+      
+      double Nsignal  = ws->var("doubleGauseSB_gauss_Ns")->getVal();
+      double Ns_Error = ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
       bias =  (Nsignal - double(stoys))/(double)stoys;
       NsignalError.setVal( Ns_Error );
       //std::cout << "bias: " << bias.getVal() << std::endl;
@@ -855,12 +863,13 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   data_bias.plotOn( f_bias );
 
   RooPlot* f_Nse = NsignalError.frame();
-  f_Nse->SetName("NsignalError");
+  f_Nse->SetName("NsignalError_plot");
   data_Nse.plotOn( f_Nse );
   
   ws->import( mgg );
   ws->import( bias );
   ws->import( data_bias );
+  ws->import( data_Nse );
   ws->import( *f_mgg );
   ws->import( *bres_toys );
   ws->import( *f_bias );
@@ -919,6 +928,12 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
       tag = MakePoly3( "sideband_fit_poly3", mgg, *ws );
       std::cout << "[INFO]: Running poly3 fit" << std::endl; 
     }
+  else if ( ffName == "poly4" )
+    {
+      tag = MakePoly4( "sideband_fit_poly4", mgg, *ws );
+      std::cout << "[INFO]: Running poly4 fit" << std::endl; 
+    }
+
   else
     {
       std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;

@@ -142,9 +142,10 @@ void  PlotLambda( )
   
   TLegend *leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");
   leg->AddEntry("NULL", "Razor-0#mu 90% CL limit: AV EFT operator", "h");
-  
-  leg->AddEntry(Lcom, "Expected limit" ,"l");
-  leg->AddEntry(grshade, "#pm 1#sigma expected limit" ,"f");
+  grshade->SetLineColor(kRed-7);
+  grshade->SetLineWidth(3);
+  grshade->SetLineStyle(1);
+  leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.03);
@@ -322,8 +323,10 @@ void  PlotLambda( )
   delete leg;
   leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");
   leg->AddEntry("NULL", "Razor-0#mu 90% CL limit: V EFT operator", "h");
-  leg->AddEntry(Lcom, "Expected limit" ,"l");
-  leg->AddEntry(grshade, "#pm 1#sigma expected limit" ,"f");
+  grshade->SetLineColor(kRed-7);
+  grshade->SetLineWidth(3);
+  grshade->SetLineStyle(1);
+  leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.03);

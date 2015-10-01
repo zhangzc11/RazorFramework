@@ -7,6 +7,7 @@
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
 #include "CommandLineInput.hh"
+#include "PrintAIC.hh"
 
 int main( int argc, char* argv[])
 {
@@ -225,9 +226,18 @@ int main( int argc, char* argv[])
   //---
   //AIC
   //---
+  RooWorkspace* w_aic[8];
+  double aic[8];
+  double aic_2[8];
+  double aic_3[8];
+  std::map< std::string, double > aic_map;
+  std::map< std::string, double > aic_map_2;
+  std::map< std::string, double > aic_map_3;
+/*
   RooWorkspace* w_aic[7];
   double aic[7];
   std::map< std::string, double > aic_map;
+*/
   //--------------------
   //D e f i n e  c u t s
   //--------------------
@@ -275,6 +285,44 @@ int main( int argc, char* argv[])
       w_aic[6] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], "modExp" );
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
     }
+  else if(fitMode == "AIC2")
+  {
+      w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "doubleExp" );
+      if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doubleExp",aic[0]));
+      w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], "singleExp" );
+      if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[1]));
+      w_aic[2] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], aic_2[2], aic_3[2], "singlePow" );
+      if( aic_map.find("singlePow") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singlePow",aic[2]));
+      w_aic[3] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[3], aic_2[3], aic_3[3], "doublePow" );
+      if( aic_map.find("doublePow") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doublePow",aic[3]));
+      w_aic[4] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[4], aic_2[4], aic_3[4], "poly2" );
+      if( aic_map.find("poly2") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly2",aic[4]));
+      w_aic[5] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[5], aic_2[5], aic_3[5], "poly3" );
+      if( aic_map.find("poly3") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly3",aic[5]));
+      w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], aic_2[6], aic_3[6], "modExp" );
+      if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
+     w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], "poly4" );
+      if( aic_map.find("poly4") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly4",aic[7]));
+    
+
+	  if( aic_map_2.find("doubleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doubleExp",aic_2[0]));
+      if( aic_map_2.find("singleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singleExp",aic_2[1]));
+      if( aic_map_2.find("singlePow") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singlePow",aic_2[2]));
+      if( aic_map_2.find("doublePow") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doublePow",aic_2[3]));
+      if( aic_map_2.find("poly2") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly2",aic_2[4]));
+      if( aic_map_2.find("poly3") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly3",aic_2[5]));
+      if( aic_map_2.find("modExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("modExp",aic_2[6]));
+      if( aic_map_2.find("poly4") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly4",aic_2[7]));
+   
+	  if( aic_map_3.find("doubleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doubleExp",aic_3[0]));
+      if( aic_map_3.find("singleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("singleExp",aic_3[1]));
+      if( aic_map_3.find("singlePow") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("singlePow",aic_3[2]));
+      if( aic_map_3.find("doublePow") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doublePow",aic_3[3]));
+      if( aic_map_3.find("poly2") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly2",aic_3[4]));
+      if( aic_map_3.find("poly3") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly3",aic_3[5]));
+      if( aic_map_3.find("modExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("modExp",aic_3[6]));
+      if( aic_map_3.find("poly4") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly4",aic_3[7]));
+  }
   else if ( fitMode == "bias" )
     {
       RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
@@ -343,6 +391,94 @@ int main( int argc, char* argv[])
 	}
       
     }
+else if( fitMode == "AIC2")
+{
+      w_aic[0]->Write("w3");
+      w_aic[1]->Write("w4");
+      w_aic[2]->Write("w5");
+      w_aic[3]->Write("w6");
+      w_aic[4]->Write("w7");
+      w_aic[5]->Write("w8");
+      w_aic[6]->Write("w9");
+      w_aic[7]->Write("w10");
+      std::cout.precision(10);
+      double min_aic = 99999999;
+      double min_aic_2 = 99999999;
+      double min_aic_3 = 99999999;
+      std::string func_min = "";
+      std::string func_min_2 = "";
+      std::string func_min_3 = "";
+      std::cout << "MIN AIC->" << min_aic << std::endl;
+      for ( auto tmp : aic_map )
+	{
+	  if (  tmp.second < min_aic )
+	    {
+	      min_aic  = tmp.second;
+	      func_min = tmp.first;
+	    }
+	}
+       for ( auto tmp : aic_map_2 )
+	{
+	  if (  tmp.second < min_aic_2 )
+	    {
+	      min_aic_2  = tmp.second;
+	      func_min_2 = tmp.first;
+	    }
+	}
+       for ( auto tmp : aic_map_3 )
+	{
+	  if (  tmp.second < min_aic_3 )
+	    {
+	      min_aic_3  = tmp.second;
+	      func_min_3 = tmp.first;
+	    }
+	}
+std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func_min] << std::endl;
+      //------------------------------
+      //c o m p u t e   d e l t a  AIC
+      //------------------------------
+      std::map<std::string, double> delta_aic_map;
+      std::map<std::string, double> delta_aic_map_2;
+      std::map<std::string, double> delta_aic_map_3;
+      double sumweights = 0.0;
+      double sumweights_2 = 0.0;
+      double sumweights_3 = 0.0;
+      for ( auto tmp : aic_map )
+	{
+	  delta_aic_map[tmp.first] = tmp.second - min_aic;
+	  sumweights += TMath::Exp( -0.5*delta_aic_map[tmp.first] ); 
+	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
+	}
+       for ( auto tmp : aic_map_2 )
+	{
+	  delta_aic_map_2[tmp.first] = tmp.second - min_aic_2;
+	  sumweights_2 += TMath::Exp( -0.5*delta_aic_map_2[tmp.first] ); 
+	  std::cout << tmp.first << " deltaAICc2: " << delta_aic_map_2[tmp.first] << std::endl;
+	}
+    for ( auto tmp : aic_map_3 )
+	{
+	  delta_aic_map_3[tmp.first] = tmp.second - min_aic_3;
+	  sumweights_3 += TMath::Exp( -0.5*delta_aic_map_3[tmp.first] ); 
+	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
+	}
+ //------------------------------
+      //c o m p u t e   AIC  weights
+      //------------------------------
+      std::map<std::string, double> aic_weight_map;
+      std::map<std::string, double> aic_weight_map_2;
+      std::map<std::string, double> aic_weight_map_3;
+      for ( auto tmp : delta_aic_map )
+	{
+	  aic_weight_map[tmp.first] = TMath::Exp( -0.5*delta_aic_map[tmp.first] )/sumweights;
+	  aic_weight_map_2[tmp.first] = TMath::Exp( -0.5*delta_aic_map_2[tmp.first] )/sumweights_2;
+	  aic_weight_map_3[tmp.first] = TMath::Exp( -0.5*delta_aic_map_3[tmp.first] )/sumweights_3;
+	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
+	}
+
+     PrintAICTable(MRcut, RSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
+//     PlotSidebandFit(MRcut,RSQcut,w_aic);
+
+}
   
   fout->Close();
     

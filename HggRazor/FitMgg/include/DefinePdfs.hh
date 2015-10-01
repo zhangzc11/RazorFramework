@@ -18,5 +18,6 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w);
 
 #endif

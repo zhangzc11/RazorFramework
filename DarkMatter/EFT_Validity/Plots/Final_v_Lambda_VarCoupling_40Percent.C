@@ -1,6 +1,6 @@
 {
 //=========Macro generated from canvas: c/c
-//=========  (Tue May  5 14:38:02 2015) by ROOT version5.34/11
+//=========  (Wed Sep 30 17:13:34 2015) by ROOT version5.34/11
    TCanvas *c = new TCanvas("c", "c",1,1,800,676);
    c->SetHighLightColor(2);
    c->Range(-0.6591427,-740.7407,3.174515,5432.099);
@@ -715,16 +715,16 @@
    graph->SetLineColor(ci);
    graph->SetLineStyle(2);
    graph->SetLineWidth(2);
-   graph->SetPoint(0,1,75.59859467);
-   graph->SetPoint(1,10,75.59859467);
-   graph->SetPoint(2,100,75.59859467);
-   graph->SetPoint(3,400,103.4507065);
-   graph->SetPoint(4,700,143.2394409);
-   graph->SetPoint(5,1000,187.0070496);
+   graph->SetPoint(0,1,127.3239517);
+   graph->SetPoint(1,10,131.3028259);
+   graph->SetPoint(2,100,127.3239517);
+   graph->SetPoint(3,400,151.1971893);
+   graph->SetPoint(4,700,183.028183);
+   graph->SetPoint(5,1000,222.8169098);
    
    TH1F *Graph_Graph21 = new TH1F("Graph_Graph21","Graph",100,0.9,1099.9);
-   Graph_Graph21->SetMinimum(64.45775);
-   Graph_Graph21->SetMaximum(198.1479);
+   Graph_Graph21->SetMinimum(117.7747);
+   Graph_Graph21->SetMaximum(232.3662);
    Graph_Graph21->SetDirectory(0);
    Graph_Graph21->SetStats(0);
 
@@ -755,16 +755,16 @@
    graph->SetLineColor(ci);
    graph->SetLineStyle(3);
    graph->SetLineWidth(2);
-   graph->SetPoint(0,1,237.5);
-   graph->SetPoint(1,10,237.5);
-   graph->SetPoint(2,100,237.5);
-   graph->SetPoint(3,400,325);
-   graph->SetPoint(4,700,450);
-   graph->SetPoint(5,1000,587.5);
+   graph->SetPoint(0,1,400);
+   graph->SetPoint(1,10,412.5);
+   graph->SetPoint(2,100,400);
+   graph->SetPoint(3,400,475);
+   graph->SetPoint(4,700,575);
+   graph->SetPoint(5,1000,700);
    
    TH1F *Graph_Graph22 = new TH1F("Graph_Graph22","Graph",100,0.9,1099.9);
-   Graph_Graph22->SetMinimum(202.5);
-   Graph_Graph22->SetMaximum(622.5);
+   Graph_Graph22->SetMinimum(370);
+   Graph_Graph22->SetMaximum(730);
    Graph_Graph22->SetDirectory(0);
    Graph_Graph22->SetStats(0);
 
@@ -795,16 +795,16 @@
    graph->SetLineColor(ci);
    graph->SetLineStyle(4);
    graph->SetLineWidth(2);
-   graph->SetPoint(0,1,475);
-   graph->SetPoint(1,10,475);
-   graph->SetPoint(2,100,475);
-   graph->SetPoint(3,400,650);
-   graph->SetPoint(4,700,900);
-   graph->SetPoint(5,1000,1175);
+   graph->SetPoint(0,1,800);
+   graph->SetPoint(1,10,825);
+   graph->SetPoint(2,100,800);
+   graph->SetPoint(3,400,950);
+   graph->SetPoint(4,700,1150);
+   graph->SetPoint(5,1000,1400);
    
    TH1F *Graph_Graph23 = new TH1F("Graph_Graph23","Graph",100,0.9,1099.9);
-   Graph_Graph23->SetMinimum(405);
-   Graph_Graph23->SetMaximum(1245);
+   Graph_Graph23->SetMinimum(740);
+   Graph_Graph23->SetMaximum(1460);
    Graph_Graph23->SetDirectory(0);
    Graph_Graph23->SetStats(0);
 
@@ -835,16 +835,16 @@
    graph->SetLineColor(ci);
    graph->SetLineStyle(5);
    graph->SetLineWidth(2);
-   graph->SetPoint(0,1,950);
-   graph->SetPoint(1,10,950);
-   graph->SetPoint(2,100,950);
-   graph->SetPoint(3,400,1300);
-   graph->SetPoint(4,700,1800);
-   graph->SetPoint(5,1000,2350);
+   graph->SetPoint(0,1,1600);
+   graph->SetPoint(1,10,1650);
+   graph->SetPoint(2,100,1600);
+   graph->SetPoint(3,400,1900);
+   graph->SetPoint(4,700,2300);
+   graph->SetPoint(5,1000,2800);
    
    TH1F *Graph_Graph24 = new TH1F("Graph_Graph24","Graph",100,0.9,1099.9);
-   Graph_Graph24->SetMinimum(810);
-   Graph_Graph24->SetMaximum(2490);
+   Graph_Graph24->SetMinimum(1480);
+   Graph_Graph24->SetMaximum(2920);
    Graph_Graph24->SetDirectory(0);
    Graph_Graph24->SetStats(0);
 

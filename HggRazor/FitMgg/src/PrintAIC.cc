@@ -24,6 +24,7 @@ void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, do
 	if( func_name.find("singlePow") == func_name.end() ) func_name.insert( std::pair<std::string, std::string>("singlePow","single power"));
 	if( func_name.find("poly2") == func_name.end() ) func_name.insert( std::pair<std::string, std::string>("poly2","second order poly"));
 	if( func_name.find("poly3") == func_name.end() ) func_name.insert( std::pair<std::string, std::string>("poly3","third order poly"));
+	if( func_name.find("poly4") == func_name.end() ) func_name.insert( std::pair<std::string, std::string>("poly4","fourth order poly"));
 	if( func_name.find("modExp") == func_name.end() ) func_name.insert( std::pair<std::string, std::string>("modExp","modified exponential"));
 
 	std::map< std::string, int > num_par;
@@ -33,16 +34,17 @@ void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, do
 	if( num_par.find("singlePow") == num_par.end() ) num_par.insert( std::pair<std::string, int>("singlePow",1));
 	if( num_par.find("poly2") == num_par.end() ) num_par.insert( std::pair<std::string, int>("poly2",3));
 	if( num_par.find("poly3") == num_par.end() ) num_par.insert( std::pair<std::string, int>("poly3",4));
+	if( num_par.find("poly4") == num_par.end() ) num_par.insert( std::pair<std::string, int>("poly4",5));
 	if( num_par.find("modExp") == num_par.end() ) num_par.insert( std::pair<std::string, int>("modExp",2));
 
     //print the table to a file
-	FILE* m_outfile = fopen("FitChoices_Table.tex", "a");
+	FILE* m_outfile = fopen("AIC_output/FitChoices_Table.tex", "a");
 	fprintf(m_outfile,"\\begin{table}[H] \n");
 	fprintf(m_outfile,"\\begin{center} \n");
 	fprintf(m_outfile,"\\begin{tabular}{|c|c|cc|cc|cc|} \n");
-	fprintf(m_outfile,"\\hline function & \\#P & $\\Delta AIC_1$ & $\\omega_1$ & $\\Delta AIC_2$ & $\\omega_2$ & $\\Delta AIC_3$ & $\\omega_3$ \\\\ \\hline \n");
-	double delta_aic[7];
-	double weight_aic[7];
+	fprintf(m_outfile,"\\hline function & \\#P & $\\Delta A_1$ & $\\omega_1$ & $\\Delta A_2$ & $\\omega_2$ & $\\Delta A_3$ & $\\omega_3$ \\\\ \\hline \n");
+	double delta_aic[8];
+	double weight_aic[8];
 	int idx=0;
 	for ( auto tmp :func_name) 
       {
@@ -58,20 +60,22 @@ void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, do
 	fprintf(m_outfile,"\\end{center} \n");
 	fprintf(m_outfile,"\\end{table} \n \n \n");
 	//pring the plot to a file
-	FILE* m_outfile2 = fopen("FitChoices_Plot.tex", "a");
+	FILE* m_outfile2 = fopen("AIC_output/FitChoices_Plot.tex", "a");
 	fprintf(m_outfile2,"\\begin{figure}[H] \n");
 	fprintf(m_outfile2,"\\begin{center} \n");
 	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{Figure/%s_%s.pdf} \n", MRcut.c_str(),RSQcut.c_str());
+	fprintf(m_outfile2,"\\caption{$M_R$ cut = %s \\&\\& $R^2$ cut = %s.} \n", MRcut.c_str(),RSQcut.c_str());
 	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", MRcut.c_str(),RSQcut.c_str());
 	fprintf(m_outfile2,"\\end{center} \n");
 	fprintf(m_outfile2,"\\end{figure} \n \n \n");
 	
 	
 	//plot the fit
-	double delta_aic_2[7]={delta_aic[0],delta_aic[5],delta_aic[1],delta_aic[6],delta_aic[3],delta_aic[4],delta_aic[2]};
-	double weight_aic_2[7]={weight_aic[0],weight_aic[5],weight_aic[1],weight_aic[6],weight_aic[3],weight_aic[4],weight_aic[2]};
+	double delta_aic_2[8]={delta_aic[0],delta_aic[6],delta_aic[1],delta_aic[7],delta_aic[3],delta_aic[4],delta_aic[5],delta_aic[2]};
+	double weight_aic_2[8]={weight_aic[0],weight_aic[6],weight_aic[1],weight_aic[7],weight_aic[3],weight_aic[4],weight_aic[5],weight_aic[2]};
+	//double weight_aic_2[7]={weight_aic[0],weight_aic[5],weight_aic[1],weight_aic[6],weight_aic[3],weight_aic[4],weight_aic[2]};
 
-	gStyle->SetTitleSize(0.16,"t");
+	gStyle->SetTitleSize(0.15,"t");
 	TCanvas *myC= new TCanvas("c1","c1",200,10,800,600);
 	myC->cd();
     gPad->SetLeftMargin(0.12);
@@ -88,12 +92,12 @@ void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, do
 	p1->GetYaxis()->SetTitleOffset(0.55);
 	p1->GetYaxis()->SetNdivisions(505);
 p1->Draw();
-	TLegend* leg[7];
-	for(int idx=0;idx<7;idx++)
+	TLegend* leg[8];
+	for(int idx=0;idx<8;idx++)
 	{
-	leg[idx] = new TLegend(0.5, 0.4, 0.99, 0.85);
-	leg[idx]->AddEntry(p1,Form("a_{i} - a_{min} = %5.2f", delta_aic_2[idx]),"");
-	leg[idx]->AddEntry(p1,Form("        #omega_{i} = %5.2f", weight_aic_2[idx]),"");
+	leg[idx] = new TLegend(0.75, 0.7, 0.99, 0.99);
+	leg[idx]->AddEntry(p1,Form("#Delta A = %5.2f", delta_aic_2[idx]),"");
+	leg[idx]->AddEntry(p1,Form("   #omega_{i} = %5.2f", weight_aic_2[idx]),"");
 	leg[idx]->SetFillStyle(0);
 	leg[idx]->SetBorderSize(0);
 	leg[idx]->SetTextColor(kRed);
@@ -156,8 +160,8 @@ leg[4]->Draw();
 p6->Draw();
 leg[5]->Draw();
 	myC->cd(7);
-	RooPlot * p7 = (RooPlot*)w[6]->obj("sideband_fit_modExp_mexp_ext_frame");
-	p7->SetTitle("modified exponential");
+	RooPlot * p7 = (RooPlot*)w[7]->obj("sideband_fit_poly4_pol4_ext_frame");
+	p7->SetTitle("fourth order poly");
 	p7->GetXaxis()->SetTitleSize(0.09);
     p7->GetXaxis()->SetLabelSize(0.11);
 	p7->GetYaxis()->SetTitleSize(0.11);
@@ -167,6 +171,17 @@ leg[5]->Draw();
 p7->Draw();
 leg[6]->Draw();
 	myC->cd(8);
+	RooPlot * p8 = (RooPlot*)w[6]->obj("sideband_fit_modExp_mexp_ext_frame");
+	p8->SetTitle("modified exponential");
+	p8->GetXaxis()->SetTitleSize(0.09);
+    p8->GetXaxis()->SetLabelSize(0.11);
+	p8->GetYaxis()->SetTitleSize(0.11);
+	p8->GetYaxis()->SetLabelSize(0.11);
+	p8->GetYaxis()->SetTitleOffset(0.55);
+	p8->GetYaxis()->SetNdivisions(505);
+p8->Draw();
+leg[7]->Draw();
+/*	myC->cd(8);
 	TLegend* leg8 = new TLegend(0.2, 0.25, 0.8, 0.75);
 	leg8->AddEntry(p1,Form("M_{R} cut: %s", MRcut.c_str()),"");
 	leg8->AddEntry(p1,Form(" R^{2} cut: %s", RSQcut.c_str()),"");
@@ -174,7 +189,7 @@ leg[6]->Draw();
 	leg8->SetBorderSize(0);
 	leg8->SetTextColor(kRed);
 	leg8->Draw();
-
+*/
 	std::string str = "AIC_output/"+MRcut+"_"+RSQcut+".pdf";
 	const char * file_Name = str.c_str();
 	myC->SaveAs(file_Name);
@@ -240,9 +255,12 @@ p4->Draw();
 	p5->GetYaxis()->SetTitleOffset(0.55);
 	p5->GetYaxis()->SetNdivisions(505);
 p5->Draw();
+
+//	gStyle->SetTitleSize(0.14,"t");
 	myC->cd(6);
 	RooPlot * p6 = (RooPlot*)w[5]->obj("sideband_fit_poly3_pol3_ext_frame");
 	p6->SetTitle("third order poly");
+	p6->SetTitleSize(0.1);
 	p6->GetXaxis()->SetTitleSize(0.09);
     p6->GetXaxis()->SetLabelSize(0.11);
 	p6->GetYaxis()->SetTitleSize(0.11);
@@ -253,6 +271,7 @@ p6->Draw();
 	myC->cd(7);
 	RooPlot * p7 = (RooPlot*)w[6]->obj("sideband_fit_modExp_mexp_ext_frame");
 	p7->SetTitle("modified exponential");
+	p7->SetTitleSize(0.1);
 	p7->GetXaxis()->SetTitleSize(0.09);
     p7->GetXaxis()->SetLabelSize(0.11);
 	p7->GetYaxis()->SetTitleSize(0.11);
