@@ -100,10 +100,10 @@ int main ( int argc, char* argv[] ){
 	      Rmap[map_key] = aux;
 	    }
 	  //Filling Map Struct
-	  Rmap[map_key].Lambda20 = FindLambda( 0.40, h_qtr_sel, h_qtr_gen )/g_c1;
-	  Rmap[map_key].Lambda40 = FindLambda( 0.40, h_qtr_sel, h_qtr_gen )/g_c2;
-	  Rmap[map_key].Lambda60 = FindLambda( 0.40, h_qtr_sel, h_qtr_gen )/g_c3;
-	  Rmap[map_key].Lambda80 = FindLambda( 0.40, h_qtr_sel, h_qtr_gen )/g_c4;
+	  Rmap[map_key].Lambda20 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c1;
+	  Rmap[map_key].Lambda40 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c2;
+	  Rmap[map_key].Lambda60 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c3;
+	  Rmap[map_key].Lambda80 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c4;
 	  
 	}
     }//end reading file
@@ -346,8 +346,12 @@ int main ( int argc, char* argv[] ){
   //leg->AddEntry("NULL", "Razor-0 #mu 90% CL limit: AV EFT operator", "h");
   //leg->AddEntry("NULL", "Razor-0#mu limit: AV EFT operator, g_{eff} = 1", "h");
 
-  leg->AddEntry(Lcom, "Expected limit" ,"l");
-  leg->AddEntry(grshade, "#pm 1#sigma expected limit" ,"f");
+  //leg->AddEntry(Lcom, "Expected limit" ,"l");
+
+  grshade->SetLineColor(kRed-7);
+  grshade->SetLineWidth(3);
+  grshade->SetLineStyle(1);
+  leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
   leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
   leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
@@ -361,7 +365,7 @@ int main ( int argc, char* argv[] ){
   leg->Draw();
 
   TLegend* leg2 = new TLegend(0.72,0.5,0.89,0.8,NULL,"brNDC");//(xmin, ymin, xmax, ymax)
-  leg2->AddEntry("NULL", "R_{#Lambda} = 40%", "h");
+  leg2->AddEntry("NULL", "R_{#Lambda} = 80%", "h");
   leg2->AddEntry(g_av_r20, "g_{eff} = 1" ,"l");
   leg2->AddEntry(g_av_r40, "g_{eff} = 2" ,"l");
   leg2->AddEntry(g_av_r60, "g_{eff} = 4" ,"l");
@@ -426,8 +430,8 @@ int main ( int argc, char* argv[] ){
   c->Update();
   
   
-  c->SaveAs(outputDir+"/Final_av_Lambda_VarCoupling_40Percent.pdf");
-  c->SaveAs(outputDir+"/Final_av_Lambda_VarCoupling_40Percent.C");
+  c->SaveAs(outputDir+"/Final_av_Lambda_VarCoupling_80Percent.pdf");
+  c->SaveAs(outputDir+"/Final_av_Lambda_VarCoupling_80Percent.C");
   
   /*
   c->SaveAs("test_av_Lambda_4pi.pdf");
@@ -518,8 +522,11 @@ int main ( int argc, char* argv[] ){
   //leg->AddEntry("NULL", "Razor-0#mu limit: V EFT operator, g_{eff} = 1", "h");
   //leg->AddEntry("NULL", "Razor-0#mu limit: V EFT operator, g_{eff} = 4#pi", "h");
 
-  leg->AddEntry(Lcom, "Expected limit" ,"l");
-  leg->AddEntry(grshade, "#pm 1#sigma expected limit" ,"f");
+  //leg->AddEntry(Lcom, "Expected limit" ,"l");
+  grshade->SetLineColor(kRed-7);
+  grshade->SetLineWidth(3);
+  grshade->SetLineStyle(1);
+  leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
   leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
   leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
@@ -534,7 +541,7 @@ int main ( int argc, char* argv[] ){
 
   delete leg2;
   leg2 = new TLegend(0.68,0.5,0.88,0.8,NULL,"brNDC");  
-  leg2->AddEntry("NULL", "R_{#Lambda} = 40%", "h");
+  leg2->AddEntry("NULL", "R_{#Lambda} = 80%", "h");
   leg2->AddEntry(g_av_r20, "g_{eff} = 1" ,"l");
   leg2->AddEntry(g_av_r40, "g_{eff} = 2" ,"l");
   leg2->AddEntry(g_av_r60, "g_{eff} = 4" ,"l");
@@ -571,8 +578,8 @@ int main ( int argc, char* argv[] ){
    c->Update();
   
    
-   c->SaveAs(outputDir+"/Final_v_Lambda_VarCoupling_40Percent.pdf");
-   c->SaveAs(outputDir+"/Final_v_Lambda_VarCoupling_40Percent.C");
+   c->SaveAs(outputDir+"/Final_v_Lambda_VarCoupling_80Percent.pdf");
+   c->SaveAs(outputDir+"/Final_v_Lambda_VarCoupling_80Percent.C");
   
    return 0;
 }
