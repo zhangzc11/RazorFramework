@@ -919,6 +919,12 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
       tag = MakePoly3( "sideband_fit_poly3", mgg, *ws );
       std::cout << "[INFO]: Running poly3 fit" << std::endl; 
     }
+  else if ( ffName == "poly4" )
+    {
+      tag = MakePoly4( "sideband_fit_poly4", mgg, *ws );
+      std::cout << "[INFO]: Running poly4 fit" << std::endl; 
+    }
+
   else
     {
       std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;

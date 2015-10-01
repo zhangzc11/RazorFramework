@@ -211,3 +211,25 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
   
   return pdfName;
 };
+TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pC","C",1,-100,100);
+  RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",1.0,-100,100);
+  RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0,-100,100);
+  RooRealVar *p2 = new RooRealVar(tag+"_p2","p_2",5,-100,100);
+  RooRealVar *p3 = new RooRealVar(tag+"_p3","p_3",5,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",2000,1,1E9);
+  
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_p1mod","@0*@0",*p1);
+  RooFormulaVar *p2mod = new RooFormulaVar(tag+"_p2mod","@0*@0",*p2);
+  RooFormulaVar *p3mod = new RooFormulaVar(tag+"_p3mod","@0*@0",*p3);
+  
+  RooBernstein* bern = new RooBernstein(tag+"_pol4","",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod,*p3mod));
+  
+  TString pdfName = tag+"_pol4_ext";
+  w.import( *(new RooExtendPdf( pdfName,"",*bern,*Nbkg)) );
+  
+  return pdfName;
+};
