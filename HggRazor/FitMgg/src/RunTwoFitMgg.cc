@@ -31,6 +31,7 @@
 #include <RooBernstein.h>
 #include <RooMinuit.h>
 #include <RooNLLVar.h>
+#include <RooRandom.h>
 //#include <RealVar.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
@@ -44,7 +45,7 @@ RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool constrainMu, fl
   mgg.setRange( "signal", 120, 130. );
   //C r e a t e  doubleGaus
   TString tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
-  ws->var("dGauss_signal_gauss_Ns")->setVal( 1600 );
+  //ws->var("dGauss_signal_gauss_Ns")->setVal( 1600 );
   
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
   ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended( kTRUE ), RooFit::Range("signal") );
@@ -515,6 +516,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
 
 RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, int npoints )
 {
+  RooRandom::randomGenerator()->SetSeed( 0 );
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
   //Getting signal shape
@@ -650,6 +652,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 
   RooPlot* bFrame = mgg.frame();
   bFrame->SetName("bFitFrame");
+  bFrame->SetTitle("");
   data.plotOn( bFrame );
   ws->pdf( tag1 )->plotOn( bFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
   ws->import( *bFrame );
@@ -747,7 +750,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //G e n e r a t i n g   t o y s
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-      double frac = .2;
+      double frac = 1.2;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
@@ -849,14 +852,15 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   
   RooPlot* f_mgg = mgg.frame();
   f_mgg->SetName("toys_plot");
+  f_mgg->SetTitle("");
   data_toys->plotOn( f_mgg );
   //ws->pdf( tag2 )->plotOn( f_mgg, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));
   
-  ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );  
-  ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
+  //ws->pdf( tag2p )->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );  
+  //ws->pdf( tag1 )->plotOn( f_mgg, RooFit::LineColor(kGreen), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
   //Plotting background only component of s+b fit
-  sbModel->plotOn( f_mgg, RooFit::LineStyle(kDashed), RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Components(tag2));
-  sbModel->plotOn( f_mgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  sbModel->plotOn( f_mgg, RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Components(tag2));
+  sbModel->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"));
 
   RooPlot* f_bias = bias.frame();
   f_bias->SetName("bias_plot");

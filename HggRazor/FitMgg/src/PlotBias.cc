@@ -130,7 +130,8 @@ void PlotBias( std::string fname = "", std::string outDir = "bias_plots")
   return;
 };
 
-std::pair<double,double>GetMeanRms( std::string fname = "", std::string outDir = "bias_plots")
+//std::pair<double,double> GetMeanRms( std::string fname = "", std::string dataSet = "bias_plots", std::string var = "bias")
+std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std::string var )
 { 
   //-----------------------
   //G e t t i n g   F i l e
@@ -140,9 +141,9 @@ std::pair<double,double>GetMeanRms( std::string fname = "", std::string outDir =
   //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
   RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
-  RooRealVar* bias = w->var("bias");
+  RooRealVar* bias = w->var( var.c_str() );
   //Getting data_bias RooDataSet
-  RooDataSet* data_bias = (RooDataSet*)w->obj("data_bias");
+  RooDataSet* data_bias = (RooDataSet*)w->obj( dataSet.c_str() );
   
   //-------------------------------------
   //D e f i n i n g   p l o t   r a n g e
