@@ -673,7 +673,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooRealVar bias("bias", "bias", -2.0, 2.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
 
-  RooRealVar NsignalError("NsignalError", "NsignalError", -1, 1, "");
+  RooRealVar NsignalError("NsignalError", "NsignalError", -2.0, 2.0, "");
   RooDataSet data_Nse( "data_Nse", "data_Nse", NsignalError);
   
   bias.setBins(100);
@@ -750,7 +750,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //G e n e r a t i n g   t o y s
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-      double frac = 1.2;
+      double frac = 1;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
