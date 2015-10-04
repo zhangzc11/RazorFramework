@@ -588,7 +588,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   pFrame->SetName("pFitFrame");
   data.plotOn( pFrame );
   ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
   ws->import( *pFrame );
   
   double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
