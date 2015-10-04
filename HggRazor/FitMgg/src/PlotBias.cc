@@ -177,13 +177,16 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
       std::string f1 = GetFitFunctionString( fitf );
       std::stringstream ss;
       ss << f1; 
+      ss.precision(1);
+      ss.setf ( std::ios::showpoint );
+      ss.setf ( std::ios::fixed ); 
       for( const auto& fitf2 : FitFunction() )
 	{
 	  std::string f2 = GetFitFunctionString( fitf2 );
 	  if ( row_ctr == 0 ) ss_fl << " & " << f2; 
 	  std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  //std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
-	  ss << " & " << mymap[pair]*100.; 
+	  ss << " & " << mymap[pair]*100. << "\\%"; 
 	  //std::cout << GetFitFunctionString( fitf )  << " "  << GetFitFunctionString( fitf2 ) << std::endl;
 	}
       if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
