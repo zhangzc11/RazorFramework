@@ -80,10 +80,10 @@ int main ( ){
 	      Rmap[aux.mass] = aux;
 	    }
 	  //Filling Map Struct
-	  Rmap[aux.mass].Lambda20 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c1;
-	  Rmap[aux.mass].Lambda40 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c2;
-	  Rmap[aux.mass].Lambda60 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c3;
-	  Rmap[aux.mass].Lambda80 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c4;
+	  Rmap[aux.mass].Lambda20 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c1;
+	  Rmap[aux.mass].Lambda40 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c2;
+	  Rmap[aux.mass].Lambda60 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c3;
+	  Rmap[aux.mass].Lambda80 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c4;
 	  
 	}
     }//end reading file
@@ -256,9 +256,10 @@ int main ( ){
   //Legend
   TLegend *leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");//(xmin, ymin, xmax, ymax)
   leg->AddEntry("NULL", "Razor-b limit: Scalar EFT operator", "h");
-  
-  leg->AddEntry(Lcom, "Expected limit" ,"l");
-  leg->AddEntry(grshade, "#pm 1#sigma expected limit" ,"f");
+  grshade->SetLineColor(kRed-7);
+  grshade->SetLineWidth(3);
+  grshade->SetLineStyle(1);
+  leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
   leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
   leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
@@ -271,9 +272,9 @@ int main ( ){
   leg->SetFillStyle(1001);
   leg->Draw();
 
-  TLegend* leg2 = new TLegend(0.608,0.51,0.758,0.81,NULL,"brNDC");//(xmin, ymin, xmax, ymax)
+  TLegend* leg2 = new TLegend(0.63,0.51,0.758,0.81,NULL,"brNDC");//(xmin, ymin, xmax, ymax)
 
-  leg2->AddEntry("NULL", "R_{#Lambda} = 25%", "h");
+  leg2->AddEntry("NULL", "R_{#Lambda} = 80%", "h");
   //leg2->AddEntry(g_v_r20, "g_{eff} = 1" ,"l");
   leg2->AddEntry(g_v_r40, "g_{eff} = 2#pi" ,"l");
   leg2->AddEntry(g_v_r60, "g_{eff} = 3#pi" ,"l");
@@ -335,8 +336,8 @@ int main ( ){
   c->SaveAs("PLOTS/test_MonoB_Lambda2Pi.C");
   */
   
-  c->SaveAs(outputDir+"/Final_MonoB_R25percent.pdf");
-  c->SaveAs(outputDir+"/Final_MonoB_R25percent.C");
+  c->SaveAs(outputDir+"/Final_MonoB_R80percent.pdf");
+  c->SaveAs(outputDir+"/Final_MonoB_R80percent.C");
   
   
   return 0;
