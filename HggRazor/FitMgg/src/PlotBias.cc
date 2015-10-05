@@ -130,7 +130,8 @@ void PlotBias( std::string fname = "", std::string outDir = "bias_plots")
   return;
 };
 
-std::pair<double,double>GetMeanRms( std::string fname = "", std::string outDir = "bias_plots")
+//std::pair<double,double> GetMeanRms( std::string fname = "", std::string dataSet = "bias_plots", std::string var = "bias")
+std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std::string var )
 { 
   //-----------------------
   //G e t t i n g   F i l e
@@ -140,9 +141,9 @@ std::pair<double,double>GetMeanRms( std::string fname = "", std::string outDir =
   //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
   RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
-  RooRealVar* bias = w->var("bias");
+  RooRealVar* bias = w->var( var.c_str() );
   //Getting data_bias RooDataSet
-  RooDataSet* data_bias = (RooDataSet*)w->obj("data_bias");
+  RooDataSet* data_bias = (RooDataSet*)w->obj( dataSet.c_str() );
   
   //-------------------------------------
   //D e f i n i n g   p l o t   r a n g e
@@ -176,13 +177,16 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
       std::string f1 = GetFitFunctionString( fitf );
       std::stringstream ss;
       ss << f1; 
+      ss.precision(1);
+      ss.setf ( std::ios::showpoint );
+      ss.setf ( std::ios::fixed ); 
       for( const auto& fitf2 : FitFunction() )
 	{
 	  std::string f2 = GetFitFunctionString( fitf2 );
 	  if ( row_ctr == 0 ) ss_fl << " & " << f2; 
 	  std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  //std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
-	  ss << " & " << mymap[pair]*100.; 
+	  ss << " & " << mymap[pair]*100. << "\\%"; 
 	  //std::cout << GetFitFunctionString( fitf )  << " "  << GetFitFunctionString( fitf2 ) << std::endl;
 	}
       if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
