@@ -734,7 +734,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   return ws;
 };
 
-RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, int npoints )
+RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, double frac )
 {
   RooRandom::randomGenerator()->SetSeed( 0 );
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
@@ -759,7 +759,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   mgg.setRange("sig", 122.08, 128.92);
   mgg.setRange("Full", 103.0, 160.0);
 
-  RooDataSet* signal_toys = GenerateToys( signalPdf, mgg, npoints );
+  RooDataSet* signal_toys = GenerateToys( signalPdf, mgg, 1e4 );
   signal_toys->SetName("signal_toys");
   RooPlot* s_mgg = mgg.frame();
   s_mgg->SetName("signal_toys_plot");
@@ -887,7 +887,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
-  npoints = n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
+  int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
   
   //-------------------------------
   //S i g n a l   +   B k g   P d f
@@ -1008,7 +1008,6 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //-----------------------------
       data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
       //data_toys = GenerateToys( ws->pdf( tag1 ), mgg, n_sideband );
-      double frac = 2;
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
       ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
