@@ -94,6 +94,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   RooAbsReal* Nfit = ws->pdf( tag3 )->createIntegral( mgg, RooFit::Range("Full") ) ;
   std::cout << sint->getVal() << std::endl;
   float N_sideband = data.sumEntries(Form("(mgg>%0.2f && mgg <120) || (mgg>131 && mgg<%0.2f)",103.,160.));
+  /*
   double n1 = ws->var("sideband_fitNbkg1")->getVal();
   double n2 = ws->var("sideband_fitNbkg2")->getVal();
   double Nbkg = n1*n1 + n2*n2; 
@@ -104,7 +105,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   std::cout << "Nbkg: " << Nbkg << std::endl;
   std::cout << "sf: "  << Nbkg*sint->getVal()/N_sideband << std::endl;
   std::cout << "-----------------------------------" << std::endl;
-  
+  */
   bres->SetName( tag3 + "_b_fitres" );
   ws->import( *bres );
 
@@ -116,11 +117,11 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   fmgg->SetName( tag3 + "_frame" );
   ws->import( *fmgg );
 
-   RooPlot* pdfFrame = mgg.frame();
-   ws->pdf( tag3 )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
-   pdfFrame->SetName( tag3+"_pdfframe" );
-   ws->import( *pdfFrame );
-   ws->import( mgg );
+  RooPlot* pdfFrame = mgg.frame();
+  ws->pdf( tag3 )->plotOn( pdfFrame, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  pdfFrame->SetName( tag3+"_pdfframe" );
+  ws->import( *pdfFrame );
+  ws->import( mgg );
   return ws;
 };
 
@@ -752,9 +753,11 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("low", 103, 120.);
+  //mgg.setRange("high", 131, 160);
+  mgg.setRange("high", 135.0, 160.);
   mgg.setRange("sig", 122.08, 128.92);
+  mgg.setRange("Full", 103.0, 160.0);
 
   RooDataSet* signal_toys = GenerateToys( signalPdf, mgg, npoints );
   signal_toys->SetName("signal_toys");
@@ -860,22 +863,40 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   npoints = data.numEntries();
   //Sideband Fit (not working with poly2 and poly3)
-  //ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  /*
+  ws->var( "doubleExp_1_Nbkg2" )->setVal(0.0);
+  ws->var( "doubleExp_1_Nbkg2" )->setConstant(kTRUE);
+
+  ws->var( "doubleExp_1_a2" )->setVal(0.0);
+  ws->var( "doubleExp_1_a2" )->setConstant(kTRUE);
+  */
+  ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  /*
+  ws->var( "doubleExp_2_Nbkg2" )->setVal(0.0);
+  ws->var( "doubleExp_2_Nbkg2" )->setConstant(kTRUE);
+
+  ws->var( "doubleExp_2_a2" )->setVal(0.0);
+  ws->var( "doubleExp_2_a2" )->setConstant(kTRUE);
+  */
+  RooFitResult* bres2 = ws->pdf( tag2 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("blah") );
   //FullFit
-  ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
-  
-  RooAbsReal* f1Integral = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
-  double f1Int = f1Integral->getVal();
+  //ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
 
   RooPlot* bFrame = mgg.frame();
   bFrame->SetName("bFitFrame");
   bFrame->SetTitle("");
   data.plotOn( bFrame );
-  ws->pdf( tag1 )->plotOn( bFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  ws->pdf( tag1 )->plotOn( bFrame, RooFit::LineColor(kBlue), RooFit::Range("blah"), RooFit::NormRange("blah"));
+  //ws->pdf( tag1 )->plotOn( bFrame, RooFit::LineColor(kBlue), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
+  ws->pdf( tag2 )->plotOn( bFrame, RooFit::LineColor(kRed), RooFit::Range("blah"), RooFit::NormRange("blah") );
   ws->import( *bFrame );
-
+  ws->import( *bres );
+  ws->import( *bres2 );
+  return ws;
+  RooAbsReal* f1Integral = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  double f1Int = f1Integral->getVal();
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -897,13 +918,20 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   
   bias.setBins(100);
   NsignalError.setBins(100);
-  data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-  ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
+  //----------------------------------------
+  //fit to data to obtain initial parameters
+  //----------------------------------------
+  //ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   RooPlot* pFrame = mgg.frame();
   pFrame->SetName("pFitFrame");
-  data_toys->plotOn( pFrame );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
+  //data_toys->plotOn( pFrame );
+  data.plotOn( pFrame );
+  //ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  //ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
+  //ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full") );
   ws->import( *pFrame );
   
   double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
