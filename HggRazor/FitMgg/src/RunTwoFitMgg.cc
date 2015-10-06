@@ -1153,9 +1153,10 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
-  mgg.setBins(57);
+  mgg.setBins(30);
   mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("high", 135, 160);
+  mgg.setRange("Full", 103, 160);
 
   TString tag;
   if ( ffName == "doubleExp" )
@@ -1209,8 +1210,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
   //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
     
@@ -1220,14 +1221,14 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //g e t t i n g   n l l 
   //---------------------
   double minNll = bres->minNll();
-  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
   RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
-  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>131 && mgg<160)");
+  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
   std::cout << "n -> " << n << std::endl;
   AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
   AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
@@ -1244,8 +1245,12 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   ws->import( *bres );
   
   RooPlot *fmgg = mgg.frame();
-  data.plotOn(fmgg);
-  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  RooDataSet* dataCut = (RooDataSet*) data.reduce(RooFit::Name("dataCut"),RooFit::SelectVars(RooArgSet(mgg)),RooFit::CutRange("low"));
+  RooDataSet* dataHigh = (RooDataSet*) data.reduce(RooFit::Name("dataHigh"),RooFit::SelectVars(RooArgSet(mgg)),RooFit::CutRange("high"));
+  dataCut->append(*dataHigh);
+  data.plotOn(fmgg,RooFit::Invisible());
+  dataCut->plotOn(fmgg);
+  ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low,high"));
   ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   
   fmgg->SetName( tag + "_frame" );
