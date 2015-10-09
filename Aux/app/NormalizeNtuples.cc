@@ -12,7 +12,7 @@
 #include "TChainTools.hh"
 #include "HggAux.hh"
 
-const float lumi = 19.8e3;
+//const float lumi = 19.8e3;
 //const float lumi = 5.0e3;  
 
 int main ( int argc, char* argv[] )
@@ -22,10 +22,21 @@ int main ( int argc, char* argv[] )
   if ( inputFile == "" )
     {
       std::cerr << "[ERROR]: Please provide a valid input list" << std::endl;
-      std::cout << "[INFOR]: options are:\n --inputFile=<your_xsec_file>\n --treeName=<yourTTree>\n (optional) --treeOpt=FullTree, runs on HggRazor\n";
+      std::cout << "[INFO]: options are:\n --inputFile=<your_xsec_file>\n --treeName=<yourTTree>\n --lumi=<lumi (fb-1)>\n (optional) --treeOpt=FullTree, runs on HggRazor\n";
       return -1;
     }
-
+  
+  //-------------------------
+  //Define lumi in pb-1
+  //-------------------------
+  float lumi = 1e3;//xsec units are in pb, so need to convert 1fb-1 to 1e3 pb-1;
+  std::string _lumi = ParseCommandLine( argc, argv, "--lumi=" );
+  if ( _lumi != "" )
+    {
+      lumi = atof( _lumi.c_str() )*1000.;//convertion to pb-1
+    }
+  
+  
   std::string treeOpt = ParseCommandLine( argc, argv, "-treeOpt=" );
   bool splitTrees = true;
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
@@ -49,6 +60,10 @@ int main ( int argc, char* argv[] )
       splitTrees = false;
     }
   
+  std::cout << "[INFO]: inputFile: " << inputFile << std::endl;
+  std::cout << "[INFO]: treeName: " << treeName << std::endl;
+  std::cout << "[INFO]: lumi: " << lumi << " (pb-1)"<< std::endl;
+
   TFile* f;
   TFile* fout;
   TH1F*  h_ngen;
