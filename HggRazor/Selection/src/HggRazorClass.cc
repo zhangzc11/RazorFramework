@@ -142,8 +142,18 @@ void HggRazorClass::Loop()
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
       //double w = xsecSF*hggBF;
-      double w = xsecSF;
+      double w;
+      if ( this->processName == "data" )
+	{
+	  w = 1.0;
+	}
+      else
+	{
+	  w = xsecSF;
+	}
+      
       h_mgg->Fill( mGammaGamma, w );
+      //std::cout << "mgg: " << mGammaGamma << std::endl;
       h_ptgg->Fill( pTGammaGamma, w );
       h_mr->Fill( MR, w );
       h_rsq->Fill( Rsq, w );
