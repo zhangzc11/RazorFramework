@@ -1098,7 +1098,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //------------
       double Nsignal  = ws->var("doubleGauseSB_gauss_Ns")->getVal();
       double Ns_Error = ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
-      bias =  (Nsignal - double(stoys))/(double)stoys;
+      //bias =  (Nsignal - double(stoys))/(double)stoys;
+      bias =  (Nsignal - double(stoys))/ws->var("doubleGauseSB_gauss_Ns")->getError();
       NsignalError.setVal( Ns_Error );
       if ( bres_toys->status() != 0  )
 	{
