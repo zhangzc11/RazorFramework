@@ -94,6 +94,17 @@ int main( int argc, char* argv[])
       invertIso = "no";
     }
   
+  std::string _fraction = ParseCommandLine( argc, argv, "-signalFraction=" );
+  float _signalFraction = 0.0;
+  if ( _fraction != "" )
+    {
+      _signalFraction = atof( _fraction.c_str() );
+    }
+  
+  if ( fitMode == "biasSignal" && _fraction == "" )
+    {
+      std::cerr << "[WARNING] signal fraction for bias study is set to default: " << _signalFraction << std::endl;
+    }
   
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
@@ -103,6 +114,7 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   std::cout << "[INFO]: inverted Iso  :" << invertIso << std::endl;
+  if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << invertIso << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -330,7 +342,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 2.0);
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, _signalFraction );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
