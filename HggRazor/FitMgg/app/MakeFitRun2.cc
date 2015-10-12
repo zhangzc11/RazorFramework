@@ -94,6 +94,17 @@ int main( int argc, char* argv[])
       invertIso = "no";
     }
   
+  std::string _fraction = ParseCommandLine( argc, argv, "-signalFraction=" );
+  float _signalFraction = 0.0;
+  if ( _fraction != "" )
+    {
+      _signalFraction = atof( _fraction.c_str() );
+    }
+  
+  if ( fitMode == "biasSignal" && _fraction == "" )
+    {
+      std::cerr << "[WARNING] signal fraction for bias study is set to default: " << _signalFraction << std::endl;
+    }
   
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
@@ -103,6 +114,7 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   std::cout << "[INFO]: inverted Iso  :" << invertIso << std::endl;
+  if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << invertIso << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -286,7 +298,7 @@ int main( int argc, char* argv[])
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
     }
   else if(fitMode == "AIC2")
-  {
+    {
       w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "doubleExp" );
       if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doubleExp",aic[0]));
       w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], "singleExp" );
@@ -301,11 +313,11 @@ int main( int argc, char* argv[])
       if( aic_map.find("poly3") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly3",aic[5]));
       w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], aic_2[6], aic_3[6], "modExp" );
       if( aic_map.find("modExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("modExp",aic[6]));
-     w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], "poly4" );
+      w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], "poly4" );
       if( aic_map.find("poly4") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly4",aic[7]));
-    
-
-	  if( aic_map_2.find("doubleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doubleExp",aic_2[0]));
+      
+      
+      if( aic_map_2.find("doubleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doubleExp",aic_2[0]));
       if( aic_map_2.find("singleExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singleExp",aic_2[1]));
       if( aic_map_2.find("singlePow") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("singlePow",aic_2[2]));
       if( aic_map_2.find("doublePow") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("doublePow",aic_2[3]));
@@ -313,8 +325,8 @@ int main( int argc, char* argv[])
       if( aic_map_2.find("poly3") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly3",aic_2[5]));
       if( aic_map_2.find("modExp") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("modExp",aic_2[6]));
       if( aic_map_2.find("poly4") == aic_map_2.end() ) aic_map_2.insert( std::pair<std::string, double>("poly4",aic_2[7]));
-   
-	  if( aic_map_3.find("doubleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doubleExp",aic_3[0]));
+      
+      if( aic_map_3.find("doubleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doubleExp",aic_3[0]));
       if( aic_map_3.find("singleExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("singleExp",aic_3[1]));
       if( aic_map_3.find("singlePow") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("singlePow",aic_3[2]));
       if( aic_map_3.find("doublePow") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("doublePow",aic_3[3]));
@@ -322,7 +334,7 @@ int main( int argc, char* argv[])
       if( aic_map_3.find("poly3") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly3",aic_3[5]));
       if( aic_map_3.find("modExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("modExp",aic_3[6]));
       if( aic_map_3.find("poly4") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly4",aic_3[7]));
-  }
+    }
   else if ( fitMode == "bias" )
     {
       RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
@@ -330,7 +342,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e0, 1e4);
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, _signalFraction );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
