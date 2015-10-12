@@ -104,6 +104,7 @@ int main( int argc, char* argv[])
   if ( fitMode == "biasSignal" && _fraction == "" )
     {
       std::cerr << "[WARNING] signal fraction for bias study is set to default: " << _signalFraction << std::endl;
+      std::cerr << "[WARNING] to set a signal fraction use --signalFraction=<sfrac>: " << std::endl;
     }
   
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
@@ -114,7 +115,7 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   std::cout << "[INFO]: inverted Iso  :" << invertIso << std::endl;
-  if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << invertIso << std::endl;
+  if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << _signalFraction << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
