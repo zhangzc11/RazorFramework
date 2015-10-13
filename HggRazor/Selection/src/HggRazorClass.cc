@@ -149,7 +149,7 @@ void HggRazorClass::Loop()
 	}
       else
 	{
-	  w = xsecSF;
+	  w = xsecSF*weight;
 	}
       
       h_mgg->Fill( mGammaGamma, w );
