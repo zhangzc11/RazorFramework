@@ -36,7 +36,7 @@ int main ( int argc, char* argv[] )
       lumi = atof( _lumi.c_str() )*1000.;//convertion to pb-1
     }
   
-  
+  std::cout << "LUMI LUMI: " << lumi << std::endl;
   std::string treeOpt = ParseCommandLine( argc, argv, "-treeOpt=" );
   bool splitTrees = true;
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );

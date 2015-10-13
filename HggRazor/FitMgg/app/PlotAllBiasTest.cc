@@ -109,6 +109,7 @@ int main( int argc, char* argv[])
   if ( mode == "table" )
     {
       MakeTable( mean_map, "mean" );
+      MakeTable( rms_map, "rms" );
     }
 
   if ( mode == "tableFitErr" )

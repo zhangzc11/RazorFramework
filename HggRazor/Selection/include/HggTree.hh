@@ -22,6 +22,7 @@ public :
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
+   Float_t         weight;
    UInt_t          lumi;
    UInt_t          run;
    UInt_t          event;
@@ -114,6 +115,7 @@ public :
    Float_t         xsecSF;
   
    // List of branches
+   TBranch        *b_weight;   //!
    TBranch        *b_lumi;   //!
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
@@ -275,6 +277,7 @@ void HggTree::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
+   fChain->SetBranchAddress("weight", &weight, &b_weight);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("event", &event, &b_event);
