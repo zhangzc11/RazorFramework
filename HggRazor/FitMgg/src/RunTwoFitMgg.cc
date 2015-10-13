@@ -576,7 +576,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   double n; 
   RooAbsReal* fIntegral;
   RooAbsReal* fIntegral2;
-  RooRealVar bias("bias", "bias", -2.0, 2.0, "");
+  RooRealVar bias("bias", "bias", -5.0, 5.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
   bias.setBins(100);
   
@@ -905,10 +905,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //--------------
   RooAbsReal* fIntegral;
   RooAbsReal* fIntegral2;
-  RooRealVar bias("bias", "bias", -2.0, 2.0, "");
+  RooRealVar bias("bias", "bias", -5.0, 5.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
 
-  RooRealVar NsignalError("NsignalError", "NsignalError", -2.0, 2.0, "");
+  RooRealVar NsignalError("NsignalError", "NsignalError", -5.0, 5.0, "");
   RooDataSet data_Nse( "data_Nse", "data_Nse", NsignalError);
   
   bias.setBins(100);
@@ -1254,6 +1254,20 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low,high"));
   ws->pdf( tag )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   
+  /*
+  double top_y = fmgg->GetMaximum();
+  int n_g = 20;
+  TGraph *grshade = new TGraph(2*n_g);
+  for ( int ig = 0; ig < n_g; ig++ )
+    {
+      grshade->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
+      grshade->SetPoint(n_g + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
+    }
+  
+  grshade->SetFillStyle(3013);
+  grshade->SetFillColor(16);
+  grshade->Draw("f same");
+  */
   fmgg->SetName( tag + "_frame" );
   ws->import( *fmgg );
   
