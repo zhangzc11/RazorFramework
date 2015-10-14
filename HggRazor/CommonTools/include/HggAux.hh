@@ -40,7 +40,7 @@ Process& operator++( Process& process );
 Process operator*( Process process );
 std::string GetProcessString( Process process );
 
-enum class HistoTypes{ mr, rsq, mgg, ptgg, Last};
+enum class HistoTypes{ mr, rsq, mgg, ptgg, pho1pt, pho1eta, pho1phi, pho1sigmaIetaIeta, pho1r9, pho1HoverE, pho1sumChargedHadronPt, pho1sumNeutralHadronEt, pho1sumPhotonEt, pho1sigmaEoverE, pho2pt, pho2eta, pho2phi, pho2sigmaIetaIeta, pho2r9, pho2HoverE, pho2sumChargedHadronPt, pho2sumNeutralHadronEt, pho2sumPhotonEt, pho2sigmaEoverE, njets, Last};
 HistoTypes begin( HistoTypes htype );
 HistoTypes end( HistoTypes htype );
 HistoTypes& operator++( HistoTypes& htype );
@@ -63,6 +63,29 @@ struct Histos
   TH1F rsq;
   TH1F mgg;
   TH1F ptgg;
+  TH1F pho1pt;
+  TH1F pho1eta;
+  TH1F pho1phi;
+  TH1F pho1sigmaIetaIeta;
+  TH1F pho1r9;
+  TH1F pho1HoverE;
+  TH1F pho1sumChargedHadronPt;
+  TH1F pho1sumNeutralHadronEt;
+  TH1F pho1sumPhotonEt;
+  TH1F pho1sigmaEoverE;
+  
+  TH1F pho2pt;
+  TH1F pho2eta;
+  TH1F pho2phi;
+  TH1F pho2sigmaIetaIeta;
+  TH1F pho2r9;
+  TH1F pho2HoverE;
+  TH1F pho2sumChargedHadronPt;
+  TH1F pho2sumNeutralHadronEt;
+  TH1F pho2sumPhotonEt;
+  TH1F pho2sigmaEoverE;
+  
+  TH1F njets;
   bool AssignHisto( HistoTypes htype, TH1F h );
   TH1F GetHisto( HistoTypes htype );
 };

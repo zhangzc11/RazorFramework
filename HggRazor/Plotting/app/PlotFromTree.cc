@@ -4,6 +4,7 @@
 //ROOT INCLUDES
 #include <TString.h>
 #include <THStack.h>
+#include <TMath.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
 #include "HggRazorClass.hh"
@@ -33,6 +34,92 @@ float HggRazorClass::mr_h = 8130.;
 int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
+
+//photon1
+int HggRazorClass::n_pho1pt = 70;
+float HggRazorClass::pho1pt_l = .0;
+float HggRazorClass::pho1pt_h = 700.0;
+
+int HggRazorClass::n_pho1eta = 50;
+float HggRazorClass::pho1eta_l = -3.0;
+float HggRazorClass::pho1eta_h = 3.0;
+
+int HggRazorClass::n_pho1phi = 50;
+float HggRazorClass::pho1phi_l = -2*3.1416;
+float HggRazorClass::pho1phi_h = 2*3.1416;
+
+int HggRazorClass::n_pho1sigmaIetaIeta = 50;
+float HggRazorClass::pho1sigmaIetaIeta_l = -3.0;
+float HggRazorClass::pho1sigmaIetaIeta_h = 3.0;
+
+int HggRazorClass::n_pho1r9 = 50;
+float HggRazorClass::pho1r9_l = 0.0;
+float HggRazorClass::pho1r9_h = 1.5;
+
+int HggRazorClass::n_pho1HoverE = 50;
+float HggRazorClass::pho1HoverE_l = -3.0;
+float HggRazorClass::pho1HoverE_h = 3.0;
+
+int HggRazorClass::n_pho1sumChargedHadronPt = 50;
+float HggRazorClass::pho1sumChargedHadronPt_l = -3.0;
+float HggRazorClass::pho1sumChargedHadronPt_h = 3.0;
+
+int HggRazorClass::n_pho1sumNeutralHadronEt = 50;
+float HggRazorClass::pho1sumNeutralHadronEt_l = -3.0;
+float HggRazorClass::pho1sumNeutralHadronEt_h = 3.0;
+
+int HggRazorClass::n_pho1sumPhotonEt = 50;
+float HggRazorClass::pho1sumPhotonEt_l = -3.0;
+float HggRazorClass::pho1sumPhotonEt_h = 3.0;
+
+int HggRazorClass::n_pho1sigmaEoverE = 50;
+float HggRazorClass::pho1sigmaEoverE_l = -3.0;
+float HggRazorClass::pho1sigmaEoverE_h = 3.0;
+
+int HggRazorClass::n_pho2pt = 200;
+float HggRazorClass::pho2pt_l = .0;
+float HggRazorClass::pho2pt_h = 1000.0;
+
+int HggRazorClass::n_pho2eta = 50;
+float HggRazorClass::pho2eta_l = -3.0;
+float HggRazorClass::pho2eta_h = 3.0;
+
+int HggRazorClass::n_pho2phi = 50;
+float HggRazorClass::pho2phi_l = -2*3.1416;
+float HggRazorClass::pho2phi_h = 2*3.1416;
+
+int HggRazorClass::n_pho2sigmaIetaIeta = 50;
+float HggRazorClass::pho2sigmaIetaIeta_l = -3.0;
+float HggRazorClass::pho2sigmaIetaIeta_h = 3.0;
+
+int HggRazorClass::n_pho2r9 = 50;
+float HggRazorClass::pho2r9_l = 0.0;
+float HggRazorClass::pho2r9_h = 1.5;
+
+int HggRazorClass::n_pho2HoverE = 50;
+float HggRazorClass::pho2HoverE_l = -3.0;
+float HggRazorClass::pho2HoverE_h = 3.0;
+
+int HggRazorClass::n_pho2sumChargedHadronPt = 50;
+float HggRazorClass::pho2sumChargedHadronPt_l = -3.0;
+float HggRazorClass::pho2sumChargedHadronPt_h = 3.0;
+
+int HggRazorClass::n_pho2sumNeutralHadronEt = 50;
+float HggRazorClass::pho2sumNeutralHadronEt_l = -3.0;
+float HggRazorClass::pho2sumNeutralHadronEt_h = 3.0;
+
+int HggRazorClass::n_pho2sumPhotonEt = 50;
+float HggRazorClass::pho2sumPhotonEt_l = -3.0;
+float HggRazorClass::pho2sumPhotonEt_h = 3.0;
+
+int HggRazorClass::n_pho2sigmaEoverE = 50;
+float HggRazorClass::pho2sigmaEoverE_l = -3.0;
+float HggRazorClass::pho2sigmaEoverE_h = 3.0;
+
+
+int HggRazorClass::n_njets = 11;
+float HggRazorClass::njets_l = .0;
+float HggRazorClass::njets_h = 10;
 
 //C u s t o m MR_RSQ_BINNING
 //--------------------------

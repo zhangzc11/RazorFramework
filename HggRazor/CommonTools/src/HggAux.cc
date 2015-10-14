@@ -25,13 +25,40 @@ FitFunction operator*( FitFunction fitf ){ return fitf; };
 FitFunction begin( FitFunction fitf ){ return FitFunction::singleExp; };
 FitFunction end( FitFunction fitf ){ return FitFunction::Last; };
 
+
+//---------------------------------
+//H i s t o g r a m   s e c t i o n
+//---------------------------------
 bool Histos::AssignHisto( HistoTypes htype, TH1F h )
 {
   if ( htype == HistoTypes::mr ) mr = h;
   if ( htype == HistoTypes::rsq ) rsq = h;
   if ( htype == HistoTypes::mgg ) mgg = h;
   if ( htype == HistoTypes::ptgg ) ptgg = h;
-
+  
+  if ( htype == HistoTypes::pho1pt ) pho1pt = h;
+  if ( htype == HistoTypes::pho1eta ) pho1eta = h;
+  if ( htype == HistoTypes::pho1phi ) pho1phi = h;
+  if ( htype == HistoTypes::pho1sigmaIetaIeta ) pho1sigmaIetaIeta = h;
+  if ( htype == HistoTypes::pho1r9 ) pho1r9 = h;
+  if ( htype == HistoTypes::pho1HoverE ) pho1HoverE = h;
+  if ( htype == HistoTypes::pho1sumChargedHadronPt ) pho1sumChargedHadronPt = h;
+  if ( htype == HistoTypes::pho1sumNeutralHadronEt ) pho1sumNeutralHadronEt = h;
+  if ( htype == HistoTypes::pho1sumPhotonEt ) pho1sumPhotonEt = h;
+  if ( htype == HistoTypes::pho1sigmaEoverE ) pho1sigmaEoverE = h;
+   
+  if ( htype == HistoTypes::pho2pt ) pho2pt = h;
+  if ( htype == HistoTypes::pho2eta ) pho2eta = h;
+  if ( htype == HistoTypes::pho2phi ) pho2phi = h;
+  if ( htype == HistoTypes::pho2sigmaIetaIeta ) pho2sigmaIetaIeta = h;
+  if ( htype == HistoTypes::pho2r9 ) pho2r9 = h;
+  if ( htype == HistoTypes::pho2HoverE ) pho2HoverE = h;
+  if ( htype == HistoTypes::pho2sumChargedHadronPt ) pho2sumChargedHadronPt = h;
+  if ( htype == HistoTypes::pho2sumNeutralHadronEt ) pho2sumNeutralHadronEt = h;
+  if ( htype == HistoTypes::pho2sumPhotonEt ) pho2sumPhotonEt = h;
+  if ( htype == HistoTypes::pho2sigmaEoverE ) pho2sigmaEoverE = h;
+  
+  if ( htype == HistoTypes::njets ) njets = h;
   return true;
 };
 
@@ -42,8 +69,66 @@ TH1F Histos::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::rsq ) return rsq;
   if ( htype == HistoTypes::mgg ) return mgg;
   if ( htype == HistoTypes::ptgg ) return ptgg;
+
+  if ( htype == HistoTypes::pho1pt ) return pho1pt;
+  if ( htype == HistoTypes::pho1eta ) return pho1eta;
+  if ( htype == HistoTypes::pho1phi ) return pho1phi;
+  if ( htype == HistoTypes::pho1sigmaIetaIeta ) return pho1sigmaIetaIeta;
+  if ( htype == HistoTypes::pho1r9 ) return pho1r9;
+  if ( htype == HistoTypes::pho1HoverE ) return pho1HoverE;
+  if ( htype == HistoTypes::pho1sumChargedHadronPt ) return pho1sumChargedHadronPt;
+  if ( htype == HistoTypes::pho1sumNeutralHadronEt ) return pho1sumNeutralHadronEt;
+  if ( htype == HistoTypes::pho1sumPhotonEt ) return pho1sumPhotonEt;
+  if ( htype == HistoTypes::pho1sigmaEoverE ) return pho1sigmaEoverE;
   
+  if ( htype == HistoTypes::pho2pt ) return pho2pt;
+  if ( htype == HistoTypes::pho2eta ) return pho2eta;
+  if ( htype == HistoTypes::pho2phi ) return pho2phi;
+  if ( htype == HistoTypes::pho2sigmaIetaIeta ) return pho2sigmaIetaIeta;
+  if ( htype == HistoTypes::pho2r9 ) return pho2r9;
+  if ( htype == HistoTypes::pho2HoverE ) return pho2HoverE;
+  if ( htype == HistoTypes::pho2sumChargedHadronPt ) return pho2sumChargedHadronPt;
+  if ( htype == HistoTypes::pho2sumNeutralHadronEt ) return pho2sumNeutralHadronEt;
+  if ( htype == HistoTypes::pho2sumPhotonEt ) return pho2sumPhotonEt;
+  if ( htype == HistoTypes::pho2sigmaEoverE ) return pho2sigmaEoverE;
+  
+  if ( htype == HistoTypes::njets ) return njets;
   return h;
+};
+
+std::string GetHistoTypesString( HistoTypes htype )
+{
+  if ( htype == HistoTypes::mr ) return "mr";
+  if ( htype == HistoTypes::rsq ) return "rsq";
+  if ( htype == HistoTypes::mgg ) return "mgg";
+  if ( htype == HistoTypes::ptgg ) return "ptgg";
+
+  if ( htype == HistoTypes::pho1pt ) return "pho1pt";
+  if ( htype == HistoTypes::pho1eta ) return "pho1eta";
+  if ( htype == HistoTypes::pho1phi ) return "pho1phi";
+  if ( htype == HistoTypes::pho1sigmaIetaIeta ) return "pho1sigmaIetaIeta";
+  if ( htype == HistoTypes::pho1r9 ) return "pho1r9";
+  if ( htype == HistoTypes::pho1HoverE ) return "pho1HoverE";
+  if ( htype == HistoTypes::pho1sumChargedHadronPt ) return "pho1sumChargedHadronPt";
+  if ( htype == HistoTypes::pho1sumNeutralHadronEt ) return "pho1sumNeutralHadronEt";
+  if ( htype == HistoTypes::pho1sumPhotonEt ) return "pho1sumPhotonEt";
+  if ( htype == HistoTypes::pho1sigmaEoverE ) return "pho1sigmaEoverE";
+    
+  if ( htype == HistoTypes::pho2pt ) return "pho2pt";
+  if ( htype == HistoTypes::pho2eta ) return "pho2eta";
+  if ( htype == HistoTypes::pho2phi ) return "pho2phi";
+  if ( htype == HistoTypes::pho2sigmaIetaIeta ) return "pho2sigmaIetaIeta";
+  if ( htype == HistoTypes::pho2r9 ) return "pho2r9";
+  if ( htype == HistoTypes::pho2HoverE ) return "pho2HoverE";
+  if ( htype == HistoTypes::pho2sumChargedHadronPt ) return "pho2sumChargedHadronPt";
+  if ( htype == HistoTypes::pho2sumNeutralHadronEt ) return "pho2sumNeutralHadronEt";
+  if ( htype == HistoTypes::pho2sumPhotonEt ) return "pho2sumPhotonEt";
+  if ( htype == HistoTypes::pho2sigmaEoverE ) return "pho2sigmaEoverE";
+  
+  if ( htype == HistoTypes::njets ) return "njets";
+  
+  std::cerr << "[ERROR]: Htype not found" << std::endl;
+  return "";
 };
 
 std::string GetBoxString( Boxes box )
@@ -114,31 +199,6 @@ std::string GetProcessString( Process process )
       std::cerr << "[ERROR]: Process not found" << std::endl;
     }
   return "";
-};
-
-std::string GetHistoTypesString( HistoTypes htype )
-{
-if ( htype == HistoTypes::mr )
-  {
-      return "mr";
-    }
-  else if ( htype == HistoTypes::rsq )
-    {
-      return "rsq";
-    }
-  else if ( htype == HistoTypes::mgg )
-    {
-      return "mgg";
-    }
-  else if ( htype == HistoTypes::ptgg )
-    {
-      return "ptgg";
-    }
-  else
-    {
-      std::cerr << "[ERROR]: Htype not found" << std::endl;
-    }
- return "";
 };
 
 std::string GetFitFunctionString( FitFunction  fitf )

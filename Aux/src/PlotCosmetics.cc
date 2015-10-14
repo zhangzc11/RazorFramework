@@ -221,7 +221,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       s->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
-      s->GetXaxis()->SetTitle("R^{2}");
+      ratio->GetXaxis()->SetTitle("R^{2}");
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->GetYaxis()->SetTitle("events / 0.04");
@@ -233,7 +233,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       s->GetXaxis()->SetRangeUser(0.0, 2000.0);
       ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
-      s->GetXaxis()->SetTitle("M_{R} (GeV)");
+      ratio->GetXaxis()->SetTitle("M_{R} (GeV)");
       s->GetYaxis()->SetTitle("events / 50 (GeV)");
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1e1*s->GetMaximum() );
@@ -242,7 +242,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "mgg" )
     {
-      s->GetXaxis()->SetRangeUser( 103., 160. );
+      s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );
@@ -250,7 +250,25 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "ptgg" )
     {
-      s->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      ratio->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1pt" )
+    {
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2pt" )
+    {
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
