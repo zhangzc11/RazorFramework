@@ -18,8 +18,11 @@ public:
   HggRazorClass( TTree* tree );
   HggRazorClass( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~HggRazorClass( );
+  //higgs
   bool InitMggHisto( );
   bool InitPtggHisto( );
+  bool InitSigmaMoverMHisto( );
+  
   bool InitMrHisto( );
   bool InitRsqHisto( );
   //photon1
@@ -79,6 +82,11 @@ private:
   static float ptgg_l;
   static float ptgg_h;
   TH1F* h_ptgg;
+
+  static int   n_sigmaMoverM;
+  static float sigmaMoverM_l;
+  static float sigmaMoverM_h;
+  TH1F* h_sigmaMoverM;
 
   static int   n_mr;
   static float mr_l;

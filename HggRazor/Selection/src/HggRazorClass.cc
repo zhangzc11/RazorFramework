@@ -34,9 +34,11 @@ HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName,
     {
       this->boxName = boxName;
     }
-  
+  //higgs
   InitMggHisto();
   InitPtggHisto();
+  InitSigmaMoverMHisto( );
+  //razor
   InitMrHisto();
   InitRsqHisto();
   //photon1
@@ -95,6 +97,18 @@ bool HggRazorClass::InitPtggHisto( )
     }
   if ( _debug ) std::cout << "[DEBUG]: Initializing ptgg histogram" << std::endl;
   h_ptgg = new TH1F( this->processName + "_" + this->boxName +  "_ptgg", "ptgg", n_ptgg, ptgg_l, ptgg_h );
+  return true;
+};
+
+bool HggRazorClass::InitSigmaMoverMHisto( )
+{
+  if ( n_sigmaMoverM == 0 || sigmaMoverM_l == sigmaMoverM_h )
+    {
+      std::cerr << "[ERROR]: sigmaMoverM histogram parameters not initialized" << std::endl;
+      return false;
+    }
+  if ( _debug ) std::cout << "[DEBUG]: Initializing sigmaMoverM histogram" << std::endl;
+  h_sigmaMoverM = new TH1F( this->processName + "_" + this->boxName +  "_sigmaMoverM", "sigmaMoverM", n_sigmaMoverM, sigmaMoverM_l, sigmaMoverM_h );
   return true;
 };
 
@@ -428,12 +442,16 @@ void HggRazorClass::Loop()
 	}
       else
 	{
-	  w = xsecSF*weight;
+	  //w = xsecSF*weight;
+	  w = xsecSF*weight*6.325885e-01;
 	}
-      
+
+      //std::cout << "weight: " << w << std::endl;
       h_mgg->Fill( mGammaGamma, w );
       //std::cout << "mgg: " << mGammaGamma << std::endl;
       h_ptgg->Fill( pTGammaGamma, w );
+      h_sigmaMoverM->Fill( sigmaMoverM, w );
+      
       h_mr->Fill( MR, w );
       h_rsq->Fill( Rsq, w );
       h_mr_rsq->Fill( MR, Rsq, w );
@@ -565,6 +583,7 @@ TH1F HggRazorClass::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::rsq )  return *h_rsq;
   if ( htype == HistoTypes::mgg )  return *h_mgg;
   if ( htype == HistoTypes::ptgg ) return *h_ptgg;
+  if ( htype == HistoTypes::sigmaMoverM ) return *h_sigmaMoverM;
   
   if ( htype == HistoTypes::pho1pt ) return *h_pho1pt;
   if ( htype == HistoTypes::pho1eta ) return *h_pho1eta;

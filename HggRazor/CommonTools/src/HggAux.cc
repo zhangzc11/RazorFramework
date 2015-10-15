@@ -35,6 +35,7 @@ bool Histos::AssignHisto( HistoTypes htype, TH1F h )
   if ( htype == HistoTypes::rsq ) rsq = h;
   if ( htype == HistoTypes::mgg ) mgg = h;
   if ( htype == HistoTypes::ptgg ) ptgg = h;
+  if ( htype == HistoTypes::sigmaMoverM ) sigmaMoverM = h;
   
   if ( htype == HistoTypes::pho1pt ) pho1pt = h;
   if ( htype == HistoTypes::pho1eta ) pho1eta = h;
@@ -69,6 +70,7 @@ TH1F Histos::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::rsq ) return rsq;
   if ( htype == HistoTypes::mgg ) return mgg;
   if ( htype == HistoTypes::ptgg ) return ptgg;
+  if ( htype == HistoTypes::sigmaMoverM ) return sigmaMoverM;
 
   if ( htype == HistoTypes::pho1pt ) return pho1pt;
   if ( htype == HistoTypes::pho1eta ) return pho1eta;
@@ -102,6 +104,7 @@ std::string GetHistoTypesString( HistoTypes htype )
   if ( htype == HistoTypes::rsq ) return "rsq";
   if ( htype == HistoTypes::mgg ) return "mgg";
   if ( htype == HistoTypes::ptgg ) return "ptgg";
+  if ( htype == HistoTypes::sigmaMoverM ) return "sigmaMoverM";
 
   if ( htype == HistoTypes::pho1pt ) return "pho1pt";
   if ( htype == HistoTypes::pho1eta ) return "pho1eta";

@@ -27,6 +27,10 @@ int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
 
+int HggRazorClass::n_sigmaMoverM = 200;
+float HggRazorClass::sigmaMoverM_l = .0;
+float HggRazorClass::sigmaMoverM_h = .05;
+
 int HggRazorClass::n_mr = 160;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 8130.;
