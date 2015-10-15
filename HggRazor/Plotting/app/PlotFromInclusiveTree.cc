@@ -14,8 +14,8 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 100;
-float HggRazorClass::mgg_l = 50.;
+int HggRazorClass::n_mgg = 38;
+float HggRazorClass::mgg_l = 103.;
 float HggRazorClass::mgg_h = 150.;
 
 int HggRazorClass::n_ptgg = 70;
@@ -142,11 +142,11 @@ float lres_k[2] = { 1.0, 1.0};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
 //TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65] == 1";
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1";
+TString cut = "MR > 350.0 && t1Rsq > 0.035 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65]";
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1";
 
-//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70] ==1";
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "MR > 350.0 && t1Rsq > 0.035 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70]";
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1";
 //TString cut = "1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
@@ -205,7 +205,7 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc;
 
-  const int nprocesses = 2;
+  const int nprocesses = 4;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
@@ -226,7 +226,7 @@ int main ( int argc, char* argv[] )
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
 	  if ( process == Process::ggH || process == Process::vbfH || process == Process::vH || process == Process::ttH ) continue;
-	  if ( process == Process::qcd || process == Process::diphoton ) continue;
+	  //if ( process == Process::qcd || process == Process::diphoton ) continue;
 	  std::cout << "---------> PROCESS: " << processName << " ctr: " << ctr << std::endl;
 	  if ( chain == NULL )
 	    {
