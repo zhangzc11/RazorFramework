@@ -30,7 +30,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "5 fb^{-1} (13 TeV)";
+TString lumiText = "0.59 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -108,7 +108,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
     }
   else if ( var == "mgg" )
     {
-      s->GetXaxis()->SetRangeUser( 103., 160. );
+      s->GetXaxis()->SetRangeUser( 50., 150. );
       s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );

@@ -442,8 +442,8 @@ void HggRazorClass::Loop()
 	}
       else
 	{
-	  //w = xsecSF*weight;
-	  w = xsecSF*weight*3.825885e-01;
+	  w = xsecSF*weight;
+	  //w = xsecSF*weight*3.825885e-01;
 	}
 
       //std::cout << "weight: " << w << std::endl;
