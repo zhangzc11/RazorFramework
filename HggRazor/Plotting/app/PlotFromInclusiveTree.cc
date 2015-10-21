@@ -14,7 +14,7 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 50;
+int HggRazorClass::n_mgg = 100;
 float HggRazorClass::mgg_l = 50.;
 float HggRazorClass::mgg_h = 150.;
 
@@ -22,7 +22,7 @@ int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
 
-int HggRazorClass::n_sigmaMoverM = 100;
+int HggRazorClass::n_sigmaMoverM = 50;
 float HggRazorClass::sigmaMoverM_l = .0;
 float HggRazorClass::sigmaMoverM_h = .05;
 
@@ -71,7 +71,7 @@ int HggRazorClass::n_pho1sumPhotonEt = 50;
 float HggRazorClass::pho1sumPhotonEt_l = 0.0;
 float HggRazorClass::pho1sumPhotonEt_h = 30.0;
 
-int HggRazorClass::n_pho1sigmaEoverE = 100;
+int HggRazorClass::n_pho1sigmaEoverE = 50;
 float HggRazorClass::pho1sigmaEoverE_l = .0;
 float HggRazorClass::pho1sigmaEoverE_h = .05;
 
@@ -112,7 +112,7 @@ int HggRazorClass::n_pho2sumPhotonEt = 50;
 float HggRazorClass::pho2sumPhotonEt_l = 0.0;
 float HggRazorClass::pho2sumPhotonEt_h = 30.0;
 
-int HggRazorClass::n_pho2sigmaEoverE = 100;
+int HggRazorClass::n_pho2sigmaEoverE = 50;
 float HggRazorClass::pho2sigmaEoverE_l = .0;
 float HggRazorClass::pho2sigmaEoverE_h = .05;
 int HggRazorClass::n_njets = 11;
@@ -141,12 +141,12 @@ float hres_k[2] = { 1.0, 1.0};
 float lres_k[2] = { 1.0, 1.0};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65]";
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48";
 
-//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70]";
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48";
+//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65] && pho1passIso == 1 && pho2passIso == 1";
+TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 )";
+
+//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70] && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 )";
 //TString cut = "1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";

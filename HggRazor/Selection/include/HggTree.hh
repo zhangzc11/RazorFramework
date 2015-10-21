@@ -68,6 +68,7 @@ public :
    Float_t         pho1sigmaEOverE;
    Bool_t          pho1passEleVeto;
    Bool_t          pho1passIso;
+   Int_t           pho1MotherID;   
    Float_t         pho2E;
    Float_t         pho2Pt;
    Float_t         pho2ECorr;
@@ -83,6 +84,7 @@ public :
    Float_t         pho2sigmaEOverE;
    Bool_t          pho2passEleVeto;
    Bool_t          pho2passIso;
+   Int_t           pho2MotherID;
    Float_t         mbbZ;
    Float_t         mbbH;
    Int_t           n_Jets;
@@ -161,6 +163,7 @@ public :
    TBranch        *b_pho1sigmaEOverE;   //!
    TBranch        *b_pho1passEleVeto;   //!
    TBranch        *b_pho1passIso;   //!
+  TBranch        *b_pho1MotherID;
    TBranch        *b_pho2E;   //!
    TBranch        *b_pho2Pt;   //!
    TBranch        *b_pho2ECorr;   //!
@@ -176,6 +179,7 @@ public :
    TBranch        *b_pho2sigmaEOverE;   //!
    TBranch        *b_pho2passEleVeto;   //!
    TBranch        *b_pho2passIso;   //!
+   TBranch        *b_pho2MotherID;
    TBranch        *b_mbbZ;   //!
    TBranch        *b_mbbH;   //!
    TBranch        *b_n_Jets;   //!
@@ -323,6 +327,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho1sigmaEOverE", &pho1sigmaEOverE, &b_pho1sigmaEOverE);
    fChain->SetBranchAddress("pho1passEleVeto", &pho1passEleVeto, &b_pho1passEleVeto);
    fChain->SetBranchAddress("pho1passIso", &pho1passIso, &b_pho1passIso);
+   fChain->SetBranchAddress("pho1MotherID", &pho1MotherID, &b_pho1MotherID);
    fChain->SetBranchAddress("pho2E", &pho2E, &b_pho2E);
    fChain->SetBranchAddress("pho2Pt", &pho2Pt, &b_pho2Pt);
    fChain->SetBranchAddress("pho2ECorr", &pho2ECorr, &b_pho2ECorr);
@@ -338,6 +343,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho2sigmaEOverE", &pho2sigmaEOverE, &b_pho2sigmaEOverE);
    fChain->SetBranchAddress("pho2passEleVeto", &pho2passEleVeto, &b_pho2passEleVeto);
    fChain->SetBranchAddress("pho2passIso", &pho2passIso, &b_pho2passIso);
+   fChain->SetBranchAddress("pho2MotherID", &pho2MotherID, &b_pho2MotherID);
    fChain->SetBranchAddress("mbbZ", &mbbZ, &b_mbbZ);
    fChain->SetBranchAddress("mbbH", &mbbH, &b_mbbH);
    fChain->SetBranchAddress("n_Jets", &n_Jets, &b_n_Jets);

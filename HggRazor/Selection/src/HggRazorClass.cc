@@ -428,6 +428,8 @@ void HggRazorClass::Loop()
     }
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  
   for (Long64_t jentry=0; jentry < nentries; jentry++ )
     {
       Long64_t ientry = LoadTree(jentry);
@@ -445,7 +447,36 @@ void HggRazorClass::Loop()
 	  w = xsecSF*weight;
 	  //w = xsecSF*weight*3.825885e-01;
 	}
+      total_in += w;
+      bool pho1_isFake = false;
+      bool pho2_isFake = false;
+      bool isFakeFake = false;
+      bool isFake = false;
+      bool prompt_prompt = false;
+      bool prompt_fake = false;
+      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 ) pho1_isFake = true;
+      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 ) pho2_isFake = true;
+      if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
+      if ( pho1_isFake || pho2_isFake ) isFake = true;
+      if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
+      if ( !pho1_isFake || !pho2_isFake ) prompt_fake = true;
+      
+      //removing events which are not prompt-fake
+      if ( prompt_prompt && this->processName == "gammaJet" )
+	{
+	  std::cout << "[INFO]: avoding prompt-prompt in gammaJet sample" << std::endl;
+	  total_rm += w;
+	  continue;
+	}
 
+      //remove events which are not fake-fake
+      if ( !isFakeFake && this->processName == "qcd" )
+	{
+	  std::cout << "[INFO]: avoding prompt-fake and prompt-prompt in qcd sample" << std::endl;
+	  total_rm += w;
+	  continue;
+	}
+      
       //std::cout << "weight: " << w << std::endl;
       h_mgg->Fill( mGammaGamma, w );
       //std::cout << "mgg: " << mGammaGamma << std::endl;
@@ -483,6 +514,8 @@ void HggRazorClass::Loop()
       
       if ( h_mr_rsq_c != NULL ) h_mr_rsq_c->Fill( MR, Rsq, w );
     }
+  
+  std::cout << "[DEBUG]: " << this->processName << " removing " << (total_rm/total_in)*100. << " % of events" << std::endl;
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
