@@ -8,8 +8,8 @@ fitName=("singleExp" "doubleExp" "modExp" "singlePow" "doublePow" "poly2" "poly3
 MR=350.0
 RSQ=0.035
 Iso="no"
-sfrac=0.0
-outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_0p0"
+sfrac=5.0
+outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_5p0"
 ctr=0
 cd $workingDir
 mkdir -p submission
