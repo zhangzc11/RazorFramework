@@ -12,8 +12,6 @@
 #include "TChainTools.hh"
 #include "HggAux.hh"
 
-//const float lumi = 19.8e3;
-//const float lumi = 5.0e3;  
 
 int main ( int argc, char* argv[] )
 {
@@ -36,7 +34,7 @@ int main ( int argc, char* argv[] )
       lumi = atof( _lumi.c_str() )*1000.;//convertion to pb-1
     }
   
-  
+  std::cout << "LUMI LUMI: " << lumi << std::endl;
   std::string treeOpt = ParseCommandLine( argc, argv, "-treeOpt=" );
   bool splitTrees = true;
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );

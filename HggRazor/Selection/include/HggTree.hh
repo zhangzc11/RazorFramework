@@ -22,6 +22,7 @@ public :
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
+   Float_t         weight;
    UInt_t          lumi;
    UInt_t          run;
    UInt_t          event;
@@ -46,7 +47,7 @@ public :
    Float_t         MT2;
    Int_t           nSelectedPhotons;
    Float_t         mGammaGamma;
-   Float_t         mggRes;
+   Float_t         sigmaMoverM;
    Float_t         pTGammaGamma;
    Float_t         etaGammaGamma;
    Float_t         phiGammaGamma;
@@ -67,6 +68,7 @@ public :
    Float_t         pho1sigmaEOverE;
    Bool_t          pho1passEleVeto;
    Bool_t          pho1passIso;
+   Int_t           pho1MotherID;   
    Float_t         pho2E;
    Float_t         pho2Pt;
    Float_t         pho2ECorr;
@@ -82,6 +84,7 @@ public :
    Float_t         pho2sigmaEOverE;
    Bool_t          pho2passEleVeto;
    Bool_t          pho2passIso;
+   Int_t           pho2MotherID;
    Float_t         mbbZ;
    Float_t         mbbH;
    Int_t           n_Jets;
@@ -114,6 +117,7 @@ public :
    Float_t         xsecSF;
   
    // List of branches
+   TBranch        *b_weight;   //!
    TBranch        *b_lumi;   //!
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
@@ -138,7 +142,7 @@ public :
    TBranch        *b_MT2;   //!
    TBranch        *b_nSelectedPhotons;   //!
    TBranch        *b_mGammaGamma;   //!
-   TBranch        *b_mggRes;   //!
+   TBranch        *b_sigmaMoverM;   //!
    TBranch        *b_pTGammaGamma;   //!
    TBranch        *b_etaGammaGamma;   //!
    TBranch        *b_phiGammaGamma;   //!
@@ -159,6 +163,7 @@ public :
    TBranch        *b_pho1sigmaEOverE;   //!
    TBranch        *b_pho1passEleVeto;   //!
    TBranch        *b_pho1passIso;   //!
+  TBranch        *b_pho1MotherID;
    TBranch        *b_pho2E;   //!
    TBranch        *b_pho2Pt;   //!
    TBranch        *b_pho2ECorr;   //!
@@ -174,6 +179,7 @@ public :
    TBranch        *b_pho2sigmaEOverE;   //!
    TBranch        *b_pho2passEleVeto;   //!
    TBranch        *b_pho2passIso;   //!
+   TBranch        *b_pho2MotherID;
    TBranch        *b_mbbZ;   //!
    TBranch        *b_mbbH;   //!
    TBranch        *b_n_Jets;   //!
@@ -275,6 +281,7 @@ void HggTree::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
+   fChain->SetBranchAddress("weight", &weight, &b_weight);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("event", &event, &b_event);
@@ -299,7 +306,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("MT2", &MT2, &b_MT2);
    fChain->SetBranchAddress("nSelectedPhotons", &nSelectedPhotons, &b_nSelectedPhotons);
    fChain->SetBranchAddress("mGammaGamma", &mGammaGamma, &b_mGammaGamma);
-   fChain->SetBranchAddress("mggRes", &mggRes, &b_mggRes);
+   fChain->SetBranchAddress("sigmaMoverM", &sigmaMoverM, &b_sigmaMoverM);
    fChain->SetBranchAddress("pTGammaGamma", &pTGammaGamma, &b_pTGammaGamma);
    fChain->SetBranchAddress("etaGammaGamma", &etaGammaGamma, &b_etaGammaGamma);
    fChain->SetBranchAddress("phiGammaGamma", &phiGammaGamma, &b_phiGammaGamma);
@@ -320,6 +327,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho1sigmaEOverE", &pho1sigmaEOverE, &b_pho1sigmaEOverE);
    fChain->SetBranchAddress("pho1passEleVeto", &pho1passEleVeto, &b_pho1passEleVeto);
    fChain->SetBranchAddress("pho1passIso", &pho1passIso, &b_pho1passIso);
+   fChain->SetBranchAddress("pho1MotherID", &pho1MotherID, &b_pho1MotherID);
    fChain->SetBranchAddress("pho2E", &pho2E, &b_pho2E);
    fChain->SetBranchAddress("pho2Pt", &pho2Pt, &b_pho2Pt);
    fChain->SetBranchAddress("pho2ECorr", &pho2ECorr, &b_pho2ECorr);
@@ -335,6 +343,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho2sigmaEOverE", &pho2sigmaEOverE, &b_pho2sigmaEOverE);
    fChain->SetBranchAddress("pho2passEleVeto", &pho2passEleVeto, &b_pho2passEleVeto);
    fChain->SetBranchAddress("pho2passIso", &pho2passIso, &b_pho2passIso);
+   fChain->SetBranchAddress("pho2MotherID", &pho2MotherID, &b_pho2MotherID);
    fChain->SetBranchAddress("mbbZ", &mbbZ, &b_mbbZ);
    fChain->SetBranchAddress("mbbH", &mbbH, &b_mbbH);
    fChain->SetBranchAddress("n_Jets", &n_Jets, &b_n_Jets);
