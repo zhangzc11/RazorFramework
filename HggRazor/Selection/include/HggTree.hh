@@ -47,7 +47,7 @@ public :
    Float_t         MT2;
    Int_t           nSelectedPhotons;
    Float_t         mGammaGamma;
-   Float_t         mggRes;
+   Float_t         sigmaMoverM;
    Float_t         pTGammaGamma;
    Float_t         etaGammaGamma;
    Float_t         phiGammaGamma;
@@ -140,7 +140,7 @@ public :
    TBranch        *b_MT2;   //!
    TBranch        *b_nSelectedPhotons;   //!
    TBranch        *b_mGammaGamma;   //!
-   TBranch        *b_mggRes;   //!
+   TBranch        *b_sigmaMoverM;   //!
    TBranch        *b_pTGammaGamma;   //!
    TBranch        *b_etaGammaGamma;   //!
    TBranch        *b_phiGammaGamma;   //!
@@ -302,7 +302,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("MT2", &MT2, &b_MT2);
    fChain->SetBranchAddress("nSelectedPhotons", &nSelectedPhotons, &b_nSelectedPhotons);
    fChain->SetBranchAddress("mGammaGamma", &mGammaGamma, &b_mGammaGamma);
-   fChain->SetBranchAddress("mggRes", &mggRes, &b_mggRes);
+   fChain->SetBranchAddress("sigmaMoverM", &sigmaMoverM, &b_sigmaMoverM);
    fChain->SetBranchAddress("pTGammaGamma", &pTGammaGamma, &b_pTGammaGamma);
    fChain->SetBranchAddress("etaGammaGamma", &etaGammaGamma, &b_etaGammaGamma);
    fChain->SetBranchAddress("phiGammaGamma", &phiGammaGamma, &b_phiGammaGamma);

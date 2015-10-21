@@ -14,17 +14,17 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 38;
-float HggRazorClass::mgg_l = 103.;
-float HggRazorClass::mgg_h = 160.;
-/*
-int HggRazorClass::n_mgg = 5;
-float HggRazorClass::mgg_l = 117.5;
-float HggRazorClass::mgg_h = 132.5;
-*/
+int HggRazorClass::n_mgg = 50;
+float HggRazorClass::mgg_l = 50.;
+float HggRazorClass::mgg_h = 150.;
+
 int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
+
+int HggRazorClass::n_sigmaMoverM = 100;
+float HggRazorClass::sigmaMoverM_l = .0;
+float HggRazorClass::sigmaMoverM_h = .05;
 
 int HggRazorClass::n_mr = 160;
 float HggRazorClass::mr_l = 130.;
@@ -33,6 +33,91 @@ float HggRazorClass::mr_h = 8130.;
 int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
+
+//photon1
+int HggRazorClass::n_pho1pt = 70;
+float HggRazorClass::pho1pt_l = .0;
+float HggRazorClass::pho1pt_h = 700.0;
+
+int HggRazorClass::n_pho1eta = 50;
+float HggRazorClass::pho1eta_l = -3.0;
+float HggRazorClass::pho1eta_h = 3.0;
+
+int HggRazorClass::n_pho1phi = 50;
+float HggRazorClass::pho1phi_l = -2*3.1416;
+float HggRazorClass::pho1phi_h = 2*3.1416;
+
+int HggRazorClass::n_pho1sigmaIetaIeta = 50;
+float HggRazorClass::pho1sigmaIetaIeta_l = .0;
+float HggRazorClass::pho1sigmaIetaIeta_h = .06;
+
+int HggRazorClass::n_pho1r9 = 50;
+float HggRazorClass::pho1r9_l = 0.0;
+float HggRazorClass::pho1r9_h = 1.5;
+
+int HggRazorClass::n_pho1HoverE = 50;
+float HggRazorClass::pho1HoverE_l = 0.0;
+float HggRazorClass::pho1HoverE_h = .2;
+
+int HggRazorClass::n_pho1sumChargedHadronPt = 50;
+float HggRazorClass::pho1sumChargedHadronPt_l = 0.0;
+float HggRazorClass::pho1sumChargedHadronPt_h = 30.0;
+
+int HggRazorClass::n_pho1sumNeutralHadronEt = 50;
+float HggRazorClass::pho1sumNeutralHadronEt_l = 0.0;
+float HggRazorClass::pho1sumNeutralHadronEt_h = 30.0;
+
+int HggRazorClass::n_pho1sumPhotonEt = 50;
+float HggRazorClass::pho1sumPhotonEt_l = 0.0;
+float HggRazorClass::pho1sumPhotonEt_h = 30.0;
+
+int HggRazorClass::n_pho1sigmaEoverE = 100;
+float HggRazorClass::pho1sigmaEoverE_l = .0;
+float HggRazorClass::pho1sigmaEoverE_h = .05;
+
+//photon2
+int HggRazorClass::n_pho2pt = 70;
+float HggRazorClass::pho2pt_l = .0;
+float HggRazorClass::pho2pt_h = 700.0;
+
+int HggRazorClass::n_pho2eta = 50;
+float HggRazorClass::pho2eta_l = -3.0;
+float HggRazorClass::pho2eta_h = 3.0;
+
+int HggRazorClass::n_pho2phi = 50;
+float HggRazorClass::pho2phi_l = -2*3.1416;
+float HggRazorClass::pho2phi_h = 2*3.1416;
+
+int HggRazorClass::n_pho2sigmaIetaIeta = 50;
+float HggRazorClass::pho2sigmaIetaIeta_l = .0;
+float HggRazorClass::pho2sigmaIetaIeta_h = .06;
+
+int HggRazorClass::n_pho2r9 = 50;
+float HggRazorClass::pho2r9_l = 0.0;
+float HggRazorClass::pho2r9_h = 1.5;
+
+int HggRazorClass::n_pho2HoverE = 50;
+float HggRazorClass::pho2HoverE_l = 0.0;
+float HggRazorClass::pho2HoverE_h = .2;
+
+int HggRazorClass::n_pho2sumChargedHadronPt = 50;
+float HggRazorClass::pho2sumChargedHadronPt_l = 0.0;
+float HggRazorClass::pho2sumChargedHadronPt_h = 30.0;
+
+int HggRazorClass::n_pho2sumNeutralHadronEt = 50;
+float HggRazorClass::pho2sumNeutralHadronEt_l = 0.0;
+float HggRazorClass::pho2sumNeutralHadronEt_h = 30.0;
+
+int HggRazorClass::n_pho2sumPhotonEt = 50;
+float HggRazorClass::pho2sumPhotonEt_l = 0.0;
+float HggRazorClass::pho2sumPhotonEt_h = 30.0;
+
+int HggRazorClass::n_pho2sigmaEoverE = 100;
+float HggRazorClass::pho2sigmaEoverE_l = .0;
+float HggRazorClass::pho2sigmaEoverE_h = .05;
+int HggRazorClass::n_njets = 11;
+float HggRazorClass::njets_l = .0;
+float HggRazorClass::njets_h = 10;
 
 //C u s t o m MR_RSQ_BINNING
 //--------------------------
@@ -51,17 +136,17 @@ const int N_Hbb = 2;
 float MR_Hbb[N_Hbb+1] = {150,300,3000};
 float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
-float hpt_k[2]  = { 1.44, 1.69};
-float hres_k[2] = { 1.03, 1.14};
-float lres_k[2] = { 1.02, 1.45};
+float hpt_k[2]  = { 1.0, 1.0};
+float hres_k[2] = { 1.0, 1.0};
+float lres_k[2] = { 1.0, 1.0};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
 //TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && trigger == 1";
-TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65] == 1";
-//TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1";
+//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65]";
+TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48";
 
-TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70] ==1";
-//TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1";
+//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70]";
+TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48";
 //TString cut = "1";
 //TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
 TString mggCut = "1";
@@ -120,10 +205,10 @@ int main ( int argc, char* argv[] )
   TH1F* data;
   TH1F* mc;
 
-  const int nprocesses = 4;
+  const int nprocesses = 2;
   const int nplots = 4;
   double k_f = 1.0;
-  const double lumi_frac = 0.253; // (5./19.8)
+  const double lumi_frac = 1.0; // (5./19.8)
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {
@@ -141,6 +226,7 @@ int main ( int argc, char* argv[] )
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
 	  if ( process == Process::ggH || process == Process::vbfH || process == Process::vH || process == Process::ttH ) continue;
+	  if ( process == Process::qcd || process == Process::diphoton ) continue;
 	  std::cout << "---------> PROCESS: " << processName << " ctr: " << ctr << std::endl;
 	  if ( chain == NULL )
 	    {
@@ -309,7 +395,7 @@ int main ( int argc, char* argv[] )
 	      for ( const auto& htmp : HistoTypes() )
 		{
 		  TH1F h_scale = hggclass->GetHisto( htmp );
-		  if ( run == "run2" ) h_scale.Scale( k_f ); 
+		  //if ( run == "run2" ) h_scale.Scale( k_f ); 
 		  histos[ctr].AssignHisto( htmp, h_scale );
 		}
 	      ctr++;

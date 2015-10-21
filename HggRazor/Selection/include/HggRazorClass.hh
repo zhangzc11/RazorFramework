@@ -18,10 +18,38 @@ public:
   HggRazorClass( TTree* tree );
   HggRazorClass( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~HggRazorClass( );
+  //higgs
   bool InitMggHisto( );
   bool InitPtggHisto( );
+  bool InitSigmaMoverMHisto( );
+  
   bool InitMrHisto( );
   bool InitRsqHisto( );
+  //photon1
+  bool InitPho1Pt( );
+  bool InitPho1Eta( );
+  bool InitPho1Phi( );
+  bool InitPho1SigmaIetaIeta( );
+  bool InitPho1R9( );
+  bool InitPho1HoverE( );
+  bool InitPho1SumChargedHadronPt( );
+  bool InitPho1SumNeutralHadronEt( );
+  bool InitPho1SumPhotonEt( );
+  bool InitPho1SigmaEoverE( );
+  
+  //photon2
+  bool InitPho2Pt( );
+  bool InitPho2Eta( );
+  bool InitPho2Phi( );
+  bool InitPho2SigmaIetaIeta( );
+  bool InitPho2R9( );
+  bool InitPho2HoverE( );
+  bool InitPho2SumChargedHadronPt( );
+  bool InitPho2SumNeutralHadronEt( );
+  bool InitPho2SumPhotonEt( );
+  bool InitPho2SigmaEoverE( );
+  
+  bool InitNjets( );
   bool InitMrRsqHisto( );
   bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
   void Loop();
@@ -55,6 +83,11 @@ private:
   static float ptgg_h;
   TH1F* h_ptgg;
 
+  static int   n_sigmaMoverM;
+  static float sigmaMoverM_l;
+  static float sigmaMoverM_h;
+  TH1F* h_sigmaMoverM;
+
   static int   n_mr;
   static float mr_l;
   static float mr_h;
@@ -64,6 +97,120 @@ private:
   static float rsq_l;
   static float rsq_h;
   TH1F* h_rsq;
+
+  //--------------
+  //P h o t o n  1
+  //--------------
+  static int   n_pho1pt;
+  static float pho1pt_l;
+  static float pho1pt_h;
+  TH1F* h_pho1pt;
+
+  static int   n_pho1eta;
+  static float pho1eta_l;
+  static float pho1eta_h;
+  TH1F* h_pho1eta;
+
+  static int   n_pho1phi;
+  static float pho1phi_l;
+  static float pho1phi_h;
+  TH1F* h_pho1phi;
+
+  static int   n_pho1sigmaIetaIeta;
+  static float pho1sigmaIetaIeta_l;
+  static float pho1sigmaIetaIeta_h;
+  TH1F* h_pho1sigmaIetaIeta;
+
+  static int   n_pho1r9;
+  static float pho1r9_l;
+  static float pho1r9_h;
+  TH1F* h_pho1r9;
+
+  static int   n_pho1HoverE;
+  static float pho1HoverE_l;
+  static float pho1HoverE_h;
+  TH1F* h_pho1HoverE;
+  
+  static int   n_pho1sumChargedHadronPt;
+  static float pho1sumChargedHadronPt_l;
+  static float pho1sumChargedHadronPt_h;
+  TH1F* h_pho1sumChargedHadronPt;
+
+  static int   n_pho1sumNeutralHadronEt;
+  static float pho1sumNeutralHadronEt_l;
+  static float pho1sumNeutralHadronEt_h;
+  TH1F* h_pho1sumNeutralHadronEt;
+
+  static int   n_pho1sumPhotonEt;
+  static float pho1sumPhotonEt_l;
+  static float pho1sumPhotonEt_h;
+  TH1F* h_pho1sumPhotonEt;
+  
+  static int   n_pho1sigmaEoverE;
+  static float pho1sigmaEoverE_l;
+  static float pho1sigmaEoverE_h;
+  TH1F* h_pho1sigmaEoverE;
+
+  //--------------
+  //P h o t o n  2
+  //--------------
+  static int   n_pho2pt;
+  static float pho2pt_l;
+  static float pho2pt_h;
+  TH1F* h_pho2pt;
+
+  static int   n_pho2eta;
+  static float pho2eta_l;
+  static float pho2eta_h;
+  TH1F* h_pho2eta;
+
+  static int   n_pho2phi;
+  static float pho2phi_l;
+  static float pho2phi_h;
+  TH1F* h_pho2phi;
+
+  static int   n_pho2sigmaIetaIeta;
+  static float pho2sigmaIetaIeta_l;
+  static float pho2sigmaIetaIeta_h;
+  TH1F* h_pho2sigmaIetaIeta;
+
+  static int   n_pho2r9;
+  static float pho2r9_l;
+  static float pho2r9_h;
+  TH1F* h_pho2r9;
+
+  static int   n_pho2HoverE;
+  static float pho2HoverE_l;
+  static float pho2HoverE_h;
+  TH1F* h_pho2HoverE;
+  
+  static int   n_pho2sumChargedHadronPt;
+  static float pho2sumChargedHadronPt_l;
+  static float pho2sumChargedHadronPt_h;
+  TH1F* h_pho2sumChargedHadronPt;
+
+  static int   n_pho2sumNeutralHadronEt;
+  static float pho2sumNeutralHadronEt_l;
+  static float pho2sumNeutralHadronEt_h;
+  TH1F* h_pho2sumNeutralHadronEt;
+
+  static int   n_pho2sumPhotonEt;
+  static float pho2sumPhotonEt_l;
+  static float pho2sumPhotonEt_h;
+  TH1F* h_pho2sumPhotonEt;
+  
+  static int   n_pho2sigmaEoverE;
+  static float pho2sigmaEoverE_l;
+  static float pho2sigmaEoverE_h;
+  TH1F* h_pho2sigmaEoverE;
+  
+  //--------
+  // J e t s
+  //--------
+  static int   n_njets;
+  static float njets_l;
+  static float njets_h;
+  TH1F* h_njets;
 
   //2D Histos
   TH2F* h_mr_rsq;
