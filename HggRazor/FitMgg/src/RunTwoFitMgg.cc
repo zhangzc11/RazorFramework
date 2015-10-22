@@ -751,6 +751,21 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   delete fsignal;
   //fsignal->Close();
   
+  TTree* outTree = new TTree("biasTree", "tree containing bias tests");
+  
+  //define variables
+  double _bias, _statUn;
+  int _status, _status2, _status3, _covStatus, _covStatus2, _covStatus3;
+  
+  outTree->Branch("bias", &_bias, "bias/D");
+  outTree->Branch("statUn", &_statUn, "statUn/D");
+  outTree->Branch("status", &_status, "status/I");
+  outTree->Branch("covStatus", &_covStatus, "covStatus/I");
+  outTree->Branch("status2", &_status2, "status2/I");
+  outTree->Branch("covStatus2", &_covStatus2, "covStatus2/I");
+  outTree->Branch("status3", &_status3, "status3/I");
+  outTree->Branch("covStatus3", &_covStatus3, "covStatus3/I");
+  
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
   mgg.setRange("low", 103, 120. );
@@ -888,7 +903,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
-  npoints = 10*npoints;
+  npoints = 100*npoints;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -905,7 +920,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //--------------
   RooAbsReal* fIntegral;
   RooAbsReal* fIntegral2;
-  RooRealVar bias("bias", "bias", -5.0, 5.0, "");
+  RooRealVar bias("bias", "bias", -50.0, 50.0, "");
   RooDataSet data_bias( "data_bias", "bias data", bias);
 
   RooRealVar NsignalError("NsignalError", "NsignalError", -5.0, 5.0, "");
@@ -1010,7 +1025,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //data_toys = GenerateToys( ws->pdf( tag1 ), mgg, n_sideband );
       int stoys = int(frac*f1Int*npoints);
       std::cout << "[INFO]:======> stoys: " << stoys << std::endl;
-      ws->var("doubleGauseSB_gauss_Ns")->setVal( sqrt(stoys) );
+      ws->var("doubleGauseSB_gauss_Ns")->setVal( stoys );
       ws->var("doubleGauseSB_frac")->setVal( gausFrac );
       ws->var("doubleGauseSB_gauss_mu")->setVal( gausMu );
       ws->var("doubleGauseSB_gauss_sigma1")->setVal( gausSigma1 );
@@ -1090,8 +1105,29 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //---------------------------------------------------------
       //S+B FIT (Ns is the only parameter floated for the signal)
       //---------------------------------------------------------
-      bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
-      bres_toys->SetName("bres_toys");
+      //bres_toys = sbModel->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+      _status = -1;
+      _covStatus = -1;
+      _status2 = -1;
+      _covStatus2 = -1;
+      RooAbsReal* nll = sbModel->createNLL( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+      RooMinuit m(*nll) ; 
+      m.migrad(); 
+      RooFitResult* r = m.save() ; 
+      _status    = r->status();
+      _covStatus = r->covQual();
+      m.hesse(); 
+      RooFitResult* r2 = m.save() ; 
+      _status2    = r2->status();
+      _covStatus2 = r2->covQual();
+      /*
+	m.minos();
+	RooFitResult* r3 = m.save() ; 
+	_status3    = r3->status();
+	_covStatus3 = r3->covQual();
+      */
+      
+      //bres_toys->SetName("bres_toys");
 
       //------------
       //Getting bias
@@ -1100,6 +1136,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       double Ns_Error = ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
       //bias =  (Nsignal - double(stoys))/(double)stoys;
       bias =  (Nsignal - double(stoys))/ws->var("doubleGauseSB_gauss_Ns")->getError();
+      _bias = bias.getVal();//tree variable
+      _statUn = ws->var("doubleGauseSB_gauss_Ns")->getError();//tree variable
+      
+      std::cout << "DEBUG DEBUG" << std::endl;
       NsignalError.setVal( Ns_Error );
       if ( bres_toys->status() != 0  )
 	{
@@ -1108,8 +1148,24 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	  _badFit = true;
 	  break;
 	}
+      
+      //if( !( bias.getVal() > 1.1 && bias.getVal() < 1.5 ) ) continue;
+      
       data_bias.add( RooArgSet(bias) );
       data_Nse.add( RooArgSet(NsignalError) );
+      
+      /*
+	if( !( bias.getVal() > 1.1 && bias.getVal() < 1.5 ) ) 
+	{
+	std::cout << "=============================" << std::endl;
+	std::cout << "bias --> " << bias.getVal() << std::endl;
+	std::cout << "=============================" << std::endl;
+	continue;
+	}
+      */
+      std::cout << "before filling tree" << std::endl;
+      outTree->Fill();
+      delete nll;
     }
   
   RooPlot* f_mgg = mgg.frame();
@@ -1142,7 +1198,12 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   ws->import( *f_Nse );
   std::cout << "[INFO]: npoints-> " << npoints << std::endl;
   
+  TFile* _fout = new TFile("test_tree_out.root", "recreate");
+  outTree->Write();
+  ws->Write();
+  _fout->Close();
   return ws;
+  //return;
 };
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
 {

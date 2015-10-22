@@ -44,7 +44,9 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 1.0, .0, 5000. );
   RooRealVar* frac   = new RooRealVar( tag+"_frac", "frac", 0.1, .0, 1.0 );
   //RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1, -1e8, 1e8 );
-  RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1e4, -1e8, 1e8 );
+  //RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1e4, -1e8, 1e8 );
+  RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 0.0, "events");
+  Ns->setConstant(kFALSE);
   //------------------
   //C r e a t e  p.d.f
   //------------------
@@ -122,9 +124,12 @@ TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
 TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
   RooRealVar* a = new RooRealVar( tag + "_a", "", 0.6,-1.,1.);
+  //RooRealVar* a = new RooRealVar( tag + "_a", "", 0.6, "a.u"); 
   RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *a);
   RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10,-1e5,1e5);
+  //RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events"); 
   RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg);
+  
   
   RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
   

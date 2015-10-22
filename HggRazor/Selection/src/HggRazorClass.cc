@@ -484,8 +484,8 @@ void HggRazorClass::Loop()
       h_sigmaMoverM->Fill( sigmaMoverM, w );
       
       h_mr->Fill( MR, w );
-      h_rsq->Fill( Rsq, w );
-      h_mr_rsq->Fill( MR, Rsq, w );
+      h_rsq->Fill( t1Rsq, w );
+      h_mr_rsq->Fill( MR, t1Rsq, w );
       //photon1
       h_pho1pt->Fill( pho1Pt, w );
       h_pho1eta->Fill( pho1Eta, w );
