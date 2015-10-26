@@ -903,7 +903,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
-  npoints = 100*npoints;
+  npoints = 1*npoints;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------

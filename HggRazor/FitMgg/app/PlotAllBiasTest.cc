@@ -64,6 +64,7 @@ int main( int argc, char* argv[])
 		  mean_map[tmp_p] = pair.first;
 		  rms_map[tmp_p] = pair.second;
 		}
+	      std::cout << "pass" << std::endl;
 	    }
 	  else if ( mode == "tableFitErr" )
 	    {

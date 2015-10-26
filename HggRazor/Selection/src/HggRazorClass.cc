@@ -444,8 +444,10 @@ void HggRazorClass::Loop()
 	}
       else
 	{
+	  
+	  //if ( this->processName == "gammaJet" || this->processName == "qcd" ) w = xsecSF*weight*1.3;
+	  //if ( this->processName == "diphoton" ) w = xsecSF*weight*1.12;
 	  w = xsecSF*weight;
-	  //w = xsecSF*weight*3.825885e-01;
 	}
       total_in += w;
       bool pho1_isFake = false;
@@ -454,8 +456,8 @@ void HggRazorClass::Loop()
       bool isFake = false;
       bool prompt_prompt = false;
       bool prompt_fake = false;
-      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 ) pho2_isFake = true;
+      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
+      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho1MotherID != 2212) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
@@ -464,7 +466,7 @@ void HggRazorClass::Loop()
       //removing events which are not prompt-fake
       if ( prompt_prompt && this->processName == "gammaJet" )
 	{
-	  std::cout << "[INFO]: avoding prompt-prompt in gammaJet sample" << std::endl;
+	  //std::cout << "[INFO]: avoding prompt-prompt in gammaJet sample" << std::endl;
 	  total_rm += w;
 	  continue;
 	}
@@ -472,7 +474,7 @@ void HggRazorClass::Loop()
       //remove events which are not fake-fake
       if ( !isFakeFake && this->processName == "qcd" )
 	{
-	  std::cout << "[INFO]: avoding prompt-fake and prompt-prompt in qcd sample" << std::endl;
+	  //std::cout << "[INFO]: avoding prompt-fake and prompt-prompt in qcd sample" << std::endl;
 	  total_rm += w;
 	  continue;
 	}
@@ -516,6 +518,7 @@ void HggRazorClass::Loop()
     }
   
   std::cout << "[DEBUG]: " << this->processName << " removing " << (total_rm/total_in)*100. << " % of events" << std::endl;
+  std::cout << "[DEBUG]: " << this->processName << "Yield: " <<  h_mgg->Integral() << std::endl;
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 

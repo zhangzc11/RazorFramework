@@ -30,7 +30,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "0.59 fb^{-1} (13 TeV)";
+TString lumiText = "1.26 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -209,7 +209,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0., 2.0 );
+  ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
@@ -244,13 +244,13 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
       s->SetMinimum( 0 );
-      s->SetMaximum( 2*s->GetMaximum() );
+      s->SetMaximum( 1.2*s->GetMaximum() );
     }
   else if ( var == "ptgg" )
     {
-      ratio->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      ratio->GetXaxis()->SetTitle("p_{T}^{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -259,7 +259,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "pho1pt" )
     {
-      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}^{T} (GeV)");
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -270,7 +270,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{1}}");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho1phi" )
@@ -343,7 +343,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "pho2pt" )
     {
-      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}^{T} (GeV)");
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -354,7 +354,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{2}}");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho2phi" )
@@ -507,7 +507,9 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
 
   if ( process == Process::gammaJet )
     {
-      leg->AddEntry( h, "#gamma + jets", "f" );
+      //leg->AddEntry( h, "#gamma + jets", "f" );
+      //leg->AddEntry( h, "Z/#gamma(ll) + jets", "f" );
+      leg->AddEntry( h, "prompt-fake", "f" );
       return true;
     }
   else if ( process == Process::diphoton )

@@ -161,7 +161,7 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   begin_s = end_s + 1;
   end_s   = fname.find( ".root" );
   std::string f2 = fname.substr( begin_s, end_s - begin_s);
-  std::cout << f1 << " f2: " << f2 <<   std::endl;
+  std::cout << "f1: "<< f1 << ", f2: " << f2 << ", mean = " << mean <<    std::endl;
   f->Close();
   return std::make_pair( mean, rms );
 };
@@ -173,8 +173,10 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
   std::stringstream ss_fl;//first line for table
   ss_fl << "--";
   for( const auto& fitf : FitFunction() )
+    //for( const auto& fitf : mymap )
     {
       std::string f1 = GetFitFunctionString( fitf );
+      //std::string f1 = fitf.first.first;
       std::stringstream ss;
       ss << f1; 
       ss.precision(1);
@@ -183,6 +185,11 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
       for( const auto& fitf2 : FitFunction() )
 	{
 	  std::string f2 = GetFitFunctionString( fitf2 );
+	  std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+	  if ( mymap.find( mypair ) == mymap.end() )
+	    {
+	      continue;
+	    }
 	  if ( row_ctr == 0 ) ss_fl << " & " << f2; 
 	  std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  //std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
