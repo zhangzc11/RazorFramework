@@ -734,7 +734,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   return ws;
 };
 
-RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, double frac )
+RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys, double frac, TString outName )
 {
   RooRandom::randomGenerator()->SetSeed( 0 );
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
@@ -903,7 +903,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
-  npoints = 100*npoints;
+  npoints = 1*npoints;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -1129,6 +1129,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       
       //bres_toys->SetName("bres_toys");
 
+      if( !( _status == 0 && _covStatus == 3 && _status2 == 0 && _covStatus == 3 ) ) continue;
       //------------
       //Getting bias
       //------------
@@ -1141,6 +1142,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       
       std::cout << "DEBUG DEBUG" << std::endl;
       NsignalError.setVal( Ns_Error );
+      /*
       if ( bres_toys->status() != 0  )
 	{
 	  std::cout << "FIT STATUS: " << bres_toys->status() << ", covQual: " << bres_toys->covQual()
@@ -1148,7 +1150,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	  _badFit = true;
 	  break;
 	}
-      
+      */
       //if( !( bias.getVal() > 1.1 && bias.getVal() < 1.5 ) ) continue;
       
       data_bias.add( RooArgSet(bias) );
@@ -1164,6 +1166,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	}
       */
       std::cout << "before filling tree" << std::endl;
+      std::cout << "iteration:" << i << std::endl;
       outTree->Fill();
       delete nll;
     }
@@ -1179,11 +1182,11 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //Plotting background only component of s+b fit
   sbModel->plotOn( f_mgg, RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Components(tag2));
   sbModel->plotOn( f_mgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"));
-
+  
   RooPlot* f_bias = bias.frame();
   f_bias->SetName("bias_plot");
   data_bias.plotOn( f_bias );
-
+  
   RooPlot* f_Nse = NsignalError.frame();
   f_Nse->SetName("NsignalError_plot");
   data_Nse.plotOn( f_Nse );
@@ -1193,14 +1196,14 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   ws->import( data_bias );
   ws->import( data_Nse );
   ws->import( *f_mgg );
-  ws->import( *bres_toys );
+  //ws->import( *bres_toys );
   ws->import( *f_bias );
   ws->import( *f_Nse );
   std::cout << "[INFO]: npoints-> " << npoints << std::endl;
-  
-  TFile* _fout = new TFile("test_tree_out.root", "recreate");
+  outName = outName + "_Tree.root";
+  TFile* _fout = new TFile( outName, "recreate");
   outTree->Write();
-  ws->Write();
+  //ws->Write("w_biasSignal");
   _fout->Close();
   return ws;
   //return;

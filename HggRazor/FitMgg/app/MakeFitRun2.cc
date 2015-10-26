@@ -271,6 +271,8 @@ int main( int argc, char* argv[])
       fout = new TFile( outputfilename.c_str(), "recreate" );
     }
   
+  TString outName = outputfilename.substr( 0, outputfilename.find(".root") );
+  
   if ( fitMode == "sideband" )
     {
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
@@ -343,7 +345,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e4, _signalFraction );
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e4, _signalFraction, outName );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
