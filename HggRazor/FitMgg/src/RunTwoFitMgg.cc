@@ -754,11 +754,12 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   TTree* outTree = new TTree("biasTree", "tree containing bias tests");
   
   //define variables
-  double _bias, _statUn;
+  double _bias, _statUn, _biasNorm;
   int _status, _status2, _status3, _covStatus, _covStatus2, _covStatus3;
   
   outTree->Branch("bias", &_bias, "bias/D");
   outTree->Branch("statUn", &_statUn, "statUn/D");
+  outTree->Branch("biasNorm", &_biasNorm, "biasNorm/D");
   outTree->Branch("status", &_status, "status/I");
   outTree->Branch("covStatus", &_covStatus, "covStatus/I");
   outTree->Branch("status2", &_status2, "status2/I");
@@ -1137,8 +1138,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       double Ns_Error = ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
       //bias =  (Nsignal - double(stoys))/(double)stoys;
       bias =  (Nsignal - double(stoys))/ws->var("doubleGauseSB_gauss_Ns")->getError();
-      _bias = bias.getVal();//tree variable
+      _bias = Nsignal - double(stoys);
       _statUn = ws->var("doubleGauseSB_gauss_Ns")->getError();//tree variable
+      _biasNorm = bias.getVal();//tree variable
       
       std::cout << "DEBUG DEBUG" << std::endl;
       NsignalError.setVal( Ns_Error );

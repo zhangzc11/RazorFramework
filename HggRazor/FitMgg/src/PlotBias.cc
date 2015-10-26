@@ -148,7 +148,7 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   //-------------------------------------
   //D e f i n i n g   p l o t   r a n g e
   //-------------------------------------
-  double mean = data_bias->mean( *bias );
+  double mean = data_bias->meanVar( *bias )->getVal();
   double rms  = data_bias->rmsVar( *bias )->getVal();
 
   //-----------------------------------
