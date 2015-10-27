@@ -182,11 +182,18 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,-10,-0.0001);
-  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2,-10,-0.0001);
+  //RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,-10,-0.0001);
+  //RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2,-10,-0.0001);
+  RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,"");
+  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2,"");
+  alpha1->setConstant(kFALSE);
+  alpha2->setConstant(kFALSE);
+  
   RooRealVar *f       = new RooRealVar(tag+"_f","f",0.3,0.0001,0.9999);
-  RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,1,1E9);
-
+  //RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,1,1E9);
+  RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,"events");
+  Nbkg->setConstant(kFALSE);
+  
   RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
   RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
 
