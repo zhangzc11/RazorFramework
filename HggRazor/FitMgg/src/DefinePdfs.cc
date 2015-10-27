@@ -209,7 +209,9 @@ TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooRealVar *pC = new RooRealVar(tag+"_pC","C",0.5, 0,1);
   RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",0.3, 0,1);
   RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0.27, 0,1);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",1e4,1,1E9);
+  //RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",1e4,1,1E9);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",1e4,"events");
+  Nbkg->setConstant(kFALSE);
   
   RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pCmod","@0*@0",*pC);
   RooFormulaVar *p0mod = new RooFormulaVar(tag+"_p0mod","@0*@0",*p0);
@@ -228,8 +230,9 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",1.0,-100,100);
   RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0,-100,100);
   RooRealVar *p2 = new RooRealVar(tag+"_p2","p_2",5,-100,100);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",2000,1,1E9);
-  
+  //RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",2000,1,1E9);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",1e4,"events");
+  Nbkg->setConstant(kFALSE);
   
   RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pCmod","@0*@0",*pC);
   RooFormulaVar *p0mod = new RooFormulaVar(tag+"_p0mod","@0*@0",*p0);
@@ -250,8 +253,10 @@ TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0,-100,100);
   RooRealVar *p2 = new RooRealVar(tag+"_p2","p_2",5,-100,100);
   RooRealVar *p3 = new RooRealVar(tag+"_p3","p_3",5,-100,100);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",2000,1,1E9);
-    
+  //RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",2000,1,1E9);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",1e4,"events");
+  Nbkg->setConstant(kFALSE);
+  
   RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pCmod","@0*@0",*pC);
   RooFormulaVar *p0mod = new RooFormulaVar(tag+"_p0mod","@0*@0",*p0);
   RooFormulaVar *p1mod = new RooFormulaVar(tag+"_p1mod","@0*@0",*p1);
