@@ -136,12 +136,13 @@ TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *a);
   RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events"); 
   Nbkg->setConstant(kFALSE);
-  RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg);
+  //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg);
   
   RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
   
   TString pdfName = tag+"_pdf_sExp_ext";
-  RooAddPdf* ext_singleExp = new RooAddPdf( pdfName,"", RooArgList( *se ), RooArgList( *NbkgSq ) );
+  //RooAddPdf* ext_singleExp = new RooAddPdf( pdfName,"", RooArgList( *se ), RooArgList( *NbkgSq ) );
+  RooAddPdf* ext_singleExp = new RooAddPdf( pdfName,"", RooArgList( *se ), RooArgList( *Nbkg ) );
   w.import( *ext_singleExp );
   return pdfName;
 };
@@ -159,9 +160,10 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w) {
   RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*alphasq,mgg,*m));
   
   TString pdfName = tag+"_mexp_ext";
-  RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg );
-  RooAddPdf* modExp_Ext = new RooAddPdf( pdfName, "modExp", RooArgList(*mexp), RooArgList(*NbkgSq) );
-  
+  //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg );
+  //RooAddPdf* modExp_Ext = new RooAddPdf( pdfName, "modExp", RooArgList(*mexp), RooArgList(*NbkgSq) );
+  RooAddPdf* modExp_Ext = new RooAddPdf( pdfName, "modExp", RooArgList(*mexp), RooArgList(*Nbkg) );
+
   w.import( *modExp_Ext );
   return pdfName;
 };
@@ -175,8 +177,9 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
   RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*alpha));
   TString pdfName     = tag+"_spow_ext";
-  RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_Nbkg1Sq","","@0*@0", *Nbkg );
-  w.import( *(new RooAddPdf( pdfName,"", RooArgList(*pow), RooArgList(*NbkgSq) )) );
+  //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_Nbkg1Sq","","@0*@0", *Nbkg );
+  //w.import( *(new RooAddPdf( pdfName,"", RooArgList(*pow), RooArgList(*NbkgSq) )) );
+  w.import( *(new RooAddPdf( pdfName,"", RooArgList(*pow), RooArgList(*Nbkg) )) );
   return pdfName;
 };
 
