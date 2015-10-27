@@ -97,15 +97,26 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a1 = new RooRealVar( tag + "_a1", "", 0.6,-1.,1.);
-  RooRealVar* a2 = new RooRealVar( tag + "_a2", "", 0.4/150,-1/150.,1/150.);
+  //RooRealVar* a1 = new RooRealVar( tag + "_a1", "", 0.6,-1.,1.);
+  //RooRealVar* a2 = new RooRealVar( tag + "_a2", "", 0.4/150,-1/150.,1/150.);
+
+  RooRealVar* a1 = new RooRealVar( tag + "_a1", "", 0.6, "");
+  RooRealVar* a2 = new RooRealVar( tag + "_a2", "", 0.4/150, "");
+  a1->setConstant(kFALSE);
+  a2->setConstant(kFALSE);
   
   RooFormulaVar* a1sq = new RooFormulaVar( tag + "_a1sq","","-1*@0*@0", *a1);
   RooFormulaVar* a2sq = new RooFormulaVar( tag + "_a2sq","","-1*@0*@0", *a2);
   
-  RooRealVar* NBkg1 = new RooRealVar( tag + "_Nbkg1","",10,-1e5,1e5);
-  RooRealVar* NBkg2 = new RooRealVar( tag + "_Nbkg2","",1,-1e5,1e5);
-  
+
+  //RooRealVar* NBkg1 = new RooRealVar( tag + "_Nbkg1","",10,-1e5,1e5);
+  //RooRealVar* NBkg2 = new RooRealVar( tag + "_Nbkg2","",1,-1e5,1e5);
+
+  RooRealVar* NBkg1 = new RooRealVar( tag + "_Nbkg1","",10,"");
+  RooRealVar* NBkg2 = new RooRealVar( tag + "_Nbkg2","",1,"");
+  NBkg1->setConstant(kFALSE);
+  NBkg2->setConstant(kFALSE);
+
   RooFormulaVar* NBkg1Sq = new RooFormulaVar( tag + "_Nbkg1Sq","","@0*@0", *NBkg1);
   RooFormulaVar* NBkg2Sq = new RooFormulaVar( tag + "_Nbkg2Sq","","@0*@0", *NBkg2);
 

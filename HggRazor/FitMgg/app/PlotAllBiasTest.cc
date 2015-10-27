@@ -66,6 +66,33 @@ int main( int argc, char* argv[])
 		}
 	      std::cout << "pass" << std::endl;
 	    }
+	  else if ( mode == "table2" )
+	    {
+	      std::string rootFile;
+	      rootFile = biasFile;
+	      //-----------------------------------
+	      //G e t t i n g   p a i r   n a m e s 
+	      //-----------------------------------
+	      std::string findName = "biasTest_";
+	      std::string findName2 = "_Tree.root";
+	      int begin_s = biasFile.find( findName );
+	      int aux_end_s =  biasFile.find( findName2 );
+	      std::string aux_s = biasFile.substr(begin_s, aux_end_s - begin_s );
+	      begin_s = aux_s.find( findName ) + findName.size();
+	      int end_s   = aux_s.find_last_of( "_" );
+	      std::string f1 = aux_s.substr( begin_s, end_s - begin_s);
+	      begin_s = end_s + 1;
+	      end_s   = aux_s.size();
+	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
+	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
+	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
+	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str() );
+	       if ( mean_map.find( tmp_p ) == mean_map.end() )
+		 {
+		   mean_map[tmp_p] = mean;
+		 }
+	       std::cout << "mean--> " << mean << std::endl;
+	    }
 	  else if ( mode == "tableFitErr" )
 	    {
 	      std::pair<double, double> pair_fe = GetMeanRms( biasFile, "data_Nse", "NsignalError" );
@@ -113,6 +140,11 @@ int main( int argc, char* argv[])
       MakeTable( rms_map, "rms" );
     }
 
+  if ( mode == "table2" )
+    {
+      MakeTable( mean_map, "mean" );
+    }
+  
   if ( mode == "tableFitErr" )
     {
       MakeTable( mean_map, "mean" );
