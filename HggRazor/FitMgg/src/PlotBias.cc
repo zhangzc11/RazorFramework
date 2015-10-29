@@ -227,10 +227,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   //double _xlow = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.5*_max ) );
   //double _xhigh = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow );
 
-  double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 3 );
+  double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
   double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
 
-  double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.02*_max ) );
+  double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
   double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
   
  
@@ -279,7 +279,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   TString lumiText;
   TString lumiText2;
   lumiText = Form("mean: %.2f", mean_val );
-  lumiText2 = Form("#sigma: %.2f", gaus->GetParameter(1) );
+  lumiText2 = Form("#mu: %.2f", gaus->GetParameter(1) );
   
   latex.SetNDC();
   latex.SetTextAngle(0);
