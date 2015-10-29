@@ -443,8 +443,7 @@ void HggRazorClass::Loop()
 	  w = 1.0;
 	}
       else
-	{
-	  
+	{ 
 	  //if ( this->processName == "gammaJet" || this->processName == "qcd" ) w = xsecSF*weight*1.3;
 	  //if ( this->processName == "diphoton" ) w = xsecSF*weight*1.12;
 	  w = xsecSF*weight;
