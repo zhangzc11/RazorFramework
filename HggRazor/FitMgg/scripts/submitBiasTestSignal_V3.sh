@@ -6,11 +6,11 @@ workingDir=/home/cmorgoth/git/RazorFramework/HggRazor/FitMgg/
 category="highres"
 #fitName=("singleExp" "doubleExp" "modExp" "singlePow" "doublePow" "poly2" "poly3" "poly4")
 fitName=("singleExp" "modExp" "singlePow" "poly2")
-MR=350.0
-RSQ=0.035
+MR=0.0
+RSQ=0.0
 Iso="no"
 sfrac=0.0
-outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_0p0_1x"
+outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_0p0_1x_SBF_FULL_V2"
 ctr=0
 cd $workingDir
 mkdir -p submission

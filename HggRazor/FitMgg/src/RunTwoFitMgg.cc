@@ -904,7 +904,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
-  npoints = 1*npoints;
+  //npoints = 30*npoints;
+  npoints = 35;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -933,7 +934,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //fit to data to obtain initial parameters
   //----------------------------------------
   //ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( data, RooFit::Save(kTRUE), RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //Generate dataset 
+  data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
+  RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   bres2p->SetName("fit_result_f2p");
   ws->import( *bres2p );
   
@@ -1016,7 +1019,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
       exit (EXIT_FAILURE);
     }
+  
   bool _badFit = false;
+  int _countPass = 0;
   for ( int i = 0; i < ntoys; i++ )
     {
       //-----------------------------
@@ -1130,7 +1135,11 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       
       //bres_toys->SetName("bres_toys");
 
-      if( !( _status == 0 && _covStatus == 3 && _status2 == 0 && _covStatus == 3 ) ) continue;
+      if( !( _status == 0 && _covStatus == 3 && _status2 == 0 && _covStatus == 3 ) )
+	{
+	  _countPass++;
+	  continue;
+	}
       //------------
       //Getting bias
       //------------

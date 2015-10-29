@@ -345,7 +345,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, _signalFraction, outName );
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e4, _signalFraction, outName );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
