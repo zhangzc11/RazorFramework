@@ -905,7 +905,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
   //npoints = 1*npoints;
-  npoints = 35;
+  npoints = 350;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -936,6 +936,45 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //Generate dataset 
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
+  
+  if ( f2 == "doubleExp" )
+    {
+      ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
+      ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
+    }
+  else if ( f2 == "singleExp" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
+    }
+  else if ( f2 == "modExp" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
+    }
+  else if ( f2 == "singlePow" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
+    }
+  else if ( f2 == "doublePow" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
+    }
+  else if ( f2 == "poly2" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
+    }
+  else if ( f2 == "poly3" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal( npoints );
+    }
+  else if ( f2 == "poly4" )
+    {
+      ws->var( f2 + "_prime_Nbkg" )->setVal( npoints );
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
   RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   bres2p->SetName("fit_result_f2p");
   ws->import( *bres2p );
