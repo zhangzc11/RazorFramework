@@ -268,7 +268,8 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(57);
   mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("high", 135, 160);
+  mgg.setRange("Full", 103, 160);
 
   TString tag;
   if ( ffName == "doubleExp" )
@@ -371,9 +372,9 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
   mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("high", 135, 160);
   mgg.setRange("sig", 122.08, 128.92);
-  
+  mgg.setRange("Full", 103, 160);
   /*
   TString tag1, tag2;
   if ( f1 == "doubleExp" )
@@ -483,7 +484,7 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
     }
   else if ( f1 == "doublePow" )
     {
-      tag1 = MakeDoublePow( "doublePow_2", mgg, *ws );
+      tag1 = MakeDoublePow( "doublePow_1", mgg, *ws );
       std::cout << "[INFO]: Running double pow fit" << std::endl; 
     }
   else if ( f1 == "poly2" )
@@ -560,13 +561,13 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   //ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   //FullFit
-  ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
 
   RooPlot* f1_frame = mgg.frame();
   f1_frame->SetName("f1_frame");
   data.plotOn( f1_frame );
-  ws->pdf( tag1 )->plotOn( f1_frame, RooFit::LineColor( kRed), RooFit::Range("Full"), RooFit::NormRange("Full") );
+  ws->pdf( tag1 )->plotOn( f1_frame, RooFit::LineColor( kRed), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
   ws->import( *f1_frame );
   RooAbsReal* f1Integral = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
   std::cout << "f1 Int: " << f1Integral->getVal() << std::endl;
@@ -584,12 +585,12 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   //-----------------------
   //do a fit to bias data
   //-----------------------
-  ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   RooPlot* pFrame = mgg.frame();
   pFrame->SetName("pFitFrame");
   data.plotOn( pFrame );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full") );
-  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Normalization(npoints, RooAbsReal::NumEvent) );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineColor(kBlue), RooFit::Range("low,high"), RooFit::NormRange("low,high") );
+  ws->pdf( tag2p )->plotOn( pFrame, RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("low,high") );
   ws->import( *pFrame );
   
   double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
@@ -1077,7 +1078,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       ws->var("doubleGauseSB_gauss_sigma1")->setVal( gausSigma1 );
       ws->var("doubleGauseSB_gauss_sigma2")->setVal( gausSigma2 );
       
-      
+
       ws->var("doubleGauseSB_frac")->setConstant(kTRUE);
       ws->var("doubleGauseSB_gauss_mu")->setConstant(kTRUE);
       ws->var("doubleGauseSB_gauss_sigma1")->setConstant(kTRUE);
