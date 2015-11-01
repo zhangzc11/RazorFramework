@@ -905,7 +905,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
   //npoints = 1*npoints;
-  npoints = 35;
+  npoints = 350;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
