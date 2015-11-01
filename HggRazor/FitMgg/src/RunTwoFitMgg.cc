@@ -905,7 +905,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events
   //npoints = 1*npoints;
-  npoints = 350;
+  npoints = 35;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
@@ -1062,6 +1062,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   bool _badFit = false;
   int _countPass = 0;
   for ( int i = 0; i < ntoys; i++ )
+  //while( _countPass < 10000 )
     {
       //-----------------------------
       //G e n e r a t i n g   t o y s
@@ -1176,9 +1177,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 
       if( !( _status == 0 && _covStatus == 3 && _status2 == 0 && _covStatus == 3 ) )
 	{
-	  _countPass++;
-	  continue;
+	  //_countPass++;
+	  //continue;
 	}
+      _countPass++;
       //------------
       //Getting bias
       //------------
@@ -1216,7 +1218,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	}
       */
       std::cout << "before filling tree" << std::endl;
-      std::cout << "iteration:" << i << std::endl;
+      //std::cout << "iteration:" << i << std::endl;
       outTree->Fill();
       delete nll;
     }
