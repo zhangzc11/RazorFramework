@@ -10,7 +10,7 @@ MR=0.0
 RSQ=0.0
 Iso="no"
 sfrac=0.0
-outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_0p0_1x_SBF_FULL_V2"
+outDir="BiasSignal_NoInvIso_GB_SBF_SoverB_0p0_10x_SBF_FULL_V3"
 ctr=0
 cd $workingDir
 mkdir -p submission
