@@ -3,6 +3,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <iostream>
 
 void ControlSampleEvent::Loop()
 {
@@ -38,6 +39,7 @@ void ControlSampleEvent::Loop()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+      std::cout << "MR-> " << GetVarVal<float>("Rsq") << std::endl;
       // if (Cut(ientry) < 0) continue;
    }
 }
