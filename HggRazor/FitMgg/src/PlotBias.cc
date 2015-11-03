@@ -219,7 +219,8 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   TFile* f = new TFile( fname , "READ" );
   TTree* tree = (TTree*)f->Get("biasTree");
   
-  tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+  //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+  tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff"); 
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
   double mean_val = hbias->GetMean();
 
