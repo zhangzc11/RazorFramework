@@ -3,6 +3,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <string>
+#include <map>
 //ROOT INCLUDES
 #include <TH1F.h>
 #include <TH2F.h>
@@ -19,8 +20,9 @@ public:
   GenericTreeClass( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~GenericTreeClass( );
 
-  CreateGenericHisto( TString histoName, TString varName, int nbins, float x_low, float x_high );
-  CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
+  void CreateGenericHisto( TString histoName, TString varName, int nbins = 0, float x_low = 0, float x_high = 0 );
+  void PrintStoredHistos();
+  void CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
 		      int nbins_y, float y_low, float y_high );
   
 private:

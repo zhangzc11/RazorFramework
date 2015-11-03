@@ -1,5 +1,5 @@
 #define ControlSampleEvent_cxx
-#include "ControlSampleEvent.h"
+#include "ControlSampleEvent.hh"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>

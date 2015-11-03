@@ -53,7 +53,6 @@ public :
    Bool_t          Flag_METFilters;
    UInt_t          NPU_Minus1;
    UInt_t          NPU_Plus1;
-   UInt_t          event;
    UInt_t          processID;
    Bool_t          HLTDecision[160];
    Int_t           genlep1Type;
@@ -98,7 +97,6 @@ public :
    Bool_t          jet2PassCSVTight;
    Float_t         lep1MT;
    Float_t         mll;
-   Float_t         MET;
    Float_t         METPhi;
    Float_t         METnoHF;
    Float_t         METnoHFPhi;
@@ -148,7 +146,6 @@ public :
    TBranch        *b_Flag_METFilters;   //!
    TBranch        *b_NPU_Minus1;   //!
    TBranch        *b_NPU_Plus1;   //!
-   TBranch        *b_event;   //!
    TBranch        *b_processID;   //!
    TBranch        *b_HLTDecision;   //!
    TBranch        *b_genlep1Type;   //!
@@ -193,7 +190,6 @@ public :
    TBranch        *b_jet2PassCSVTight;   //!
    TBranch        *b_lep1MT;   //!
    TBranch        *b_mll;   //!
-   TBranch        *b_MET;   //!
    TBranch        *b_METPhi;   //!
    TBranch        *b_METnoHF;   //!
    TBranch        *b_METnoHFPhi;   //!
@@ -266,6 +262,101 @@ Long64_t ControlSampleEvent::LoadTree(Long64_t entry)
    return centry;
 }
 
+void ControlSampleEvent::GetVarVal( TString varName )
+{
+  if ( varName == "option", &option, &b_option);
+  if ( varName == "weight", &weight, &b_weight);
+  if ( varName == "run", &run, &b_run);
+  if ( varName == "lumi", &lumi, &b_lumi);
+  if ( varName == "event", &event, &b_event);
+  if ( varName == "NPU_0", &NPU_0, &b_NPU_0);
+  if ( varName == "NPV", &NPV, &b_NPV);
+  if ( varName == "MR", &MR, &b_MR);
+  if ( varName == "Rsq", &Rsq, &b_Rsq);
+  if ( varName == "MET", &MET, &b_MET);
+  if ( varName == "NJets40", &NJets40, &b_NJets40);
+  if ( varName == "NJets80", &NJets80, &b_NJets80);
+  if ( varName == "NBJetsLoose", &NBJetsLoose, &b_NBJetsLoose);
+  if ( varName == "NBJetsMedium", &NBJetsMedium, &b_NBJetsMedium);
+  if ( varName == "NBJetsTight", &NBJetsTight, &b_NBJetsTight);
+  if ( varName == "Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
+  if ( varName == "Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);
+  if ( varName == "Flag_hcalLaserEventFilter", &Flag_hcalLaserEventFilter, &b_Flag_hcalLaserEventFilter);
+  if ( varName == "Flag_EcalDeadCellTriggerPrimitiveFilter", &Flag_EcalDeadCellTriggerPrimitiveFilter, &b_Flag_EcalDeadCellTriggerPrimitiveFilter);
+   if ( varName == "Flag_goodVertices", &Flag_goodVertices, &b_Flag_goodVertices);
+   if ( varName == "Flag_trackingFailureFilter", &Flag_trackingFailureFilter, &b_Flag_trackingFailureFilter);
+   if ( varName == "Flag_eeBadScFilter", &Flag_eeBadScFilter, &b_Flag_eeBadScFilter);
+   if ( varName == "Flag_ecalLaserCorrFilter", &Flag_ecalLaserCorrFilter, &b_Flag_ecalLaserCorrFilter);
+   if ( varName == "Flag_trkPOGFilters", &Flag_trkPOGFilters, &b_Flag_trkPOGFilters);
+   if ( varName == "Flag_trkPOG_manystripclus53X", &Flag_trkPOG_manystripclus53X, &b_Flag_trkPOG_manystripclus53X);
+   if ( varName == "Flag_trkPOG_toomanystripclus53X", &Flag_trkPOG_toomanystripclus53X, &b_Flag_trkPOG_toomanystripclus53X);
+   if ( varName == "Flag_trkPOG_logErrorTooManyClusters", &Flag_trkPOG_logErrorTooManyClusters, &b_Flag_trkPOG_logErrorTooManyClusters);
+   if ( varName == "Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
+   if ( varName == "NPU_Minus1", &NPU_Minus1, &b_NPU_Minus1);
+   if ( varName == "NPU_Plus1", &NPU_Plus1, &b_NPU_Plus1);
+   if ( varName == "processID", &processID, &b_processID);
+   if ( varName == "HLTDecision", HLTDecision, &b_HLTDecision);
+   if ( varName == "genlep1Type", &genlep1Type, &b_genlep1Type);
+   if ( varName == "lep1Type", &lep1Type, &b_lep1Type);
+   if ( varName == "lep1MatchedGenLepIndex", &lep1MatchedGenLepIndex, &b_lep1MatchedGenLepIndex);
+   if ( varName == "genlep2Type", &genlep2Type, &b_genlep2Type);
+   if ( varName == "lep2Type", &lep2Type, &b_lep2Type);
+   if ( varName == "lep2MatchedGenLepIndex", &lep2MatchedGenLepIndex, &b_lep2MatchedGenLepIndex);
+   if ( varName == "lep1PassVeto", &lep1PassVeto, &b_lep1PassVeto);
+   if ( varName == "lep1PassLoose", &lep1PassLoose, &b_lep1PassLoose);
+   if ( varName == "lep1PassTight", &lep1PassTight, &b_lep1PassTight);
+   if ( varName == "lep1PassVetoID", &lep1PassVetoID, &b_lep1PassVetoID);
+   if ( varName == "lep1PassLooseID", &lep1PassLooseID, &b_lep1PassLooseID);
+   if ( varName == "lep1PassTightID", &lep1PassTightID, &b_lep1PassTightID);
+   if ( varName == "lep1PassVetoIso", &lep1PassVetoIso, &b_lep1PassVetoIso);
+   if ( varName == "lep1PassLooseIso", &lep1PassLooseIso, &b_lep1PassLooseIso);
+   if ( varName == "lep1PassTightIso", &lep1PassTightIso, &b_lep1PassTightIso);
+   if ( varName == "lep1MinDRToBJet", &lep1MinDRToBJet, &b_lep1MinDRToBJet);
+   if ( varName == "lep1Activity", &lep1Activity, &b_lep1Activity);
+   if ( varName == "lep2PassVeto", &lep2PassVeto, &b_lep2PassVeto);
+   if ( varName == "lep2PassLoose", &lep2PassLoose, &b_lep2PassLoose);
+   if ( varName == "lep2PassTight", &lep2PassTight, &b_lep2PassTight);
+   if ( varName == "lep2PassVetoID", &lep2PassVetoID, &b_lep2PassVetoID);
+   if ( varName == "lep2PassLooseID", &lep2PassLooseID, &b_lep2PassLooseID);
+   if ( varName == "lep2PassTightID", &lep2PassTightID, &b_lep2PassTightID);
+   if ( varName == "lep2PassVetoIso", &lep2PassVetoIso, &b_lep2PassVetoIso);
+   if ( varName == "lep2PassLooseIso", &lep2PassLooseIso, &b_lep2PassLooseIso);
+   if ( varName == "lep2PassTightIso", &lep2PassTightIso, &b_lep2PassTightIso);
+   if ( varName == "lep2MinDRToBJet", &lep2MinDRToBJet, &b_lep2MinDRToBJet);
+   if ( varName == "lep2Activity", &lep2Activity, &b_lep2Activity);
+   if ( varName == "bjet1PassLoose", &bjet1PassLoose, &b_bjet1PassLoose);
+   if ( varName == "bjet1PassMedium", &bjet1PassMedium, &b_bjet1PassMedium);
+   if ( varName == "bjet1PassTight", &bjet1PassTight, &b_bjet1PassTight);
+   if ( varName == "bjet2PassLoose", &bjet2PassLoose, &b_bjet2PassLoose);
+   if ( varName == "bjet2PassMedium", &bjet2PassMedium, &b_bjet2PassMedium);
+   if ( varName == "bjet2PassTight", &bjet2PassTight, &b_bjet2PassTight);
+   if ( varName == "jet1PassCSVLoose", &jet1PassCSVLoose, &b_jet1PassCSVLoose);
+   if ( varName == "jet1PassCSVMedium", &jet1PassCSVMedium, &b_jet1PassCSVMedium);
+   if ( varName == "jet1PassCSVTight", &jet1PassCSVTight, &b_jet1PassCSVTight);
+   if ( varName == "jet2PassCSVLoose", &jet2PassCSVLoose, &b_jet2PassCSVLoose);
+   if ( varName == "jet2PassCSVMedium", &jet2PassCSVMedium, &b_jet2PassCSVMedium);
+   if ( varName == "jet2PassCSVTight", &jet2PassCSVTight, &b_jet2PassCSVTight);
+   if ( varName == "lep1MT", &lep1MT, &b_lep1MT);
+   if ( varName == "mll", &mll, &b_mll);
+   if ( varName == "METPhi", &METPhi, &b_METPhi);
+   if ( varName == "METnoHF", &METnoHF, &b_METnoHF);
+   if ( varName == "METnoHFPhi", &METnoHFPhi, &b_METnoHFPhi);
+   if ( varName == "METRaw", &METRaw, &b_METRaw);
+   if ( varName == "METRawPhi", &METRawPhi, &b_METRawPhi);
+   if ( varName == "dPhiRazor", &dPhiRazor, &b_dPhiRazor);
+   if ( varName == "HT", &HT, &b_HT);
+   if ( varName == "genZpt", &genZpt, &b_genZpt);
+   if ( varName == "genZphi", &genZphi, &b_genZphi);
+   if ( varName == "genlep1", &genlep1, &b_genlep1);
+   if ( varName == "genlep2", &genlep2, &b_genlep2);
+   if ( varName == "lep1", &lep1, &b_lep1);
+   if ( varName == "lep2", &lep2, &b_lep2);
+   if ( varName == "bjet1", &bjet1, &b_bjet1);
+   if ( varName == "bjet2", &bjet2, &b_bjet2);
+   if ( varName == "jet1", &jet1, &b_jet1);
+   if ( varName == "jet2", &jet2, &b_jet2);
+};
+
 void ControlSampleEvent::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
@@ -321,7 +412,6 @@ void ControlSampleEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
    fChain->SetBranchAddress("NPU_Minus1", &NPU_Minus1, &b_NPU_Minus1);
    fChain->SetBranchAddress("NPU_Plus1", &NPU_Plus1, &b_NPU_Plus1);
-//    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("processID", &processID, &b_processID);
    fChain->SetBranchAddress("HLTDecision", HLTDecision, &b_HLTDecision);
    fChain->SetBranchAddress("genlep1Type", &genlep1Type, &b_genlep1Type);
@@ -366,7 +456,6 @@ void ControlSampleEvent::Init(TTree *tree)
    fChain->SetBranchAddress("jet2PassCSVTight", &jet2PassCSVTight, &b_jet2PassCSVTight);
    fChain->SetBranchAddress("lep1MT", &lep1MT, &b_lep1MT);
    fChain->SetBranchAddress("mll", &mll, &b_mll);
-//    fChain->SetBranchAddress("MET", &MET, &b_MET);
    fChain->SetBranchAddress("METPhi", &METPhi, &b_METPhi);
    fChain->SetBranchAddress("METnoHF", &METnoHF, &b_METnoHF);
    fChain->SetBranchAddress("METnoHFPhi", &METnoHFPhi, &b_METnoHFPhi);
