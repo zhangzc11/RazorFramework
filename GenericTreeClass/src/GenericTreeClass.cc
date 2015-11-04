@@ -65,3 +65,27 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
 {
   std::cout << "2D var: " << varName << std::endl;
 };
+
+void GenericTreeClass::Loop()
+{
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  
+  Long64_t nbytes = 0, nb = 0;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+    for ( auto& tmp : map_1D_Histos )
+      {
+	tmp.second->Fill( GetVarVal<float>(tmp.first) );
+      }
+    // if (Cut(ientry) < 0) continue;
+  }
+  for ( auto& tmp : map_1D_Histos )
+    {
+      std::cout << tmp.first << " Mean: " << tmp.second->GetMean() << std::endl;
+    }
+};

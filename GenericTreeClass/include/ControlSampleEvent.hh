@@ -297,7 +297,7 @@ retType ControlSampleEvent::GetVarVal( TString varName )
   if ( varName == "NPU_Minus1" ) return NPU_Minus1;
   if ( varName == "NPU_Plus1" ) return NPU_Plus1;
   if ( varName == "processID" ) return processID;
-  if ( varName == "HLTDecision" ) return HLTDecision;
+  if ( varName == "HLTDecision" ) return *HLTDecision;
   if ( varName == "genlep1Type" ) return genlep1Type;
   if ( varName == "lep1Type" ) return lep1Type;
   if ( varName == "lep1MatchedGenLepIndex" ) return lep1MatchedGenLepIndex;

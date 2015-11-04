@@ -45,6 +45,16 @@ TString mggCut = "1";
 
 #define _debug 1
 
+
+struct binning
+{
+  int nbins;
+  float x_low;
+  float x_high;
+  binning(){};
+  binning( int nbins, float x_low, float x_high ): nbins(nbins), x_low(x_low), x_high(x_high) {};
+};
+
 int main ( int argc, char* argv[] )
 {
   std::cout << "[INFO]: Initializing program" << std::endl;
@@ -102,10 +112,35 @@ int main ( int argc, char* argv[] )
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
   const int mod = 0; 
+  
 
-  myClass->CreateGenericHisto( "mr", "MR", 250, 0, 2500 );
+  TString plots[3] = {"MR", "Rsq", "NJets40"};
+  for ( int i = 0; i < 3; i++)
+    {
+      myClass->CreateGenericHisto( plots[i], plots[i], 25, 0, 2500 );
+    }
+  
   myClass->PrintStoredHistos();
   
   myClass->Loop();
+  for ( int i = 0; i < 3; i++)
+    {
+      //Loop the processes in here (not implemented)
+      std::cout << "deb 0" << std::endl;
+      stack = new THStack( "hs" , "Hgg Stack " );
+      leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
+      std::cout << "deb 2" << std::endl;
+      TH1F* tmp_h = new TH1F( *(myClass->map_1D_Histos[ plots[i] ]) );
+      std::cout << "deb 2.1" << std::endl;
+      TH1F* h_s = GetStyledHisto( tmp_h, Process::gammaJet );
+      std::cout << "deb 2" << std::endl;
+      stack->Add( h_s, "histo" );
+      TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
+      data = new TH1F ( *h_data );
+      mc = new TH1F( *tmp_h );
+      std::cout << "deb 0" << std::endl;
+      AddLegend( h_s, leg, Process::gammaJet );
+      MakeStackPlot( stack, data, mc, plots[i], "plots/" + plots[i] + "_" + "INCLUSIVE", leg );
+    }
   return 0;
 }

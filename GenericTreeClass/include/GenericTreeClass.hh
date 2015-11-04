@@ -19,11 +19,13 @@ public:
   GenericTreeClass( TTree* tree );
   GenericTreeClass( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~GenericTreeClass( );
-
+  
+  void Loop();
   void CreateGenericHisto( TString histoName, TString varName, int nbins = 0, float x_low = 0, float x_high = 0 );
   void PrintStoredHistos();
   void CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
 		      int nbins_y, float y_low, float y_high );
+  std::map<TString, TH1F*> map_1D_Histos;
   
 private:
 
@@ -33,7 +35,7 @@ private:
   bool _info;
   TString processName;
   TString boxName;
-  std::map<TString, TH1F*> map_1D_Histos;
+  
   std::map<TString, TH2F*> map_2D_Histos;
   
 };
