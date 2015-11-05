@@ -114,33 +114,31 @@ int main ( int argc, char* argv[] )
   const int mod = 0; 
   
 
-  TString plots[3] = {"MR", "Rsq", "NJets40"};
-  for ( int i = 0; i < 3; i++)
-    {
-      myClass->CreateGenericHisto( plots[i], plots[i], 25, 0, 2500 );
-    }
+  TString plots[] = {"MR", "Rsq", "NJets40", "sqrt(Rsq)*MR"};
+  TString plotNames[] = {"MR", "Rsq", "NJets40", "lep1Pt"};
+  myClass->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
+  myClass->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
+  myClass->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
+  myClass->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
   
   myClass->PrintStoredHistos();
   
+  std::cout << "before loop" << std::endl;
   myClass->Loop();
-  for ( int i = 0; i < 3; i++)
+  std::cout << "pass loop" << std::endl;
+  for ( int i = 0; i < 4; i++)
     {
       //Loop the processes in here (not implemented)
-      std::cout << "deb 0" << std::endl;
       stack = new THStack( "hs" , "Hgg Stack " );
       leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
-      std::cout << "deb 2" << std::endl;
-      TH1F* tmp_h = new TH1F( *(myClass->map_1D_Histos[ plots[i] ]) );
-      std::cout << "deb 2.1" << std::endl;
+      TH1F* tmp_h = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
       TH1F* h_s = GetStyledHisto( tmp_h, Process::gammaJet );
-      std::cout << "deb 2" << std::endl;
       stack->Add( h_s, "histo" );
       TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
       data = new TH1F ( *h_data );
       mc = new TH1F( *tmp_h );
-      std::cout << "deb 0" << std::endl;
       AddLegend( h_s, leg, Process::gammaJet );
-      MakeStackPlot( stack, data, mc, plots[i], "plots/" + plots[i] + "_" + "INCLUSIVE", leg );
+      MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg );
     }
   return 0;
 }

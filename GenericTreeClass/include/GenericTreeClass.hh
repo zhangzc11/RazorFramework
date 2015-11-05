@@ -25,7 +25,7 @@ public:
   void PrintStoredHistos();
   void CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
 		      int nbins_y, float y_low, float y_high );
-  std::map<TString, TH1F*> map_1D_Histos;
+  std::map< std::pair<TString, TString>, TH1F* > map_1D_Histos;
   
 private:
 

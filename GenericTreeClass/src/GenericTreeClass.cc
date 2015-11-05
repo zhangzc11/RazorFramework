@@ -44,9 +44,10 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
 {
   //std::cout << "1D var: " << varName << std::endl;
   TH1F* _h = new TH1F( histoName, histoName, nbins, x_low, x_high );
-  if ( map_1D_Histos.find( varName ) == map_1D_Histos.end() )
+  std::pair<TString, TString> mypair = std::make_pair(histoName, varName);
+  if ( map_1D_Histos.find( mypair ) == map_1D_Histos.end() )
     {
-      map_1D_Histos[ varName ] = _h;
+      map_1D_Histos[ mypair ] = _h;
     }
   else
     {
@@ -57,7 +58,7 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
 void GenericTreeClass::PrintStoredHistos()
 {
   std::cout << map_1D_Histos.size() << std::endl;
-  for ( auto& tmp : map_1D_Histos ) std::cout << tmp.first << " nbins: " << tmp.second->GetNbinsX() << std::endl;
+  for ( auto& tmp : map_1D_Histos ) std::cout << tmp.first.first << " nbins: " << tmp.second->GetNbinsX() << std::endl;
 };
 
 void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
@@ -78,14 +79,28 @@ void GenericTreeClass::Loop()
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
+    std::cout << "lep1" << lep1->Pt() << std::endl;
     for ( auto& tmp : map_1D_Histos )
       {
-	tmp.second->Fill( GetVarVal<float>(tmp.first) );
+	float varVal= GetVarVal<float>(tmp.first.second);
+	if ( varVal != -666. ) tmp.second->Fill( varVal );
       }
     // if (Cut(ientry) < 0) continue;
   }
   for ( auto& tmp : map_1D_Histos )
     {
-      std::cout << tmp.first << " Mean: " << tmp.second->GetMean() << std::endl;
+      float varVal = GetVarVal<float>(tmp.first.second);
+      std::cout << tmp.first.first << " ,varVal->" << varVal << std::endl;
+      int _nbins = tmp.second->GetNbinsX();
+      float _xlow = tmp.second->GetXaxis()->GetXmin();
+      float _xhigh = tmp.second->GetXaxis()->GetXmax();
+      if ( varVal == -666. )
+	{
+	  TString drawCommand = Form(" >> tmp1(%d, %f, %f)", _nbins, _xlow, _xhigh );
+	  drawCommand = tmp.first.second + drawCommand;
+	  std::cout << "drawCommand->" << drawCommand << std::endl;
+	  fChain->Draw(drawCommand, "", "goff");
+	  tmp.second = (TH1F*)gDirectory->Get("tmp1");
+	}
     }
 };

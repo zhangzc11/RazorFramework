@@ -349,6 +349,7 @@ retType ControlSampleEvent::GetVarVal( TString varName )
   if ( varName == "HT" ) return HT;
   if ( varName == "genZpt" ) return genZpt;
   if ( varName == "genZphi" ) return genZphi;
+  return (float)-666.;
   //if ( varName == "genlep1" ) return genlep1;
   //if ( varName == "genlep2" ) return genlep2;
   //if ( varName == "lep1" ) return lep1;
