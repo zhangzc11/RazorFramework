@@ -79,7 +79,7 @@ void GenericTreeClass::Loop()
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-    std::cout << "lep1" << lep1->Pt() << std::endl;
+    //std::cout << "lep1" << lep1->Pt() << std::endl;
     for ( auto& tmp : map_1D_Histos )
       {
 	float varVal= GetVarVal<float>(tmp.first.second);

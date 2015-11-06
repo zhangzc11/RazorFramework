@@ -58,23 +58,18 @@ struct binning
 int main ( int argc, char* argv[] )
 {
   std::cout << "[INFO]: Initializing program" << std::endl;
-    
-  //Map Containing the lists for different processes 
-  std::map< std::string, std::string > mapList;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
   if (  inputFile == "" )
     {
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
-  
   std::string run = ParseCommandLine( argc, argv, "-run=" );
   if (  run == "" )
     {
       std::cout << "[WARNING]: please provide a valid run, use --run=<run1/run2>" << std::endl;
       run = "run1";
     }
-
   std::string treeType = ParseCommandLine( argc, argv, "-treeType=" );
   if (  treeType == "" )
     {
@@ -88,13 +83,12 @@ int main ( int argc, char* argv[] )
   std::cout << "[INFO]: run: " << run << std::endl;
   std::cout << "=================================" << std::endl;
   
+  //------------------------------------------------
+  //Map Containing the lists for different processes
+  //------------------------------------------------
+  std::map< std::string, std::string > mapList;
   FillMapList( mapList, inputFile );
   if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
-  
-  for( auto& myMap : mapList )
-    {
-      if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
-    }
   
   TFile* f;
   TTree* tree;
@@ -107,6 +101,20 @@ int main ( int argc, char* argv[] )
   TH1F* mc;
   TH1F* mc2 = new TH1F();
 
+  std::map < std::string, TChain* > processNtuples;
+  for( auto& myMap : mapList )
+    {
+      if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
+      //-----------------------------
+      // R e t r i e v i n g  T r e e
+      //-----------------------------
+      if ( processNtuples.find( myMap.first ) == processNtuples.end() )
+	{
+	  processNtuples[myMap.first] = new TChain( "ControlSampleEvent" );
+	  AddTChain( processNtuples[myMap.first], myMap.second );
+	}
+    }
+  
   const int nprocesses = 2;
   const int nplots = 4;
   double k_f = 1.0;
@@ -126,19 +134,39 @@ int main ( int argc, char* argv[] )
   std::cout << "before loop" << std::endl;
   myClass->Loop();
   std::cout << "pass loop" << std::endl;
+  
   for ( int i = 0; i < 4; i++)
     {
-      //Loop the processes in here (not implemented)
+      //------------------------------
+      //Stack Histogram
+      //------------------------------
       stack = new THStack( "hs" , "Hgg Stack " );
+      int ctrHisto = 0;
       leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
-      TH1F* tmp_h = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
-      TH1F* h_s = GetStyledHisto( tmp_h, Process::gammaJet );
-      stack->Add( h_s, "histo" );
-      TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
-      data = new TH1F ( *h_data );
-      mc = new TH1F( *tmp_h );
-      AddLegend( h_s, leg, Process::gammaJet );
+      for( const auto& process : Process() )
+	{
+	  std::string processName = GetProcessString( process );
+	  TH1F* tmp_h  = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
+	  TH1F* h_s    = GetStyledHisto( tmp_h, process );
+	  stack->Add( h_s, "histo" );
+	  TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
+	  
+	  if ( ctrHisto == 0 )
+	    {
+	      data = new TH1F ( *h_data );
+	      mc   = new TH1F( *tmp_h );
+	    }
+	  else
+	    {
+	      mc->Add( tmp_h );
+	      data->Add( h_data );
+	    }
+	  
+	  AddLegend( h_s, leg, process );
+	  ctrHisto++;
+	}
       MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg );
     }
+  
   return 0;
 }
