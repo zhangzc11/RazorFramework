@@ -139,8 +139,8 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   //-----------------------
   TFile* f = new TFile( fname.c_str() , "READ" );
   //Getting Workspace
-  //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
-  RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
+  RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  //RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
   RooRealVar* bias = w->var( var.c_str() );
   //Getting data_bias RooDataSet
@@ -223,7 +223,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff"); 
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
   double mean_val = hbias->GetMean();
-
+  
   double _max = hbias->GetBinContent( hbias->GetMaximumBin() );
   //double _xlow = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.5*_max ) );
   //double _xhigh = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow );
@@ -250,7 +250,8 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   
   TF1* gaus = new TF1( "gaus", "gaus(0)", _xlow, _xhigh );
   hbias->Fit( gaus, "R");
-  hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
+  //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
+  hbias->GetXaxis()->SetRangeUser( -4, 4 );
   hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
   std::cout << "Gaussian Mean: " << gaus->GetParameter(1) << std::endl;
   hbias->SetStats( kFALSE );
@@ -280,7 +281,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   TString lumiText;
   TString lumiText2;
   lumiText = Form("mean: %.2f", mean_val );
-  lumiText2 = Form("#mu: %.2f", gaus->GetParameter(1) );
+  lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
   
   latex.SetNDC();
   latex.SetTextAngle(0);
