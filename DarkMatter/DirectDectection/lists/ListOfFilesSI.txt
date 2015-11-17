@@ -6,3 +6,5 @@ OtherExpLimits/SUPER-K_SD.txt
 OtherExpLimits/V_SI_Monojet.txt
 OtherExpLimits/XENON100_SI.txt
 OtherExpLimits/superCDMS_SI.txt
+OtherExpLimits/CRESTII_NEW.txt
+OtherExpLimits/CRESTII_LowThreshold.txt

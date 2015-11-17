@@ -3,3 +3,6 @@ OtherExpLimits/COUPP_2012_SD.txt
 OtherExpLimits/SIMPLE_2012_SD.txt
 OtherExpLimits/SUPER-K_SD.txt
 OtherExpLimits/ICE_CUBE_WW.txt
+OtherExpLimits/XENON_SD_FINAL.txt
+OtherExpLimits/PICO.txt
+OtherExpLimits/PICASSO.txt

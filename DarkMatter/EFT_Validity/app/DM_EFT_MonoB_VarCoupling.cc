@@ -80,10 +80,10 @@ int main ( ){
 	      Rmap[aux.mass] = aux;
 	    }
 	  //Filling Map Struct
-	  Rmap[aux.mass].Lambda20 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c1;
-	  Rmap[aux.mass].Lambda40 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c2;
-	  Rmap[aux.mass].Lambda60 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c3;
-	  Rmap[aux.mass].Lambda80 = FindLambda( 0.8, h_qtr_sel, h_qtr_gen )/g_c4;
+	  Rmap[aux.mass].Lambda20 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c1;
+	  Rmap[aux.mass].Lambda40 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c2;
+	  Rmap[aux.mass].Lambda60 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c3;
+	  Rmap[aux.mass].Lambda80 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c4;
 	  
 	}
     }//end reading file
@@ -261,8 +261,8 @@ int main ( ){
   grshade->SetLineStyle(1);
   leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
-  leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
-  leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
+  leg->AddEntry(g_2m, "#Lambda < 2M_{#chi}" ,"lf");
+  leg->AddEntry(g_2mover4pi, "#Lambda < M_{#chi}/2#pi" ,"lf");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.03);
   leg->SetLineColor(1);
@@ -323,7 +323,7 @@ int main ( ){
    latex.SetTextFont(extraTextFont);
    latex.SetTextAlign(31); 
    latex.SetTextSize(extraTextSize);
-   latex.DrawLatex(extrax, extray, extraText);
+   //latex.DrawLatex(extrax, extray, extraText);
 
   
   c->cd();
