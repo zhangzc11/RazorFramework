@@ -1,7 +1,9 @@
 //C++ INCLUDES
 #include <iostream>
 #include <math.h>
+#include <sstream>
 //ROOT INCLUDES
+#include <TRandom3.h>
 //LOCAL INCLUDES
 #include "GenericTreeClass.hh"
 
@@ -87,6 +89,8 @@ void GenericTreeClass::Loop()
       }
     // if (Cut(ientry) < 0) continue;
   }
+  TRandom3 r(1);
+  int h_number = r.Integer(10000);
   for ( auto& tmp : map_1D_Histos )
     {
       float varVal = GetVarVal<float>(tmp.first.second);
@@ -96,11 +100,15 @@ void GenericTreeClass::Loop()
       float _xhigh = tmp.second->GetXaxis()->GetXmax();
       if ( varVal == -666. )
 	{
-	  TString drawCommand = Form(" >> tmp1(%d, %f, %f)", _nbins, _xlow, _xhigh );
+	  //TString _histoName = Form( "tmp_%d", h_number );
+	  //std::string _s_histoName = _histoName;
+	  std::stringstream _histoName;
+	  _histoName << "tmp_" << h_number;
+	  TString drawCommand = Form(" >> %s(%d, %f, %f)", _histoName.str().c_str(), _nbins, _xlow, _xhigh );
 	  drawCommand = tmp.first.second + drawCommand;
-	  std::cout << "drawCommand->" << drawCommand << std::endl;
+	  std::cout << "drawCommand-> " << drawCommand << std::endl;
 	  fChain->Draw(drawCommand, "weight*(1)", "goff");
-	  tmp.second = (TH1F*)gDirectory->Get("tmp1");
+	  tmp.second = (TH1F*)gDirectory->Get(_histoName.str().c_str());
 	}
     }
 };
