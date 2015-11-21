@@ -89,7 +89,7 @@ void GenericTreeClass::Loop()
       }
     // if (Cut(ientry) < 0) continue;
   }
-  TRandom3 r(1);
+  TRandom3 r(0);
   int h_number = r.Integer(10000);
   for ( auto& tmp : map_1D_Histos )
     {
@@ -100,6 +100,7 @@ void GenericTreeClass::Loop()
       float _xhigh = tmp.second->GetXaxis()->GetXmax();
       if ( varVal == -666. )
 	{
+	  gDirectory->Clear(); 
 	  //TString _histoName = Form( "tmp_%d", h_number );
 	  //std::string _s_histoName = _histoName;
 	  std::stringstream _histoName;
@@ -108,6 +109,8 @@ void GenericTreeClass::Loop()
 	  drawCommand = tmp.first.second + drawCommand;
 	  std::cout << "drawCommand-> " << drawCommand << std::endl;
 	  fChain->Draw(drawCommand, "weight*(1)", "goff");
+	  //fChain->Draw(drawCommand, "", "goff");
+	  std::cout << "histName--> " << _histoName.str() << std::endl;
 	  tmp.second = (TH1F*)gDirectory->Get(_histoName.str().c_str());
 	}
     }
