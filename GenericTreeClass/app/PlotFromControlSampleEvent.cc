@@ -166,6 +166,7 @@ int main ( int argc, char* argv[] )
 	  std::string processName = process.first;
 	  Process myprocess = GetProcessString( process.first );
 	  //TH1F* tmp_h  = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
+	  std::cout << plotNames[i] << std::endl;
 	  TH1F* tmp_h  = new TH1F( *(process.second->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
 	  TH1F* h_s    = GetStyledHisto( tmp_h, myprocess );
 	  stack->Add( h_s, "histo" );
