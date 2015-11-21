@@ -155,7 +155,7 @@
 
   //TLegend* leg = new TLegend(0.7, 0.65, 0.83, 0.89);//(xmin, ymin, xmax, ymax)
   TLegend *leg = new TLegend(0.48, 0.78, 0.75, 0.85, NULL,"brNDC");
-  leg->AddEntry(RSI, "Razor DM" ,"l");
+  leg->AddEntry(RSI, "Razor-0#mu" ,"l");
   //leg->AddEntry(RSI, "Razor DM, g_{eff} = 1" ,"l");
   //leg->AddEntry(RSI_4pi, "Razor DM, g_{eff} = 4#pi","l");
   //leg->AddEntry(Lmono, "CMS Monojet" ,"l");

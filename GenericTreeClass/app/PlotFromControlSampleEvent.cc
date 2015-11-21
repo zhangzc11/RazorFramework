@@ -102,6 +102,7 @@ int main ( int argc, char* argv[] )
   TH1F* mc2 = new TH1F();
 
   std::map < std::string, TChain* > processNtuples;
+  std::map < std::string, GenericTreeClass* > listGTC;
   for( auto& myMap : mapList )
     {
       if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
@@ -112,6 +113,7 @@ int main ( int argc, char* argv[] )
 	{
 	  processNtuples[myMap.first] = new TChain( "ControlSampleEvent" );
 	  AddTChain( processNtuples[myMap.first], myMap.second );
+	  listGTC[myMap.first] = new GenericTreeClass(processNtuples[myMap.first]);
 	}
     }
   
@@ -124,15 +126,29 @@ int main ( int argc, char* argv[] )
 
   TString plots[] = {"MR", "Rsq", "NJets40", "sqrt(Rsq)*MR"};
   TString plotNames[] = {"MR", "Rsq", "NJets40", "lep1Pt"};
-  myClass->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
-  myClass->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
-  myClass->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
-  myClass->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
+  /*
+    myClass->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
+    myClass->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
+    myClass->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
+    myClass->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
+    myClass->PrintStoredHistos();
+    myClass->Loop();
+  */
   
-  myClass->PrintStoredHistos();
+  for( auto process : listGTC )
+    {
+      process.second->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
+      process.second->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
+      process.second->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
+      process.second->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
+      process.second->PrintStoredHistos();
+      process.second->Loop();
+    }
+
+  
   
   std::cout << "before loop" << std::endl;
-  myClass->Loop();
+  
   std::cout << "pass loop" << std::endl;
   
   for ( int i = 0; i < 4; i++)
@@ -143,11 +159,14 @@ int main ( int argc, char* argv[] )
       stack = new THStack( "hs" , "Hgg Stack " );
       int ctrHisto = 0;
       leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
-      for( const auto& process : Process() )
+      //for( const auto& process : Process() )
+      for( auto process : listGTC )
 	{
-	  std::string processName = GetProcessString( process );
-	  TH1F* tmp_h  = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
-	  TH1F* h_s    = GetStyledHisto( tmp_h, process );
+	  //std::string processName = GetProcessString( process );
+	  std::string processName = process.first;
+	  //TH1F* tmp_h  = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
+	  TH1F* tmp_h  = new TH1F( *(process.second->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
+	  TH1F* h_s    = GetStyledHisto( tmp_h, Process::ttH );
 	  stack->Add( h_s, "histo" );
 	  TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
 	  
@@ -162,7 +181,7 @@ int main ( int argc, char* argv[] )
 	      data->Add( h_data );
 	    }
 	  
-	  AddLegend( h_s, leg, process );
+	  AddLegend( h_s, leg, Process::ttH );
 	  ctrHisto++;
 	}
       MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg );
