@@ -20,7 +20,7 @@ Boxes operator*( Boxes box );
 
 std::string GetBoxString( Boxes box );
 
-enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, data, Last };
+enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, ww, zz, wz, data, unknown, Last };
 struct Yields
 {
   float gammaJet[2];
@@ -46,6 +46,8 @@ HistoTypes end( HistoTypes htype );
 HistoTypes& operator++( HistoTypes& htype );
 HistoTypes operator*( HistoTypes htype );
 std::string GetHistoTypesString( HistoTypes htype );
+
+Process GetProcessString( std::string process );
 
 enum class FitFunction{ singleExp, doubleExp, modExp, singlePow, doublePow, poly2, poly3, Last };
 // R e d e f i n i n g   O p e r a t o r   t o   L o o p   O v e r   F i t F u n c t i o n s

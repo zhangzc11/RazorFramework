@@ -485,6 +485,41 @@ bool SetHistoStyle( TH1F* h, Process process )
       h->SetFillColor( kOrange - 2 );
       h->SetLineColor( kOrange - 2 );
     }
+  else if ( process == Process::w )
+    {
+      h->SetFillColor( kGreen - 2 );
+      h->SetLineColor( kGreen - 2 );
+    }
+  else if ( process == Process::znunu )
+    {
+      h->SetFillColor( kAzure - 2 );
+      h->SetLineColor( kAzure - 2 );
+    }
+  else if ( process == Process::dy )
+    {
+      h->SetFillColor( kViolet - 2 );
+      h->SetLineColor( kViolet - 2 );
+    }
+  else if ( process == Process::tt )
+    {
+      h->SetFillColor( kPink - 2 );
+      h->SetLineColor( kPink - 2 );
+    }
+  else if ( process == Process::ww )
+    {
+      h->SetFillColor( kRed - 2 );
+      h->SetLineColor( kRed - 2 );
+    }
+  else if ( process == Process::zz )
+    {
+      h->SetFillColor( kRed + 4 );
+      h->SetLineColor( kRed + 4 );
+    }
+  else if ( process == Process::wz )
+    {
+      h->SetFillColor( kRed + 6 );
+      h->SetLineColor( kRed + 6 );
+    }
   else if ( process == Process::data )
     {
       h->SetMarkerStyle( 20 );
@@ -540,6 +575,41 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
   else if ( process == Process::vbfH )
     {
       leg->AddEntry( h, "VBFH + jets", "f" );
+      return true;
+    }
+   else if ( process == Process::w )
+    {
+      leg->AddEntry( h, "W(l#nu) + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::znunu )
+    {
+      leg->AddEntry( h, "Z(#nu#nu) + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::dy )
+    {
+      leg->AddEntry( h, "Z/#gamma^{*} + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::tt )
+    {
+      leg->AddEntry( h, "t#bar{t} + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::ww )
+    {
+      leg->AddEntry( h, "WW + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::zz )
+    {
+      leg->AddEntry( h, "ZZ + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::wz )
+    {
+      leg->AddEntry( h, "WZ + jets", "f" );
       return true;
     }
   else if ( process == Process::data )

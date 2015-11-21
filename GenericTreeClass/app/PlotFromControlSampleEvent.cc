@@ -164,9 +164,10 @@ int main ( int argc, char* argv[] )
 	{
 	  //std::string processName = GetProcessString( process );
 	  std::string processName = process.first;
+	  Process myprocess = GetProcessString( process.first );
 	  //TH1F* tmp_h  = new TH1F( *(myClass->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
 	  TH1F* tmp_h  = new TH1F( *(process.second->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
-	  TH1F* h_s    = GetStyledHisto( tmp_h, Process::ttH );
+	  TH1F* h_s    = GetStyledHisto( tmp_h, myprocess );
 	  stack->Add( h_s, "histo" );
 	  TH1F* h_data = GetStyledHisto( tmp_h, Process::data );
 	  
@@ -181,7 +182,7 @@ int main ( int argc, char* argv[] )
 	      data->Add( h_data );
 	    }
 	  
-	  AddLegend( h_s, leg, Process::ttH );
+	  AddLegend( h_s, leg, myprocess );
 	  ctrHisto++;
 	}
       MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg );

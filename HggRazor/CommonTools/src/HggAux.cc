@@ -204,6 +204,61 @@ std::string GetProcessString( Process process )
   return "";
 };
 
+
+Process GetProcessString( std::string process )
+{
+  if ( process == "ttH" )
+    {
+      return Process::ttH;
+    }
+  else if ( process == "tt" )
+    {
+      return Process::tt;
+    }
+  else if ( process == "w" )
+    {
+      return Process::w;
+    }
+  else if ( process == "dy" )
+    {
+      return Process::dy;
+    }
+  /*
+  else if ( process == Process::vH )
+    {
+      return "vH";
+    }
+  else if ( process == Process::ggH )
+    {
+      return "ggH";
+    }
+  else if ( process == Process::vbfH )
+    {
+      return "vbfH";
+    }
+  else if( process == Process::qcd )
+    {
+      return "qcd";
+    }
+  else if( process == Process::diphoton )
+    {
+      return "diphoton";
+    }
+  else if( process == Process::gammaJet )
+    {
+      return "gammaJet";
+    }
+  else if( process == Process::data )
+    {
+      return "data";
+    }
+  else
+    {
+      std::cerr << "[ERROR]: Process not found" << std::endl;
+    }
+  */
+  return Process::unknown;
+};
 std::string GetFitFunctionString( FitFunction  fitf )
 {
   if ( fitf == FitFunction::singleExp )
