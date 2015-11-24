@@ -45,7 +45,7 @@ GenericTreeClass::~GenericTreeClass()
 void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, int nbins, float x_low, float x_high )
 {
   //std::cout << "1D var: " << varName << std::endl;
-  TH1F* _h = new TH1F( histoName, histoName, nbins, x_low, x_high );
+  TH1D* _h = new TH1D( histoName+"_"+this->processName, histoName, nbins, x_low, x_high );
   std::pair<TString, TString> mypair = std::make_pair(histoName, varName);
   if ( map_1D_Histos.find( mypair ) == map_1D_Histos.end() )
     {
@@ -71,6 +71,12 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
 
 void GenericTreeClass::Loop()
 {
+  /*
+  TFile* puFile = new TFile("/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorAnalyzer/data/PileupReweight_Spring15MCTo2015Data.root");
+  TH1D* puweightHist = (TH1D*)puFile->Get("PileupReweight");
+  */
+  
+  std::cout << "loop begins" << std::endl; 
   if (fChain == 0) return;
   
   Long64_t nentries = fChain->GetEntriesFast();
@@ -80,15 +86,29 @@ void GenericTreeClass::Loop()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
-
+    
     //std::cout << "lep1" << lep1->Pt() << std::endl;
     for ( auto& tmp : map_1D_Histos )
       {
 	float varVal= GetVarVal<float>(tmp.first.second);
-	if ( varVal != -666. ) tmp.second->Fill( varVal, weight );
+	if( this->processName != "data" && this->processName != "Data" && this->processName != "DATA" )
+	  {
+	    double puWeight = puweightHist->GetBinContent( puweightHist->GetXaxis()->FindFixBin( NPU_0 ) );
+	    if ( varVal != -666. ) tmp.second->Fill( varVal, weight*puWeight );
+	  }
+	else
+	  {
+	    //data
+	    if ( varVal != -666. ) tmp.second->Fill( varVal );
+	  }
       }
     // if (Cut(ientry) < 0) continue;
   }
+
+  for ( auto& tmp : map_1D_Histos )
+    {
+      std::cout << tmp.first.second << " Yield: " << tmp.second->Integral() << std::endl;
+    }
   TRandom3 r(0);
   int h_number = r.Integer(10000);
   for ( auto& tmp : map_1D_Histos )
@@ -108,10 +128,18 @@ void GenericTreeClass::Loop()
 	  TString drawCommand = Form(" >> %s(%d, %f, %f)", _histoName.str().c_str(), _nbins, _xlow, _xhigh );
 	  drawCommand = tmp.first.second + drawCommand;
 	  std::cout << "drawCommand-> " << drawCommand << std::endl;
-	  fChain->Draw(drawCommand, "weight*(1)", "goff");
+	  if( this->processName != "data" && this->processName != "Data" && this->processName != "DATA" )
+	    {
+	      fChain->Draw(drawCommand, "weight*(1)", "goff");
+	    }
+	  else
+	    {
+	      //data
+	      fChain->Draw(drawCommand, "", "goff");
+	    }
 	  //fChain->Draw(drawCommand, "", "goff");
 	  std::cout << "histName--> " << _histoName.str() << std::endl;
-	  tmp.second = (TH1F*)gDirectory->Get(_histoName.str().c_str());
+	  tmp.second = (TH1D*)gDirectory->Get(_histoName.str().c_str());
 	}
     }
 };

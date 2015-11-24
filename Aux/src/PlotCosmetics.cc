@@ -143,7 +143,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   return true;
 };
 
-bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outName, TLegend* leg )
+bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg )
 {
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -197,8 +197,8 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   pad2->cd();
 
   std::cout << "deb" << std::endl;
-  //TH1F* MC = (TH1F*)s->GetHistogram();
-  TH1F* ratio = new TH1F( *data );
+  //TH1D* MC = (TH1D*)s->GetHistogram();
+  TH1D* ratio = new TH1D( *data );
   ratio->Divide( mc );
   ratio->SetMarkerStyle( 20 );
   ratio->GetXaxis()->SetTitleSize( axisTitleSizeRatioX );
@@ -434,21 +434,23 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
       pad1->SetLogy();
       pad1->Update();
     }
-  
+
+  pad1->SetLogy();
+  pad1->Update();
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
   delete c;
   return true;
 };
 
-TH1F* GetStyledHisto( TH1F* h, Process process )
+TH1D* GetStyledHisto( TH1D* h, Process process )
 {
-  TH1F* h_n = new TH1F( *h );
+  TH1D* h_n = new TH1D( *h );
   SetHistoStyle( h_n, process );
   return h_n;
 };
 
-bool SetHistoStyle( TH1F* h, Process process )
+bool SetHistoStyle( TH1D* h, Process process )
 {
   if ( process == Process::gammaJet )
     {
@@ -505,6 +507,16 @@ bool SetHistoStyle( TH1F* h, Process process )
       h->SetFillColor( kPink - 2 );
       h->SetLineColor( kPink - 2 );
     }
+  else if ( process == Process::top )
+    {
+      h->SetFillColor( kBlue - 2 );
+      h->SetLineColor( kBlue - 2 );
+    }
+  else if ( process == Process::vv )
+    {
+      h->SetFillColor( kRed - 2 );
+      h->SetLineColor( kRed - 2 );
+    }
   else if ( process == Process::ww )
     {
       h->SetFillColor( kRed - 2 );
@@ -536,7 +548,7 @@ bool SetHistoStyle( TH1F* h, Process process )
 };
 
 
-bool AddLegend( TH1F* h, TLegend* leg, Process process )
+bool AddLegend( TH1D* h, TLegend* leg, Process process )
 {
   if ( leg == NULL ) return false;
 
@@ -595,6 +607,16 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
   else if ( process == Process::tt )
     {
       leg->AddEntry( h, "t#bar{t} + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::top )
+    {
+      leg->AddEntry( h, "t + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::vv )
+    {
+      leg->AddEntry( h, "vv + jets", "f" );
       return true;
     }
   else if ( process == Process::ww )

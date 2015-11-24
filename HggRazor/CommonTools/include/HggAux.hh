@@ -20,7 +20,7 @@ Boxes operator*( Boxes box );
 
 std::string GetBoxString( Boxes box );
 
-enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, ww, zz, wz, data, unknown, Last };
+enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, top, vv, ww, zz, wz, data, unknown, Last };
 struct Yields
 {
   float gammaJet[2];

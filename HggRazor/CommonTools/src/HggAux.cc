@@ -223,40 +223,63 @@ Process GetProcessString( std::string process )
     {
       return Process::dy;
     }
-  /*
-  else if ( process == Process::vH )
+  else if ( process == "top" )
     {
-      return "vH";
+      return Process::top;
     }
-  else if ( process == Process::ggH )
+  else if ( process == "vv" )
     {
-      return "ggH";
+      return Process::vv;
     }
-  else if ( process == Process::vbfH )
+  else if ( process == "ww" )
     {
-      return "vbfH";
+      return Process::ww;
     }
-  else if( process == Process::qcd )
+  else if ( process == "zz" )
     {
-      return "qcd";
+      return Process::zz;
     }
-  else if( process == Process::diphoton )
+  else if ( process == "wz" )
     {
-      return "diphoton";
+      return Process::wz;
     }
-  else if( process == Process::gammaJet )
+  else if ( process == "znunu" )
     {
-      return "gammaJet";
+      return Process::znunu;
     }
-  else if( process == Process::data )
+  else if ( process == "vH" )
     {
-      return "data";
+      return Process::vH;
+    }
+  else if ( process == "ggH" )
+    {
+      return Process::ggH;
+    }
+  else if ( process == "vbfH" )
+    {
+      return Process::vbfH;
+    }
+  else if( process == "qcd" )
+    {
+      return Process::qcd;
+    }
+  else if( process == "diphoton" )
+    {
+      return Process::diphoton;
+    }
+  else if( process == "gammaJet" )
+    {
+      return Process::gammaJet;
+    }
+  else if( process == "data" )
+    {
+      return Process::data;
     }
   else
     {
-      std::cerr << "[ERROR]: Process not found" << std::endl;
+      std::cerr << "[ERROR] (HggAux): Process not found" << std::endl;
     }
-  */
+
   return Process::unknown;
 };
 std::string GetFitFunctionString( FitFunction  fitf )

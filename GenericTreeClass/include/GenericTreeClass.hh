@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 //ROOT INCLUDES
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 #include <TString.h>
 //LOCAL INCLUDES
@@ -25,7 +25,9 @@ public:
   void PrintStoredHistos();
   void CreateGenericHisto( TString histoName, TString varName, int nbins_x, float x_low, float x_high,
 		      int nbins_y, float y_low, float y_high );
-  std::map< std::pair<TString, TString>, TH1F* > map_1D_Histos;
+  std::map< std::pair<TString, TString>, TH1D* > map_1D_Histos;
+  TString GetProcessName(){return this->processName;};
+  void SetPuHisto( TH1D* histo ){ this->puweightHist = new TH1D( *histo );}
   
 private:
 
@@ -35,6 +37,8 @@ private:
   bool _info;
   TString processName;
   TString boxName;
+  
+  TH1D* puweightHist;
   
   std::map<TString, TH2F*> map_2D_Histos;
   

@@ -217,6 +217,9 @@ public :
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+   virtual void     DeleteTree();
+   virtual void     ActivateBranch( TString var );
+   virtual void     DeActivateAllBranches();
    template < typename retType > retType GetVarVal( TString varName );
 };
 
@@ -243,6 +246,27 @@ ControlSampleEvent::~ControlSampleEvent()
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
+
+void ControlSampleEvent::DeleteTree()
+{
+  if (!fChain) return;
+  delete fChain;
+  return;
+};
+
+void ControlSampleEvent::ActivateBranch( TString var )
+{
+  if (!fChain) return;
+  fChain->SetBranchStatus( var , 1);
+  return;
+};
+
+void ControlSampleEvent::DeActivateAllBranches( )
+{
+  if (!fChain) return;
+  fChain->SetBranchStatus( "*" , 0);
+  return;
+};
 
 Int_t ControlSampleEvent::GetEntry(Long64_t entry)
 {
