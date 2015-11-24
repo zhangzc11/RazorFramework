@@ -125,6 +125,7 @@ int main ( int argc, char* argv[] )
   TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
+  int varNamesLen = sizeof(varNames)/sizeof(TString)-1;
   
   //----------------                                                                                                     
   //DummyRootFile
@@ -163,7 +164,7 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
-	  for( int i  = 0; i < 11; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
+	  for( int i  = 0; i < varNamesLen; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
 	  listGTC[myMap.first]->Loop();
 	  listGTC[myMap.first]->DeleteTree();
 	}
