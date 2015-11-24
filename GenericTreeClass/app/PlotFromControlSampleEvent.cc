@@ -122,7 +122,7 @@ int main ( int argc, char* argv[] )
   const int nplots = 11;
   TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2"};
   TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_Rsq", "MyMT_lep1", "MyMT_lep2"};
-  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
+  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
   
@@ -163,7 +163,7 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
-	  for( int i  = 0; i < 11; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
+	  for( int i  = 0; i < 12; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
 	  listGTC[myMap.first]->Loop();
 	  listGTC[myMap.first]->DeleteTree();
 	}
