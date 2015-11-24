@@ -119,10 +119,10 @@ int main ( int argc, char* argv[] )
   TH1D* mc2 = new TH1D();
 
 
-  const int nplots = 7;
-  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium"};
-  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium"};
-  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "mll", "HT", "MET", "NBJetsMedium", "weight", "NPU_0"};
+  const int nplots = 11;
+  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2"};
+  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_Rsq", "MyMT_lep1", "MyMT_lep2"};
+  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
   
@@ -157,9 +157,13 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[4], plots[4], 100, 0., 1000. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[5], plots[5], 50, 0., 200. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[6], plots[6], 10, 0, 10 );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[7], plots[7], 100, 0, 1000. );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[8], plots[8], 50, 0, 2500. );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[9], plots[9], 100, 0, 500. );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
-	  for( int i  = 0; i < 10; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
+	  for( int i  = 0; i < 11; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
 	  listGTC[myMap.first]->Loop();
 	  listGTC[myMap.first]->DeleteTree();
 	}

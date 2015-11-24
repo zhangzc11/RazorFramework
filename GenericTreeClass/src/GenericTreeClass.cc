@@ -80,14 +80,18 @@ void GenericTreeClass::Loop()
   if (fChain == 0) return;
   
   Long64_t nentries = fChain->GetEntriesFast();
-  
+  float tmp2;
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     
-    //std::cout << "lep1" << lep1->Pt() << std::endl;
+    tmp2 = lep1->Eta();
+    //std::cout << "lep1: " << lep1->Eta() << std::endl;
+    //std::cout << "lep2: " << lep2->Eta() << std::endl;
+    //auto PdotP = []( TLorentzVector* p1, TLorentzVector* p2 ){ return p1->Dot( *p2 ); };
+    
     for ( auto& tmp : map_1D_Histos )
       {
 	float varVal= GetVarVal<float>(tmp.first.second);
@@ -105,10 +109,6 @@ void GenericTreeClass::Loop()
     // if (Cut(ientry) < 0) continue;
   }
 
-  for ( auto& tmp : map_1D_Histos )
-    {
-      std::cout << tmp.first.second << " Yield: " << tmp.second->Integral() << std::endl;
-    }
   TRandom3 r(0);
   int h_number = r.Integer(10000);
   for ( auto& tmp : map_1D_Histos )
@@ -125,6 +125,7 @@ void GenericTreeClass::Loop()
 	  //std::string _s_histoName = _histoName;
 	  std::stringstream _histoName;
 	  _histoName << "tmp_" << h_number;
+	  //float tmp2 = lep1->Eta(); 
 	  TString drawCommand = Form(" >> %s(%d, %f, %f)", _histoName.str().c_str(), _nbins, _xlow, _xhigh );
 	  drawCommand = tmp.first.second + drawCommand;
 	  std::cout << "drawCommand-> " << drawCommand << std::endl;
@@ -135,11 +136,20 @@ void GenericTreeClass::Loop()
 	  else
 	    {
 	      //data
+	      std::cout << "Drawing" << std::endl;
 	      fChain->Draw(drawCommand, "", "goff");
 	    }
 	  //fChain->Draw(drawCommand, "", "goff");
 	  std::cout << "histName--> " << _histoName.str() << std::endl;
 	  tmp.second = (TH1D*)gDirectory->Get(_histoName.str().c_str());
+	  tmp.second->Draw();
+	  tmp.second->SaveAs("artur.pdf");
 	}
     }
+  
+  for ( auto& tmp : map_1D_Histos )
+    {
+      std::cout << tmp.first.second << " Yield: " << tmp.second->Integral() << std::endl;
+    }
+  
 };

@@ -373,6 +373,40 @@ retType ControlSampleEvent::GetVarVal( TString varName )
   if ( varName == "HT" ) return HT;
   if ( varName == "genZpt" ) return genZpt;
   if ( varName == "genZphi" ) return genZphi;
+  if ( varName == "lep1Pt" ) return lep1->Pt();
+  if ( varName == "lep1Eta" ) return lep1->Eta();
+  if ( varName == "lep1Phi" ) return lep1->Phi();
+  if ( varName == "lep1E" ) return lep1->E();
+  if ( varName == "lep2Pt" ) return lep2->Pt();
+  if ( varName == "lep2Eta" ) return lep2->Eta();
+  if ( varName == "lep2Phi" ) return lep2->Phi();
+  if ( varName == "lep2E" ) return lep2->E();
+  if ( varName == "MR*Rsq" ) return MR*Rsq;
+  if ( varName == "MyMT_lep1" )
+    {
+      auto deltaPhi = [](double phi1, double phi2) {
+	double dphi = phi1-phi2;
+	while (dphi > TMath::Pi())
+	  dphi -= TMath::TwoPi();
+	while (dphi <= -TMath::Pi())
+	  dphi += TMath::TwoPi();
+	return dphi;
+      };
+      return sqrt( 2*MET*lep1->Pt()*( 1.-cos( deltaPhi( lep1->Phi(), METPhi) ) ) );
+    }
+  if ( varName == "MyMT_lep2" ) 
+    {
+      auto deltaPhi = [](double phi1, double phi2) {
+        double dphi = phi1-phi2;
+        while (dphi > TMath::Pi())
+          dphi -= TMath::TwoPi();
+        while (dphi <= -TMath::Pi())
+          dphi += TMath::TwoPi();
+        return dphi;
+      };
+      return sqrt( 2*MET*lep2->Pt()*( 1. - cos( deltaPhi( lep2->Phi(), METPhi) ) ) );
+    }
+  
   return (float)-666.;
   //if ( varName == "genlep1" ) return genlep1;
   //if ( varName == "genlep2" ) return genlep2;
