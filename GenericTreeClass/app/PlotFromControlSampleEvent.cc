@@ -125,7 +125,8 @@ int main ( int argc, char* argv[] )
   TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
-  
+  int varNamesLen = sizeof(varNames)/sizeof(TString);
+
   //----------------                                                                                                     
   //DummyRootFile
   //----------------                                                                                                     
@@ -163,7 +164,7 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
-	  for( int i  = 0; i < 12; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
+	  for( int i  = 0; i < varNamesLen; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
 	  listGTC[myMap.first]->Loop();
 	  listGTC[myMap.first]->DeleteTree();
 	}
@@ -173,36 +174,8 @@ int main ( int argc, char* argv[] )
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
   const int mod = 0; 
-  
-  //const int nplots = 6;
-  //TString plots[] = {"MR", "Rsq", "NJets40", "lep1.Pt()", "mll", "HT"};
-  //TString plotNames[] = {"MR", "Rsq", "NJets40", "lep1Pt", "mll", "HT"};
-  /*
-    myClass->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
-    myClass->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
-    myClass->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
-    myClass->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
-    myClass->PrintStoredHistos();
-    myClass->Loop();
-  */
-  
-  /*
-  for( auto process : listGTC )
-    {
-      process.second->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
-      process.second->CreateGenericHisto( plotNames[1], plots[1], 20, 0, 1.0 );
-      process.second->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
-      process.second->CreateGenericHisto( plotNames[3], plots[3], 60, 0, 300 );
-      process.second->CreateGenericHisto( plotNames[4], plots[4], 35, 50., 120. );
-      process.second->CreateGenericHisto( plotNames[5], plots[5], 100, 0., 1000. );
-      process.second->PrintStoredHistos();
-      process.second->Loop();
-    }
-  */
-  
-  
+    
   std::cout << "before loop" << std::endl;
-  std::cout << "pass loop" << std::endl;
   
   for ( int i = 0; i < nplots; i++)
     {

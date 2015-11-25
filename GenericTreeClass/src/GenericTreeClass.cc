@@ -86,8 +86,10 @@ void GenericTreeClass::Loop()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+    if(jentry % 100000 == 0) std::cout << "Processing entry " << jentry<<std::endl;
     
-    tmp2 = lep1->Eta();
+    //tmp2 = lep1->Eta();
     //std::cout << "lep1: " << lep1->Eta() << std::endl;
     //std::cout << "lep2: " << lep2->Eta() << std::endl;
     //auto PdotP = []( TLorentzVector* p1, TLorentzVector* p2 ){ return p1->Dot( *p2 ); };
