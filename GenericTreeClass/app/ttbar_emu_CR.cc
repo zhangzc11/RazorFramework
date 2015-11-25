@@ -31,17 +31,7 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 float hpt_k[2]  = { 1.0, 1.0};
 float hres_k[2] = { 1.0, 1.0};
 float lres_k[2] = { 1.0, 1.0};
-//A p p l y   B a s e l i n e   C u t
-//-----------------------------------
-//DATA
-//EBEB
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
-//MC
-//EBEB
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
-
-TString mggCut = "1";
 
 #define _debug 1
 
@@ -58,9 +48,9 @@ struct binning
 
 const float lumi = 2100.;
 
-TString ZLL_cut = "(abs(lep1Type) == 13 && abs(lep2Type) == 13) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 60. && mll < 120.";
+//TString ZLL_cut = "(abs(lep1Type) == 13 && abs(lep2Type) == 13) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 60. && mll < 120.";
 
-TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20.";
+TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20. && MR>300 ";
 
 TString dataTrigger = "(HLTDecision[2] == 1 || HLTDecision[7] == 1 || HLTDecision[12] == 1 || HLTDecision[11] == 1 || HLTDecision[15] == 1 || HLTDecision[22] == 1 || HLTDecision[23] == 1 || HLTDecision[24] == 1 || HLTDecision[25] == 1 || HLTDecision[26] == 1 || HLTDecision[27] == 1 || HLTDecision[28] == 1 || HLTDecision[29] == 1)";
 
@@ -75,23 +65,10 @@ int main ( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
-  std::string run = ParseCommandLine( argc, argv, "-run=" );
-  if (  run == "" )
-    {
-      std::cout << "[WARNING]: please provide a valid run, use --run=<run1/run2>" << std::endl;
-      run = "run1";
-    }
-  std::string treeType = ParseCommandLine( argc, argv, "-treeType=" );
-  if (  treeType == "" )
-    {
-      std::cout << "[WARNING]: please provide a valid treeType, use --treeType=<inclusive/category>" << std::endl;
-      treeType = "inclusive";
-    }
-  
+    
   std::cout << "=================================" << std::endl;
   std::cout << "===========set parameters========" << std::endl;
   std::cout << "[INFO]: input file: " << inputFile << std::endl;
-  std::cout << "[INFO]: run: " << run << std::endl;
   std::cout << "=================================" << std::endl;
   
   //----------------------
@@ -111,7 +88,6 @@ int main ( int argc, char* argv[] )
   TTree* tree;
   TChain* chain;
   TTree* cutTree;
-  //GenericTreeClass* myClass = new GenericTreeClass();
   THStack* stack;
   TLegend* leg;
   TH1D* data;
@@ -119,12 +95,22 @@ int main ( int argc, char* argv[] )
   TH1D* mc2 = new TH1D();
 
 
-  const int nplots = 11;
-  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2"};
-  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_Rsq", "MyMT_lep1", "MyMT_lep2"};
+  //const int nplots = 11;
+  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
+  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
+  TString plotLabels[] = {"M_{R} (GeV)", "R^{2}", "NJets_{40}", "m_{ll} (GeV)", "HT (GeV)", "MET (GET)", "NBJets_{M}", "p_{T}^{l_{1}} (GeV)", "M_{R}*R^{3} (GeV)", "M_{T}^{l_{1}} (GeV)", "M_{T}^{l_{2}} (GeV)", "M_{T}^{l_{rnd}} (GeV)"};
   TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
+  int varNamesLen = sizeof(varNames)/sizeof(TString);
+  int nplots = sizeof(plots)/sizeof(TString);
+  
+  //-----------------------------
+  //P r i n t   P l o t   I n f o  
+  //-----------------------------
+
+  std::cout << "[INFO]: number of variables activated " << varNamesLen << std::endl;
+  std::cout << "[INFO]: number of plots to be made " << nplots << std::endl;
   
   //----------------                                                                                                     
   //DummyRootFile
@@ -161,9 +147,10 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[8], plots[8], 50, 0, 2500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[9], plots[9], 100, 0, 500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[11], plots[11], 100, 0, 500. );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
-	  for( int i  = 0; i < 12; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
+	  for( int i  = 0; i < varNamesLen; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
 	  listGTC[myMap.first]->Loop();
 	  listGTC[myMap.first]->DeleteTree();
 	}
@@ -173,36 +160,8 @@ int main ( int argc, char* argv[] )
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
   const int mod = 0; 
-  
-  //const int nplots = 6;
-  //TString plots[] = {"MR", "Rsq", "NJets40", "lep1.Pt()", "mll", "HT"};
-  //TString plotNames[] = {"MR", "Rsq", "NJets40", "lep1Pt", "mll", "HT"};
-  /*
-    myClass->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
-    myClass->CreateGenericHisto( plotNames[1], plots[1], 25, 0, 1.5 );
-    myClass->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
-    myClass->CreateGenericHisto( plotNames[3], plots[3], 25, 0, 2000 );
-    myClass->PrintStoredHistos();
-    myClass->Loop();
-  */
-  
-  /*
-  for( auto process : listGTC )
-    {
-      process.second->CreateGenericHisto( plotNames[0], plots[0], 25, 0, 2500 );
-      process.second->CreateGenericHisto( plotNames[1], plots[1], 20, 0, 1.0 );
-      process.second->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
-      process.second->CreateGenericHisto( plotNames[3], plots[3], 60, 0, 300 );
-      process.second->CreateGenericHisto( plotNames[4], plots[4], 35, 50., 120. );
-      process.second->CreateGenericHisto( plotNames[5], plots[5], 100, 0., 1000. );
-      process.second->PrintStoredHistos();
-      process.second->Loop();
-    }
-  */
-  
-  
+    
   std::cout << "before loop" << std::endl;
-  std::cout << "pass loop" << std::endl;
   
   for ( int i = 0; i < nplots; i++)
     {
@@ -251,7 +210,7 @@ int main ( int argc, char* argv[] )
       std::cout << "data histo created" << std::endl;
       AddLegend( data, leg, Process::data );
       std::cout << "data: " << data->Integral() << " mc: " << mc->Integral() << std::endl;
-      MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg );
+      MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg, plotLabels[i] );
     }
   
 

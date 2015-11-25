@@ -143,7 +143,7 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   return true;
 };
 
-bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg )
+bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg, TString label )
 {
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -435,6 +435,12 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       pad1->Update();
     }
 
+  ratio->GetXaxis()->SetTitle( label );
+  s->GetYaxis()->SetTitle("events");
+  s->SetMaximum( 1e1*data->GetMaximum() );
+  s->SetMinimum( 1e-1 );
+  pad1->SetLogy();
+  pad1->Update();
   pad1->SetLogy();
   pad1->Update();
   c->SaveAs( outName+".pdf" );

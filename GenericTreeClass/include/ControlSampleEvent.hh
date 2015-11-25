@@ -8,8 +8,12 @@
 #ifndef ControlSampleEvent_h
 #define ControlSampleEvent_h
 
+//C++
+#include <iostream>
+//ROOT
 #include <TROOT.h>
 #include <TChain.h>
+#include <TRandom3.h>
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
@@ -290,6 +294,17 @@ Long64_t ControlSampleEvent::LoadTree(Long64_t entry)
 template < typename retType >
 retType ControlSampleEvent::GetVarVal( TString varName )
 {
+  auto deltaPhi = [](double phi1, double phi2) {
+    double dphi = phi1-phi2;
+    while (dphi > TMath::Pi())
+      dphi -= TMath::TwoPi();
+    while (dphi <= -TMath::Pi())
+      dphi += TMath::TwoPi();
+    return dphi;
+  };
+  
+  TRandom3 r3(0);
+  
   if ( varName == "option" ) return option;
   if ( varName == "weight" ) return weight;
   if ( varName == "run" ) return run;
@@ -382,30 +397,16 @@ retType ControlSampleEvent::GetVarVal( TString varName )
   if ( varName == "lep2Phi" ) return lep2->Phi();
   if ( varName == "lep2E" ) return lep2->E();
   if ( varName == "MR*Rsq" ) return MR*Rsq;
-  if ( varName == "MyMT_lep1" )
+  if ( varName == "MyMT_lep1" ) return sqrt( 2*MET*lep1->Pt()*( 1.-cos( deltaPhi( lep1->Phi(), METPhi) ) ) );
+  if ( varName == "MyMT_lep2" ) return sqrt( 2*MET*lep2->Pt()*( 1. - cos( deltaPhi( lep2->Phi(), METPhi) ) ) );
+  if ( varName == "MyMT_rnd" ) 
     {
-      auto deltaPhi = [](double phi1, double phi2) {
-	double dphi = phi1-phi2;
-	while (dphi > TMath::Pi())
-	  dphi -= TMath::TwoPi();
-	while (dphi <= -TMath::Pi())
-	  dphi += TMath::TwoPi();
-	return dphi;
-      };
-      return sqrt( 2*MET*lep1->Pt()*( 1.-cos( deltaPhi( lep1->Phi(), METPhi) ) ) );
-    }
-  if ( varName == "MyMT_lep2" ) 
-    {
-      auto deltaPhi = [](double phi1, double phi2) {
-        double dphi = phi1-phi2;
-        while (dphi > TMath::Pi())
-          dphi -= TMath::TwoPi();
-        while (dphi <= -TMath::Pi())
-          dphi += TMath::TwoPi();
-        return dphi;
-      };
+      int pickLepton = r3.Integer(2);
+      if ( pickLepton == 0 ) return sqrt( 2*MET*lep1->Pt()*( 1.-cos( deltaPhi( lep1->Phi(), METPhi) ) ) );
       return sqrt( 2*MET*lep2->Pt()*( 1. - cos( deltaPhi( lep2->Phi(), METPhi) ) ) );
     }
+  
+      
   
   return (float)-666.;
   //if ( varName == "genlep1" ) return genlep1;
