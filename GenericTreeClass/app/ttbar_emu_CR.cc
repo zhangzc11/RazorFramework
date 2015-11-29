@@ -1,6 +1,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <map>
+#include <assert.h>
 //ROOT INCLUDES
 #include <TString.h>
 #include <THStack.h>
@@ -50,7 +51,7 @@ const float lumi = 2100.;
 
 //TString ZLL_cut = "(abs(lep1Type) == 13 && abs(lep2Type) == 13) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 60. && mll < 120.";
 
-TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20. && MR>300 ";
+TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20.";
 
 TString dataTrigger = "(HLTDecision[2] == 1 || HLTDecision[7] == 1 || HLTDecision[12] == 1 || HLTDecision[11] == 1 || HLTDecision[15] == 1 || HLTDecision[22] == 1 || HLTDecision[23] == 1 || HLTDecision[24] == 1 || HLTDecision[25] == 1 || HLTDecision[26] == 1 || HLTDecision[27] == 1 || HLTDecision[28] == 1 || HLTDecision[29] == 1)";
 
@@ -76,6 +77,14 @@ int main ( int argc, char* argv[] )
   //----------------------
   TFile* puFile = new TFile("/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorAnalyzer/data/PileupReweight_Spring15MCTo2015Data.root");
   TH1D* puweightHist = (TH1D*)puFile->Get("PileupReweight");
+  assert(puweightHist);
+  
+  //-------------
+  //b-tagging eff
+  //-------------
+  TFile* btagEffFile = new TFile("/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorFramework/Aux/data/BTagEffFastsimToFullsimCorrectionFactors.root ");
+  TH2D* btagEffHist = (TH2D*)btagEffFile->Get("BTagEff_Medium_Fullsim");
+  assert(btagEffHist);
   
   //------------------------------------------------
   //Map Containing the lists for different processes
@@ -97,13 +106,17 @@ int main ( int argc, char* argv[] )
 
   //const int nplots = 11;
   TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
-  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
+  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_times_Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
   TString plotLabels[] = {"M_{R} (GeV)", "R^{2}", "NJets_{40}", "m_{ll} (GeV)", "HT (GeV)", "MET (GET)", "NBJets_{M}", "p_{T}^{l_{1}} (GeV)", "M_{R}*R^{3} (GeV)", "M_{T}^{l_{1}} (GeV)", "M_{T}^{l_{2}} (GeV)", "M_{T}^{l_{rnd}} (GeV)"};
+  TString plots2D[]     = {"MR,Rsq"};//parsing needs comma separated values
+  TString plotNames2D[] = {"MR_vs_Rsq"};
+  
   TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
   int varNamesLen = sizeof(varNames)/sizeof(TString);
-  int nplots = sizeof(plots)/sizeof(TString);
+  int nplots   = sizeof(plots)/sizeof(TString);
+  int nplots2D = sizeof(plots2D)/sizeof(TString);
   
   //-----------------------------
   //P r i n t   P l o t   I n f o  
@@ -136,6 +149,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  listGTC[myMap.first] = new GenericTreeClass( cutTree, myMap.first, "dummy");
 	  listGTC[myMap.first]->SetPuHisto( puweightHist );
+	  listGTC[myMap.first]->SetBtagEffHisto( btagEffHist );
+	  listGTC[myMap.first]->SetBtagCalibrator("/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorFramework/Aux/data/CSVv2.csv");
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[0], plots[0], 50, 200, 2700 );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[1], plots[1], 20, 0, 1.0 );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[2], plots[2], 10, 0, 10 );
@@ -148,6 +163,8 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[9], plots[9], 100, 0, 500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[11], plots[11], 100, 0, 500. );
+	  //2D plots
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames2D[0], plots2D[0], N_HighPt, MR_HighPt, N_HighPt, Rsq_HighPt );
 	  listGTC[myMap.first]->PrintStoredHistos();
 	  listGTC[myMap.first]->DeActivateAllBranches();
 	  for( int i  = 0; i < varNamesLen; i ++ )listGTC[myMap.first]->ActivateBranch( varNames[i] );
@@ -212,20 +229,48 @@ int main ( int argc, char* argv[] )
       std::cout << "data: " << data->Integral() << " mc: " << mc->Integral() << std::endl;
       MakeStackPlot( stack, data, mc, plots[i], "plots/" + plotNames[i] + "_" + "INCLUSIVE", leg, plotLabels[i] );
     }
+
+
+  std::map< TString, TH2D* > MR_Rsq_histoMap;
+  for ( auto tmp : listGTC )
+    {
+      if ( MR_Rsq_histoMap.find( tmp.first ) == MR_Rsq_histoMap.end() )
+	{
+	  MR_Rsq_histoMap[tmp.first] = new TH2D( *tmp.second->map_2D_Histos[ std::make_pair(plotNames2D[0],plots2D[0]) ] );
+	  if ( tmp.first != "data" ) MR_Rsq_histoMap[tmp.first]->Scale( lumi );
+	}
+      else
+	{
+	  std::cerr << "[WARNING]: repeated process-> " << tmp.first << std::endl;
+	}
+    }
+  for ( auto tmp : MR_Rsq_histoMap )
+    {
+      std::cout << tmp.first << " Yield: " << tmp.second->Integral() << std::endl;
+    }
   
 
   TFile* fout = new TFile("fout_test.root", "RECREATE");
   for( auto process : listGTC )
     {
+      std::string processName = process.first;
+      Process myprocess = GetProcessString( process.first );
       for ( int i = 0; i < nplots; i++)
 	{
-	  std::string processName = process.first;
-	  Process myprocess = GetProcessString( process.first );
 	  TH1D* tmp_h  = new TH1D( *(process.second->map_1D_Histos[ std::make_pair(plotNames[i],plots[i]) ]) );
 	  if ( myprocess != Process::data ) tmp_h->Scale( lumi );
 	  TString pName = "_" + plotNames[i];
 	  tmp_h->Write( processName.c_str() + pName );
 	}
+      
+      for ( int i = 0; i < nplots2D; i++)
+        {
+          TH2D* tmp_h  = new TH2D( *(process.second->map_2D_Histos[ std::make_pair(plotNames2D[i],plots2D[i]) ]) );
+          if ( myprocess != Process::data ) tmp_h->Scale( lumi );
+          TString pName = "_" + plotNames2D[i];
+          tmp_h->Write( processName.c_str() + pName );
+        }
+      
     }
   fout->Close();
   

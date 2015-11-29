@@ -34,6 +34,15 @@ GenericTreeClass::GenericTreeClass( TTree* tree, TString processName, TString bo
     {
       this->boxName = boxName;
     }
+  
+  this->calib = BTagCalibration("csvv2", "/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorFramework/Aux/data/CSVv2.csv");
+  this->reader = BTagCalibrationReader(&calib,               // calibration instance
+				       BTagEntry::OP_LOOSE,  // operating point
+				       "mujets",               // measurement type
+				       "central");           // systematics type
+  this->reader_up = BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "mujets", "up");  // sys up
+  this->reader_do = BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "mujets", "down");  // sys down
+  
 };
 
 GenericTreeClass::~GenericTreeClass()
@@ -57,6 +66,35 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
     }
 };
 
+void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, int nbins_x, float* x_binning, int nbins_y, float* y_binning )
+{
+  TH2D* _h = new TH2D( histoName+"_"+this->processName, histoName, nbins_x, x_binning, nbins_y, y_binning );
+  std::pair<TString, TString> mypair = std::make_pair(histoName, varName);
+  //Filling 2d histo map
+  if ( map_2D_Histos.find( mypair ) == map_2D_Histos.end() )
+    {
+      map_2D_Histos[ mypair ] = _h;
+    }
+  else
+    {
+      std::cout << "[WARNING]: trying to create histo with variable already used, DO NOTHING" << std::endl;
+    }
+};
+
+std::pair<TString, TString> GenericTreeClass::SplitVarNames2D( TString varNames )
+{
+  std::stringstream mySS;
+  mySS << varNames;
+  std::string myS = mySS.str();
+  int commaPlace = myS.find(",");
+  std::string firstVar = myS.substr(0,commaPlace);
+  std::string secondVar = myS.substr( commaPlace+1, myS.size() );
+  TString firstTS = firstVar.c_str();
+  TString secondTS = secondVar.c_str();
+  std::pair<TString, TString> mypair = std::make_pair( firstTS, secondTS );
+  return mypair;
+};
+
 void GenericTreeClass::PrintStoredHistos()
 {
   std::cout << map_1D_Histos.size() << std::endl;
@@ -71,11 +109,6 @@ void GenericTreeClass::CreateGenericHisto( TString histoName, TString varName, i
 
 void GenericTreeClass::Loop()
 {
-  /*
-  TFile* puFile = new TFile("/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorAnalyzer/data/PileupReweight_Spring15MCTo2015Data.root");
-  TH1D* puweightHist = (TH1D*)puFile->Get("PileupReweight");
-  */
-  
   std::cout << "loop begins" << std::endl; 
   if (fChain == 0) return;
   
@@ -89,24 +122,26 @@ void GenericTreeClass::Loop()
 
     if(jentry % 100000 == 0) std::cout << "Processing entry " << jentry<<std::endl;
     
-    //tmp2 = lep1->Eta();
-    //std::cout << "lep1: " << lep1->Eta() << std::endl;
-    //std::cout << "lep2: " << lep2->Eta() << std::endl;
-    //auto PdotP = []( TLorentzVector* p1, TLorentzVector* p2 ){ return p1->Dot( *p2 ); };
-    
+    double puWeight = puweightHist->GetBinContent( puweightHist->GetXaxis()->FindFixBin( NPU_0 ) );
+    if( this->processName == "data" && this->processName == "Data" && this->processName == "DATA" )
+      {
+	puWeight = 1.0;
+	weight = 1.0;
+      }
+    //Filling 1D Histos
     for ( auto& tmp : map_1D_Histos )
       {
 	float varVal= GetVarVal<float>(tmp.first.second);
-	if( this->processName != "data" && this->processName != "Data" && this->processName != "DATA" )
-	  {
-	    double puWeight = puweightHist->GetBinContent( puweightHist->GetXaxis()->FindFixBin( NPU_0 ) );
-	    if ( varVal != -666. ) tmp.second->Fill( varVal, weight*puWeight );
-	  }
-	else
-	  {
-	    //data
-	    if ( varVal != -666. ) tmp.second->Fill( varVal );
-	  }
+	if ( varVal != -666. ) tmp.second->Fill( varVal, weight*puWeight );
+      }
+    //Filling 2D histos
+    for ( auto& tmp : map_2D_Histos )
+      {
+	//std::cout << "2D VarNames: " << tmp.first.second << std::endl;
+	std::pair<TString, TString> mypair = SplitVarNames2D( tmp.first.second );
+	double var1 = GetVarVal<float>( mypair.first );
+	double var2 = GetVarVal<float>( mypair.second );
+	tmp.second->Fill( var1, var2, weight*puWeight );
       }
     // if (Cut(ientry) < 0) continue;
   }
@@ -154,4 +189,31 @@ void GenericTreeClass::Loop()
       std::cout << tmp.first.second << " Yield: " << tmp.second->Integral() << std::endl;
     }
   
+};
+
+void GenericTreeClass::SetBtagCalibrator( std::string btagFile )
+{
+  this->calib = BTagCalibration("csvv2", btagFile);
+  this->reader = BTagCalibrationReader(&calib,               // calibration instance
+				       BTagEntry::OP_MEDIUM,  // operating point
+				       "mujets",               // measurement type
+				       "central");           // systematics type
+  this->reader_up = BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
+  this->reader_do = BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down 
+
+};
+
+double GenericTreeClass::GetBtagWeight()
+{
+  
+  if( this->processName != "data" && this->processName != "Data" && this->processName != "DATA" ) return 1.0;
+  /*
+  if ( abs(jetPartonFlavor[i]) == 5 && abs(jetEta[i]) < 2.4 && jetCorrPt > 40 )//NOTE: b-tags only go on 40 GeV jets (this may change)
+    {
+      double effMedium = btagMediumEfficiencyHist->GetBinContent(
+								 btagMediumEfficiencyHist->GetXaxis()->FindFixBin(fmax(fmin(jetCorrPt,199.9),10.0)),
+								 btagMediumEfficiencyHist->GetYaxis()->FindFixBin(fabs(jetEta[i])));
+    }
+  */
+  return 1.0;
 };
