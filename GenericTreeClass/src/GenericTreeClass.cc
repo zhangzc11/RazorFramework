@@ -123,16 +123,19 @@ void GenericTreeClass::Loop()
     if(jentry % 100000 == 0) std::cout << "Processing entry " << jentry<<std::endl;
     
     double puWeight = puweightHist->GetBinContent( puweightHist->GetXaxis()->FindFixBin( NPU_0 ) );
-    if( this->processName == "data" && this->processName == "Data" && this->processName == "DATA" )
+    if( this->processName == "data" || this->processName == "Data" || this->processName == "DATA" )
       {
 	puWeight = 1.0;
 	weight = 1.0;
+	btagW  = 1.0;
       }
     //Filling 1D Histos
+    //std::cout << "process: " << this->processName << std::endl;
+    //std::cout << "puWeight " << puWeight << " " << weight << " " << btagW << std::endl;
     for ( auto& tmp : map_1D_Histos )
       {
 	float varVal= GetVarVal<float>(tmp.first.second);
-	if ( varVal != -666. ) tmp.second->Fill( varVal, weight*puWeight );
+	if ( varVal != -666. ) tmp.second->Fill( varVal, weight*puWeight*btagW );
       }
     //Filling 2D histos
     for ( auto& tmp : map_2D_Histos )
@@ -141,7 +144,7 @@ void GenericTreeClass::Loop()
 	std::pair<TString, TString> mypair = SplitVarNames2D( tmp.first.second );
 	double var1 = GetVarVal<float>( mypair.first );
 	double var2 = GetVarVal<float>( mypair.second );
-	tmp.second->Fill( var1, var2, weight*puWeight );
+	tmp.second->Fill( var1, var2, weight*puWeight*btagW );
       }
     // if (Cut(ientry) < 0) continue;
   }

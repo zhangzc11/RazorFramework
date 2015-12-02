@@ -31,6 +31,9 @@ public :
    // Declaration of leaf types
    Int_t           option;
    Float_t         weight;
+   Float_t         btagW;
+   Float_t         btagW_up;
+   Float_t         btagW_down;
    UInt_t          run;
    UInt_t          lumi;
    UInt_t          event;
@@ -124,6 +127,9 @@ public :
    // List of branches
    TBranch        *b_option;   //!
    TBranch        *b_weight;   //!
+   TBranch        *b_btagW;  //!
+   TBranch        *b_btagW_up;  //! 
+   TBranch        *b_btagW_down;  //! 
    TBranch        *b_run;   //!
    TBranch        *b_lumi;   //!
    TBranch        *b_event;   //!
@@ -309,6 +315,9 @@ retType ControlSampleEvent::GetVarVal( TString varName )
   
   if ( varName == "option" ) return option;
   if ( varName == "weight" ) return weight;
+  if ( varName == "btagW" ) return btagW;
+  if ( varName == "btagW_up" ) return btagW_up;
+  if ( varName == "btagW_down" ) return btagW_down;
   if ( varName == "run" ) return run;
   if ( varName == "lumi" ) return lumi;
   if ( varName == "event" ) return event;
@@ -407,6 +416,12 @@ retType ControlSampleEvent::GetVarVal( TString varName )
       if ( pickLepton == 0 ) return sqrt( 2*MET*lep1->Pt()*( 1.-cos( deltaPhi( lep1->Phi(), METPhi) ) ) );
       return sqrt( 2*MET*lep2->Pt()*( 1. - cos( deltaPhi( lep2->Phi(), METPhi) ) ) );
     }
+  if( varName == "ttRecoil" ) 
+    {
+      TLorentzVector visTT = *lep1 + *lep2 + *bjet1 + *bjet2;
+      TVector3 met( MET*cos(METPhi), MET*sin(METPhi), .0 );
+      return (visTT.Vect() + met).Pt();
+    }
   
       
   
@@ -448,6 +463,9 @@ void ControlSampleEvent::Init(TTree *tree)
 
    fChain->SetBranchAddress("option", &option, &b_option);
    fChain->SetBranchAddress("weight", &weight, &b_weight);
+   fChain->SetBranchAddress("btagW", &btagW, &b_btagW);
+   fChain->SetBranchAddress("btagW_up", &btagW_up, &b_btagW_up);
+   fChain->SetBranchAddress("btagW_down", &btagW_down, &b_btagW_down);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("event", &event, &b_event);
