@@ -51,7 +51,7 @@ const float lumi = 2100.;
 
 //TString ZLL_cut = "(abs(lep1Type) == 13 && abs(lep2Type) == 13) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 60. && mll < 120.";
 
-TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20.";
+TString emu_cut = "( (abs(lep1Type) == 11 && abs(lep2Type) == 13) || (abs(lep1Type) == 13 && abs(lep2Type) == 11) ) && lep1.Pt() > 30. && lep2.Pt() > 30.  && lep1PassTight == 1 && lep2PassTight == 1 && mll > 20. && jet1PassCSVMedium == 1 && jet2PassCSVMedium == 1";
 
 TString dataTrigger = "(HLTDecision[2] == 1 || HLTDecision[7] == 1 || HLTDecision[12] == 1 || HLTDecision[11] == 1 || HLTDecision[15] == 1 || HLTDecision[22] == 1 || HLTDecision[23] == 1 || HLTDecision[24] == 1 || HLTDecision[25] == 1 || HLTDecision[26] == 1 || HLTDecision[27] == 1 || HLTDecision[28] == 1 || HLTDecision[29] == 1)";
 
@@ -105,13 +105,28 @@ int main ( int argc, char* argv[] )
 
 
   //const int nplots = 11;
-  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
-  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_times_Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd"};
-  TString plotLabels[] = {"M_{R} (GeV)", "R^{2}", "NJets_{40}", "m_{ll} (GeV)", "HT (GeV)", "MET (GET)", "NBJets_{M}", "p_{T}^{l_{1}} (GeV)", "M_{R}*R^{3} (GeV)", "M_{T}^{l_{1}} (GeV)", "M_{T}^{l_{2}} (GeV)", "M_{T}^{l_{rnd}} (GeV)"};
+  
+  //VarName in ControlSampleEvent
+  TString plots[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR*Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd", "ttRecoil"};
+  //Plot File Name
+  TString plotNames[] = {"MR", "Rsq", "NJets40", "mll", "HT", "MET", "NBJetsMedium", "lep1Pt", "MR_times_Rsq", "MyMT_lep1", "MyMT_lep2", "MyMT_rnd", "ttRecoil"};
+  //Plot X label
+  TString plotLabels[] = {"M_{R} (GeV)", "R^{2}", "NJets_{40}", "m_{ll} (GeV)", "HT (GeV)", "MET (GET)", "NBJets_{M}", "p_{T}^{l_{1}} (GeV)", "M_{R}*R^{3} (GeV)", "M_{T}^{l_{1}} (GeV)", "M_{T}^{l_{2}} (GeV)", "M_{T}^{l_{rnd}} (GeV)", "P_{T}^{t#bar{t}} (GeV)"};
+  
+  //------------
+  // 2D plots
+  //------------
   TString plots2D[]     = {"MR,Rsq"};//parsing needs comma separated values
   TString plotNames2D[] = {"MR_vs_Rsq"};
   
-  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "NPU_0"};
+  //----------------------------
+  // Var to be activated in Tree
+  //----------------------------
+  TString varNames[] = {"MR", "Rsq", "NJets40", "lep1", "lep2", "bjet1", "bjet2",  "mll", "HT", "MET", "METPhi", "NBJetsMedium", "weight", "btagW", "NPU_0"};
+
+  //-----------------------
+  //This is all the Magic!!
+  //-----------------------
   std::map < std::string, TChain* > processNtuples;
   std::map < std::string, GenericTreeClass* > listGTC;
   int varNamesLen = sizeof(varNames)/sizeof(TString);
@@ -121,13 +136,12 @@ int main ( int argc, char* argv[] )
   //-----------------------------
   //P r i n t   P l o t   I n f o  
   //-----------------------------
-
   std::cout << "[INFO]: number of variables activated " << varNamesLen << std::endl;
   std::cout << "[INFO]: number of plots to be made " << nplots << std::endl;
   
-  //----------------                                                                                                     
+  //----------------
   //DummyRootFile
-  //----------------                                                                                                     
+  //----------------
   TFile* ftmp = new TFile("ftmp.root", "RECREATE");
   for( auto& myMap : mapList )
     {
@@ -163,6 +177,7 @@ int main ( int argc, char* argv[] )
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[9], plots[9], 100, 0, 500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[10], plots[10], 100, 0, 500. );
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames[11], plots[11], 100, 0, 500. );
+	  listGTC[myMap.first]->CreateGenericHisto( plotNames[12], plots[12], 200, 0, 1000. );
 	  //2D plots
 	  listGTC[myMap.first]->CreateGenericHisto( plotNames2D[0], plots2D[0], N_HighPt, MR_HighPt, N_HighPt, Rsq_HighPt );
 	  listGTC[myMap.first]->PrintStoredHistos();
