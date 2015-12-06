@@ -40,9 +40,14 @@
 RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  /*RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(57);
-  mgg.setRange( "signal", 120, 130. );
+  mgg.setRange( "signal", 120, 130. );*/
+  
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 100, 1000, "GeV" );
+  mgg.setBins(180);
+  mgg.setRange( "signal", 650, 850. );
+  
   //C r e a t e  doubleGaus
   TString tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
   //ws->var("dGauss_signal_gauss_Ns")->setVal( 1600 );
@@ -180,14 +185,36 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
 
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
-  RooWorkspace* ws = new RooWorkspace( "wsb", "" );
+
+  //------------------------------------
+  // C r e a t e   s i g n a l  s h a p e
+  //------------------------------------
   
-  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  //Getting signal shape from MC
+  TFile* fsignal = new TFile("signalModels/RSGraviton_750GeV.root", "read");
+  RooWorkspace* wsignal = (RooWorkspace*)fsignal->Get("w_sFit");
+  RooAbsPdf* signalPdf = wsignal->pdf("dGauss_signal_doublegauss");
+  double gausFrac   =  wsignal->var("dGauss_signal_frac")->getVal();
+  double gausMu     =  wsignal->var("dGauss_signal_gauss_mu")->getVal();
+  double gausSigma1 =  wsignal->var("dGauss_signal_gauss_sigma1")->getVal();
+  double gausSigma2 =  wsignal->var("dGauss_signal_gauss_sigma2")->getVal();
+
+  delete fsignal;
+  //fsignal->Close();
+  
+  TFile* ftmp = new TFile("tmp_output_OurID.root", "recreate");
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  /*  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(38);
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 131, 160);
-  mgg.setRange("signal", 103, 160);
-
+  mgg.setRange("signal", 103, 160);*/
+  
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 220, 1000, "GeV" );
+  mgg.setBins(39);
+  mgg.setRange( "signal", 650, 850. );
+  mgg.setRange("high", 850, 1000);
+  mgg.setRange("low", 220, 650);
   //--------------------------------
   //I m p or t i n g   D a t a
   //--------------------------------
@@ -196,28 +223,53 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   //------------------------------------
   // C r e a t e   b k g  s h a p e
   //------------------------------------
-  TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_bkg", mgg, *ws );
-  //------------------------------------
-  // C r e a t e   b k g  s h a p e
-  //------------------------------------
-  TString tag_signal = MakeDoubleGauss( "fullsb_fit_signal", mgg, *ws );
+  //TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_bkg", mgg, *ws );
+  TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_doubleExp", mgg, *ws );
+  //TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  TString tag_bkg2 = MakeSingleExp( "fullsb_fit_singleExp2", mgg, *ws );
+  
+  
+  std::cout << "reading model from file" << std::endl;
+  //Define arbitrarily a double gaussian
+  //TString tag_signal = MakeDoubleGauss( "doubleGaussSB1", mgg, *ws );
+  TString tag_signal2 = MakeDoubleGauss( "doubleGaussSB", mgg, *ws );
 
-  //RooAddPdf* model = new ( "model", "model", RooFit::RooArgList( *ws->pdf( tag_signal ), *ws->pdf( tag_bkg ) ) ) ;
-  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal ), *ws->pdf( tag_bkg ) ) ) ;
+  std::cout << "creating s+b model" << std::endl;
+  //---------------
+  //S+B  m  o d e l
+  //---------------
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg ) ) ) ;
+  //RooAddPdf* model2 = new RooAddPdf( "model2", "model2", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  //Fixing gaussian parameter for 2nd model
+  ws->var("doubleGaussSB_gauss_Ns")->setVal( 0 );
+  ws->var("doubleGaussSB_frac")->setVal( gausFrac );
+  ws->var("doubleGaussSB_gauss_mu")->setVal( gausMu );
+  ws->var("doubleGaussSB_gauss_sigma1")->setVal( gausSigma1 );
+  ws->var("doubleGaussSB_gauss_sigma2")->setVal( gausSigma2 );
+  ws->var("doubleGaussSB_gauss_Ns")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_frac")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_gauss_mu")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_gauss_sigma1")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_gauss_sigma2")->setConstant(kTRUE);
 
+  std::cout << "entering constraints" << std::endl;
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
   //--------------------------------------
+  /*
   RooRealVar HiggsMass("HiggsMass","",128.7);
   RooRealVar HiggsMassError("HiggsMassError","",0.4);
   RooGaussian HiggsMassConstraint("HiggsMassConstraint","", *ws->var("fullsb_fit_signal_gauss_mu"),HiggsMass,HiggsMassError);
-
+  std::cout << "pass constraints" << std::endl;
+  std::cout << "entering forceSigma" << std::endl;
   if( forceSigma != -1 ) {
     ws->var("fullsb_fit_signal_gauss_sigma1")->setVal( forceSigma );
     ws->var("fullsb_fit_signal_gauss_sigma1")->setConstant(true);
     ws->var("fullsb_fit_signal_frac")->setVal( 1.0 );
     ws->var("fullsb_fit_signal_frac")->setConstant(true);
   }
+  */
+  std::cout << "pass forceSigma" << std::endl;
 
   //---------------------
   //F i t   t o   D a t a
@@ -225,6 +277,10 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   
   model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  
+  //model2->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  //RooFitResult* bres2 = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+ 
 
   //-------------------------------------
   //P r o f i l e d   L i k e l i h o o d 
@@ -232,7 +288,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   /*
     profile in Ns to obtain significance.
   */
-  RooArgSet poi   = RooArgSet( *ws->var("fullsb_fit_signal_gauss_Ns") );
+  RooArgSet poi   = RooArgSet( *ws->var("doubleGaussSB_gauss_Ns") );
   RooAbsReal* nll = model->createNLL(data);
   RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
   RooAbsReal* p2ll = n2ll.createProfile( poi );
@@ -242,6 +298,9 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
   RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
   */
+  //--------------------------------
+  // m o d e l   1   p l o t t i n g
+  //--------------------------------
   RooPlot *fmgg = mgg.frame();
   data.plotOn(fmgg);
   model->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
@@ -250,14 +309,32 @@ RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu,
   ws->import( *model );
   ws->import( *bres );
   ws->import( *fmgg );
+  
+  //--------------------------------
+  // m o d e l   2   p l o t t i n g
+  //--------------------------------
+  /*
+  RooPlot *fmgg2 = mgg.frame();
+  data.plotOn(fmgg2);
+  model2->plotOn(fmgg2,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  model2->plotOn(fmgg2,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg2->SetName( "fullsb_fit_frame2" );
+  ws->import( *model2 );
+  ws->import( *bres2 );
+  ws->import( *fmgg2 );*/
 
-  RooPlot* fns = ws->var("fullsb_fit_signal_gauss_Ns")->frame( RooFit::Range(0, 20, true) );
+  //--------------------------------------
+  // l i k e l i h o o d   p l o t t i n g
+  //--------------------------------------
+  RooPlot* fns = ws->var("doubleGaussSB_gauss_Ns")->frame( RooFit::Range(0, 20, true) );
   fns->SetMinimum(0);
   fns->SetMaximum(6);
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
   p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
   fns->SetName("nll_trick");
   ws->import( *fns );
+  ws->Write("w_sb");
+  ftmp->Close();
   return ws;
 };
 
