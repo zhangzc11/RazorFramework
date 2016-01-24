@@ -223,9 +223,9 @@ int main ( int argc, char* argv[] )
   HggRazorClass* hggclass;
   THStack* stack;
   TLegend* leg;
-  TH1F* data;
-  TH1F* mc;
-  TH1F* mc2 = new TH1F();
+  TH1D* data;
+  TH1D* mc;
+  TH1D* mc2 = new TH1D();
 
   const int nprocesses = 2;
   const int nplots = 4;
@@ -304,17 +304,17 @@ int main ( int argc, char* argv[] )
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
-	      TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
+	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      if ( histos[i].process == Process::data )
 		{
-		  data = new TH1F ( *h_s ); 
+		  data = new TH1D ( *h_s ); 
 		}
 	      else
 		{
 		  stack->Add( h_s, "histo" );
 		  if ( mc == NULL || _isFirstMC )
 		    {
-		      mc = new TH1F( *h_s );
+		      mc = new TH1D( *h_s );
 		      _isFirstMC = false;
 		    }
 		  else
@@ -432,12 +432,12 @@ int main ( int argc, char* argv[] )
 		  std::cout << "DEB "<< std::endl;
 		  TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 		  std::cout << "DEB "<< std::endl;
-		  TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
+		  TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 		  std::cout << "DEB "<< std::endl;
 		  if ( histos[i].process == Process::data )
 		    {
 		      std::cout << "DEBdata "<< std::endl;
-		      data = new TH1F ( *h_s ); 
+		      data = new TH1D ( *h_s ); 
 		    }
 		  else
 		    {
@@ -445,7 +445,7 @@ int main ( int argc, char* argv[] )
 		      if ( mc == NULL || _isFirstMC )
 			{
 			  std::cout << "creating mc" << std::endl;
-			  mc = new TH1F( *h_s );
+			  mc = new TH1D( *h_s );
 			  _isFirstMC = false;
 			}
 		      else
