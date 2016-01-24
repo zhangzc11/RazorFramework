@@ -438,6 +438,7 @@ void HggRazorClass::Loop()
       // if (Cut(ientry) < 0) continue;
       //double w = xsecSF*hggBF;
       double w;
+      xsecSF = 1.0;
       if ( this->processName == "data" )
 	{
 	  w = 1.0;

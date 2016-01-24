@@ -143,10 +143,10 @@ float lres_k[2] = { 1.0, 1.0};
 //-----------------------------------
 //DATA
 //GammaGamma
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65] && pho1passIso == 1 && pho2passIso == 1";
+TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
 //EBEB
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -157,11 +157,11 @@ TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 
 
 //MC
 //GammaGamma
-//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70] && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
 //Zee
 //EBEB
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -227,7 +227,7 @@ int main ( int argc, char* argv[] )
   TH1D* mc;
   TH1D* mc2 = new TH1D();
 
-  const int nprocesses = 2;
+  const int nprocesses = 3;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
@@ -240,6 +240,7 @@ int main ( int argc, char* argv[] )
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
+	  std::cout << "---------> PROCESS: " << processName << " ,process #: " << ctr << std::endl;
 	  //-----------------------------
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
@@ -247,9 +248,8 @@ int main ( int argc, char* argv[] )
 	  AddTChain( chain, mapList[processName] );
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
-	  if ( process == Process::ggH || process == Process::vbfH || process == Process::vH || process == Process::ttH ) continue;
-	  if ( process == Process::qcd || process == Process::diphoton ) continue;
-	  std::cout << "---------> PROCESS: " << processName << " ctr: " << ctr << std::endl;
+	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet) ) continue;
+	  	  
 	  if ( chain == NULL )
 	    {
 	      std::cout << "[WARNING]: Empty selected tree in process: " << processName << std::endl;
@@ -284,30 +284,36 @@ int main ( int argc, char* argv[] )
 	  //-----------------------------
 	  //Assigning Histograms to Array
 	  //-----------------------------
+	  std::cout << "DEB3" << std::endl;
 	  for ( const auto& htmp : HistoTypes() )
 	    {
+	      std::cout << GetHistoTypesString( htmp ) << std::endl;
 	      TH1F h_scale = hggclass->GetHisto( htmp );
 	      //if ( run == "run2" ) h_scale.Scale( k_f ); 
 	      histos[ctr].AssignHisto( htmp, h_scale );
 	    }
+	  std::cout << "DEB4" << std::endl;
 	  ctr++;
 	}
       //---------------
       //P l o t t i n g
       //---------------
+      std::cout << "PLOTTING" << std::endl;
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::string histoName = GetHistoTypesString( htmp );
+	  std::cout << "histoName: " << histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
 	  bool _isFirstMC = true;
+	  std::cout << "deb1: " << histoName << std::endl;
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      if ( histos[i].process == Process::data )
 		{
-		  data = new TH1D ( *h_s ); 
+		  data = new TH1D ( *h_s );
 		}
 	      else
 		{
@@ -323,7 +329,8 @@ int main ( int argc, char* argv[] )
 		    }
 		}
 	      //std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
-	      //std::cout << "histo: " << histoName << "data->" << data->Integral() << " MC-> " << mc2->Integral() << std::endl;
+	       if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
+	       else std::cout << histoName << "-> " << mc->Integral() << std::endl;
 	      AddLegend( h_s, leg, histos[i].process );
 	      //
 	    }
