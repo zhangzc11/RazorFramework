@@ -60,6 +60,8 @@ bool Histos::AssignHisto( HistoTypes htype, TH1F h )
   if ( htype == HistoTypes::pho2sigmaEoverE ) pho2sigmaEoverE = h;
   
   if ( htype == HistoTypes::njets ) njets = h;
+  if ( htype == HistoTypes::unrollHighPt ) unrollHighPt = h;
+  if ( htype == HistoTypes::unrollHighRes ) unrollHighRes = h;
   return true;
 };
 
@@ -95,6 +97,8 @@ TH1F Histos::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::pho2sigmaEoverE ) return pho2sigmaEoverE;
   
   if ( htype == HistoTypes::njets ) return njets;
+  if ( htype == HistoTypes::unrollHighPt ) return unrollHighPt;
+  if ( htype == HistoTypes::unrollHighRes ) return unrollHighRes;
   return h;
 };
 
@@ -129,6 +133,8 @@ std::string GetHistoTypesString( HistoTypes htype )
   if ( htype == HistoTypes::pho2sigmaEoverE ) return "pho2sigmaEoverE";
   
   if ( htype == HistoTypes::njets ) return "njets";
+  if ( htype == HistoTypes::unrollHighPt ) return "unrollHighPt";
+  if ( htype == HistoTypes::unrollHighRes ) return "unrollHighRes";
   
   std::cerr << "[ERROR]: Htype not found" << std::endl;
   return "";
@@ -193,7 +199,11 @@ std::string GetProcessString( Process process )
     {
       return "gammaJet";
     }
-  else if( process == Process::data )
+  else if ( process == Process::signal )
+    {
+      return "signal";
+    }
+  else if ( process == Process::data )
     {
       return "data";
     }
@@ -270,6 +280,10 @@ Process GetProcessString( std::string process )
   else if( process == "gammaJet" )
     {
       return Process::gammaJet;
+    }
+  else if ( process == "signal" )
+    {
+      return Process::signal;
     }
   else if( process == "data" )
     {

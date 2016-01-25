@@ -52,6 +52,7 @@ public:
   bool InitNjets( );
   bool InitMrRsqHisto( );
   bool InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by );
+  bool IntUnrollHistos( );
   void Loop();
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h, double& err );
@@ -61,6 +62,8 @@ public:
   TH1F GetMgg();
   TH1F GetPtgg();
   TH1F GetHisto( HistoTypes htype );
+  float GetHighPtGB( double mr, double r2 );
+  float GetHighResGB( double mr, double r2 );
   static float GetHggBF( );
 private:
 
@@ -97,7 +100,28 @@ private:
   static float rsq_l;
   static float rsq_h;
   TH1F* h_rsq;
+  
+  //unroll plots
+  static int n_unroll_highPt;
+  TH1F* h_unroll_highPt;
+  
+  static int n_unroll_highRes;
+  TH1F* h_unroll_highRes;
 
+  static float highPt_MR[6];
+  static float highPt_R0[6];
+  static float highPt_R1[5];
+  static float highPt_R2[4];
+  static float highPt_R3[3];
+  static float highPt_R4[2];
+
+  static float highRes_MR[5];
+  static float highRes_R0[5];
+  static float highRes_R1[4];
+  static float highRes_R2[3];
+  static float highRes_R3[2];
+  
+  
   //--------------
   //P h o t o n  1
   //--------------

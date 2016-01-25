@@ -14,9 +14,9 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 60;
-float HggRazorClass::mgg_l = 60.;
-float HggRazorClass::mgg_h = 120.;
+int HggRazorClass::n_mgg = 38;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
 
 int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
@@ -33,6 +33,23 @@ float HggRazorClass::mr_h = 8130.;
 int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
+
+int HggRazorClass::n_unroll_highPt  = 15;
+int HggRazorClass::n_unroll_highRes = 10;
+
+float HggRazorClass::highPt_MR[6] = {150., 200., 300., 500., 1600., 10000.};
+float HggRazorClass::highPt_R0[6] = {0.0, 0.05, 0.1, 0.15, 0.2, 2.0};
+float HggRazorClass::highPt_R1[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highPt_R2[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highPt_R3[3] = {0.0, 0.05, 2.0};
+float HggRazorClass::highPt_R4[2] = {0.0, 2.0};
+
+float HggRazorClass::highRes_MR[5] = {150., 250., 400., 1400., 10000.};
+float HggRazorClass::highRes_R0[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highRes_R1[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highRes_R2[3] = {0.0, 0.05, 1.0};
+float HggRazorClass::highRes_R3[2] = {0.0, 2.0};
+
 
 //photon1
 int HggRazorClass::n_pho1pt = 70;
@@ -115,6 +132,7 @@ float HggRazorClass::pho2sumPhotonEt_h = 30.0;
 int HggRazorClass::n_pho2sigmaEoverE = 150;
 float HggRazorClass::pho2sigmaEoverE_l = .006;
 float HggRazorClass::pho2sigmaEoverE_h = .02;
+
 int HggRazorClass::n_njets = 11;
 float HggRazorClass::njets_l = .0;
 float HggRazorClass::njets_h = 10;
@@ -223,11 +241,13 @@ int main ( int argc, char* argv[] )
   HggRazorClass* hggclass;
   THStack* stack;
   TLegend* leg;
+  TLegend* leg2;
   TH1D* data;
+  TH1D* signal;
   TH1D* mc;
   TH1D* mc2 = new TH1D();
 
-  const int nprocesses = 3;
+  const int nprocesses = 4;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
@@ -248,7 +268,7 @@ int main ( int argc, char* argv[] )
 	  AddTChain( chain, mapList[processName] );
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
-	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet) ) continue;
+	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::signal) ) continue;
 	  	  
 	  if ( chain == NULL )
 	    {
@@ -302,11 +322,13 @@ int main ( int argc, char* argv[] )
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::string histoName = GetHistoTypesString( htmp );
-	  std::cout << "histoName: " << histoName << std::endl;
+	  //std::cout << "histoName: " << histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
+	  leg2 = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
 	  bool _isFirstMC = true;
-	  std::cout << "deb1: " << histoName << std::endl;
+	  //std::cout << "deb1: " << histoName << std::endl;
+	  float NormFactor = 1.0;//Scale mc to unity if required
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
@@ -314,10 +336,12 @@ int main ( int argc, char* argv[] )
 	      if ( histos[i].process == Process::data )
 		{
 		  data = new TH1D ( *h_s );
+		  data->Scale(1.0/data->Integral());
 		}
-	      else
+	      else if ( histos[i].process != Process::signal )
 		{
-		  stack->Add( h_s, "histo" );
+		  //stack->Add( h_s, "histo" );
+		  std::cout << "stacking " << GetProcessString( histos[i].process ) << std::endl;
 		  if ( mc == NULL || _isFirstMC )
 		    {
 		      mc = new TH1D( *h_s );
@@ -328,20 +352,32 @@ int main ( int argc, char* argv[] )
 		      mc->Add( h_s );
 		    }
 		}
+	      else
+		{
+		  signal = new TH1D ( *h_s );
+		  signal->Scale(1.0/signal->Integral());
+		}
 	      //std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
-	       if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
-	       else std::cout << histoName << "-> " << mc->Integral() << std::endl;
+	      //if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
+	      //else std::cout << histoName << "-> " << mc->Integral() << std::endl;
+	      
 	      AddLegend( h_s, leg, histos[i].process );
+	      if (  histos[i].process != Process::data ) AddLegend( h_s, leg2, histos[i].process );
 	      //
+	    }
+	  NormFactor = mc->Integral();
+	  mc->Scale(1.0/NormFactor);
+	  for (  int i  = 0; i < nprocesses; i++ )
+	    {
+	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
+	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
+	      h_s->Scale(1.0/NormFactor);
+	      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
+	       
 	    }
 	  if ( run == "run2" )
 	    {
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Resonant/" + histoName + "_" + boxName + "_Mr400_Rsq0p05_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + boxName + "_Mr200_Rsq0p02_Full", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + "INCLUSIVE" + "_Inclusive_Full", leg );
+	      MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
 	      MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
 	    }
 	}

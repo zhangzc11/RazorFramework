@@ -20,7 +20,7 @@ Boxes operator*( Boxes box );
 
 std::string GetBoxString( Boxes box );
 
-enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, top, vv, ww, zz, wz, data, unknown, Last };
+enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, top, vv, ww, zz, wz, signal,data, unknown, Last };
 struct Yields
 {
   float gammaJet[2];
@@ -40,7 +40,7 @@ Process& operator++( Process& process );
 Process operator*( Process process );
 std::string GetProcessString( Process process );
 
-enum class HistoTypes{ mr, rsq, mgg, ptgg, sigmaMoverM, pho1pt, pho1eta, pho1phi, pho1sigmaIetaIeta, pho1r9, pho1HoverE, pho1sumChargedHadronPt, pho1sumNeutralHadronEt, pho1sumPhotonEt, pho1sigmaEoverE, pho2pt, pho2eta, pho2phi, pho2sigmaIetaIeta, pho2r9, pho2HoverE, pho2sumChargedHadronPt, pho2sumNeutralHadronEt, pho2sumPhotonEt, pho2sigmaEoverE, njets, Last};
+enum class HistoTypes{ mr, rsq, mgg, ptgg, sigmaMoverM, pho1pt, pho1eta, pho1phi, pho1sigmaIetaIeta, pho1r9, pho1HoverE, pho1sumChargedHadronPt, pho1sumNeutralHadronEt, pho1sumPhotonEt, pho1sigmaEoverE, pho2pt, pho2eta, pho2phi, pho2sigmaIetaIeta, pho2r9, pho2HoverE, pho2sumChargedHadronPt, pho2sumNeutralHadronEt, pho2sumPhotonEt, pho2sigmaEoverE, njets, unrollHighPt, unrollHighRes, Last};
 HistoTypes begin( HistoTypes htype );
 HistoTypes end( HistoTypes htype );
 HistoTypes& operator++( HistoTypes& htype );
@@ -63,6 +63,8 @@ struct Histos
   Process process;
   TH1F mr;
   TH1F rsq;
+  TH1F unrollHighPt;
+  TH1F unrollHighRes;
   TH1F mgg;
   TH1F ptgg;
   TH1F sigmaMoverM;
