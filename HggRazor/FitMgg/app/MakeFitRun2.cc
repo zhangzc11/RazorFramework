@@ -203,9 +203,6 @@ int main( int argc, char* argv[])
     if (BinSelection == "14") BinCutString = " && MR > 1200  ";
   }
  
-
-
-
   //----------------
   // M a i n   C u t
   //----------------
@@ -235,7 +232,6 @@ int main( int argc, char* argv[])
       else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
- 
   //---------------------------------------------
   // A l e x ' s   T r e e   F o r m at   C a s e
   //---------------------------------------------
