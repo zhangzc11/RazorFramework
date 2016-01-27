@@ -1348,7 +1348,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
-  mgg.setBins(30);
+  mgg.setBins(38);
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 135, 160);
   mgg.setRange("Full", 103, 160);
@@ -1423,7 +1423,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
-  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
+  //double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
+  double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
   std::cout << "n -> " << n << std::endl;
   AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
   AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
