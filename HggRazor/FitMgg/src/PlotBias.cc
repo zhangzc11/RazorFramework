@@ -11,6 +11,7 @@
 #include <TLatex.h>
 #include <TStyle.h>
 #include <TAxis.h>
+#include <TF1.h>
 //RooFit
 #include <RooRealVar.h>
 #include <RooWorkspace.h>
@@ -138,8 +139,8 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   //-----------------------
   TFile* f = new TFile( fname.c_str() , "READ" );
   //Getting Workspace
-  //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
-  RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
+  RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  //RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
   RooRealVar* bias = w->var( var.c_str() );
   //Getting data_bias RooDataSet
@@ -148,7 +149,7 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   //-------------------------------------
   //D e f i n i n g   p l o t   r a n g e
   //-------------------------------------
-  double mean = data_bias->mean( *bias );
+  double mean = data_bias->meanVar( *bias )->getVal();
   double rms  = data_bias->rmsVar( *bias )->getVal();
 
   //-----------------------------------
@@ -161,7 +162,7 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   begin_s = end_s + 1;
   end_s   = fname.find( ".root" );
   std::string f2 = fname.substr( begin_s, end_s - begin_s);
-  std::cout << f1 << " f2: " << f2 <<   std::endl;
+  std::cout << "f1: "<< f1 << ", f2: " << f2 << ", mean = " << mean <<    std::endl;
   f->Close();
   return std::make_pair( mean, rms );
 };
@@ -173,8 +174,10 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
   std::stringstream ss_fl;//first line for table
   ss_fl << "--";
   for( const auto& fitf : FitFunction() )
+    //for( const auto& fitf : mymap )
     {
       std::string f1 = GetFitFunctionString( fitf );
+      //std::string f1 = fitf.first.first;
       std::stringstream ss;
       ss << f1; 
       ss.precision(1);
@@ -183,6 +186,11 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
       for( const auto& fitf2 : FitFunction() )
 	{
 	  std::string f2 = GetFitFunctionString( fitf2 );
+	  std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+	  if ( mymap.find( mypair ) == mymap.end() )
+	    {
+	      continue;
+	    }
 	  if ( row_ctr == 0 ) ss_fl << " & " << f2; 
 	  std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  //std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
@@ -204,4 +212,86 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
     }
   std::cout << "\\hline\n\n\\hline\n\\hline\n\\end{tabular}\n\\end{table}" << std::endl;
    return;
+};
+
+double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" )
+{
+  TFile* f = new TFile( fname , "READ" );
+  TTree* tree = (TTree*)f->Get("biasTree");
+  
+  //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+  tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff"); 
+  TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
+  double mean_val = hbias->GetMean();
+  
+  double _max = hbias->GetBinContent( hbias->GetMaximumBin() );
+  //double _xlow = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.5*_max ) );
+  //double _xhigh = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow );
+
+  double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
+  double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
+
+  double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
+  double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
+  
+ 
+  TCanvas *C = new TCanvas("c", "c",2119,33,800,700);
+  C->SetHighLightColor(2);
+  //C->Range(-0.6543224,-1290.871,3.177829,8696.391);
+  C->SetFillColor(0);
+  C->SetBorderMode(0);
+  C->SetBorderSize(2);
+  C->SetLeftMargin(0.16);
+  C->SetRightMargin(0.05);
+  C->SetTopMargin(0.07);
+  C->SetBottomMargin(0.12);
+  C->SetFrameBorderMode(0);
+  C->SetFrameBorderMode(0);
+  
+  TF1* gaus = new TF1( "gaus", "gaus(0)", _xlow, _xhigh );
+  hbias->Fit( gaus, "R");
+  //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
+  hbias->GetXaxis()->SetRangeUser( -4, 4 );
+  hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
+  std::cout << "Gaussian Mean: " << gaus->GetParameter(1) << std::endl;
+  hbias->SetStats( kFALSE );
+  hbias->Draw("e");
+  
+
+  //-----------------
+  //LATEX
+  //-----------------
+  float lumix = 0.92;
+  float lumiy = 0.85;
+  float lumifont = 42;
+   
+  float cmsx = 0.28;
+  float cmsy = 0.875;
+  TString CMSText = "CMS";
+  float cmsTextFont   = 61;  // default is helvetic-bold
+  float extrax = cmsx + 0.067;
+  float extray = cmsy - 0.04;
+  TString extraText   = "Preliminary";
+  float extraTextFont = 52;  // default is helvetica-italics
+  // ratio of "CMS" and extra text size
+  float extraOverCmsTextSize  = 0.76;
+  float cmsSize = 0.05;
+  
+  TLatex latex;
+  TString lumiText;
+  TString lumiText2;
+  lumiText = Form("mean: %.2f", mean_val );
+  lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
+  
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  latex.SetTextFont(lumifont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);    
+  latex.DrawLatex(lumix, lumiy, lumiText);
+  latex.DrawLatex(lumix, lumiy-0.1, lumiText2);
+  
+  C->SaveAs( "biasFits/" + f1 + "_" + f2 + ".pdf" );
+  return gaus->GetParameter(1);
 };

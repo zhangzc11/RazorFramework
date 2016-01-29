@@ -58,5 +58,5 @@ $(TARGET1v1) : $(OBJ1v1)
 	@echo $@	
 	@echo $<
 clean :
-	rm -f *.o src/*.o $(TARGET) $(TARGETv1) $(TARGET1) $(TARGET1v1)*~
+	rm -f *.o app/*.o src/*.o $(TARGET) $(TARGETv1) $(TARGET1) $(TARGET1v1)*~
 

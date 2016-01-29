@@ -31,15 +31,21 @@ int main( int argc, char* argv[])
       treeName = "HighRes";
     }
 
-  std::string MRcut = ParseCommandLine( argc, argv, "-MRcut=" );
-  std::string RSQcut = ParseCommandLine( argc, argv, "-RSQcut=" );
+  std::string LowMRcut = ParseCommandLine( argc, argv, "-LowMRcut=" );
+  std::string HighMRcut = ParseCommandLine( argc, argv, "-HighMRcut=" );
+  std::string LowRSQcut = ParseCommandLine( argc, argv, "-LowRSQcut=" );
+  std::string HighRSQcut = ParseCommandLine( argc, argv, "-HighRSQcut=" );
+  
   std::string BinSelection = ParseCommandLine( argc, argv, "-BinSelection=" );
-  if (  BinSelection == "" && ( MRcut == "" || RSQcut == "" ) )
+  if (  BinSelection == "" && ( LowMRcut == "" || LowRSQcut == "" ) )
     {
-      std::cout << "[WARNING]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --MRcut=<yourMRCut> --RSQcut=<yourRSQCut>" << std::endl;
-      BinSelection = "0";
-      MRcut = "";
-      RSQcut = "";
+      std::cout << "[ERROR]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --LowMRcut=<yourLowMRCut> --LowRSQcut=<yourLowRSQCut>" << std::endl;
+      return -1;
+    }
+
+  if (  BinSelection == "" && ( HighMRcut == "" || HighRSQcut == "" ) )
+    {
+      std::cout << "[WARNING]: user does not provide either a High-MR cut or High-Rsq cut. use --HighMRcut=<yourHighMRCut> --HighRSQcut=<HighRSQCut>" << std::endl;
     }
 
 
@@ -144,10 +150,21 @@ int main( int argc, char* argv[])
   //MR-Rsq Bin Cut String
   //****************************************************  
   TString BinCutString = "";
-  if (  MRcut != "" || RSQcut != "" )
+  if (  LowMRcut != "" || LowRSQcut != "" )
     {
-      BinCutString = " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
+      BinCutString = " && MR > " + LowMRcut + " && t1Rsq > " + LowRSQcut;
     }
+  
+  if (  HighMRcut != "" )
+    {
+      BinCutString += " && MR < " + HighMRcut;
+    }
+  
+  if ( HighRSQcut != "" )
+    {
+      BinCutString += " && t1Rsq < " + HighRSQcut;
+    }
+  
   if (categoryMode == "highpt") {
     if (BinSelection == "0") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq < 0.05 ";
     if (BinSelection == "1") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq >= 0.05 && t1Rsq < 0.10 ";
@@ -205,18 +222,38 @@ int main( int argc, char* argv[])
     if (BinSelection == "14") BinCutString = " && MR > 1200  ";
   }
  
+  //----------------
+  // M a i n   C u t
+  //----------------
+  /*CP's Tree Format is default*/
+  
+  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
 
   //****************************************************
   //Category Cut String
   //****************************************************  
   TString categoryCutString = "";
-  if (categoryMode == "highpt") categoryCutString = " && ptgg >= 110 ";
-  else if (categoryMode == "hbb") categoryCutString = " && ptgg < 110 && abs(mbb-125)<25";
-  else if (categoryMode == "zbb") categoryCutString = " && ptgg < 110 && abs(mbb-91.2)<25 ";
-  else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
-  else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
-  
-  TString cut = "abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.&& mGammaGamma > 103. && mGammaGamma<160 && pTGammaGamma > 20 && trigger == 1 && pho1R9>0.9 && pho2R9>0.9 && pTGammaGamma < 110.";
+  if ( treeName == "SusyHggTree" )
+    {
+      if (categoryMode == "highpt") categoryCutString = " && ptgg >= 110 ";
+      else if (categoryMode == "hbb") categoryCutString = " && ptgg < 110 && abs(mbb-125)<25";
+      else if (categoryMode == "zbb") categoryCutString = " && ptgg < 110 && abs(mbb-91.2)<25 ";
+      else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
+      else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
+      else if (categoryMode == "inclusive") categoryCutString = "";
+    }
+  else
+    {
+      if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
+      else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
+      else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
+      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+      else if (categoryMode == "inclusive") categoryCutString = "";
+    }
+  //---------------------------------------------
+  // A l e x ' s   T r e e   F o r m at   C a s e
+  //---------------------------------------------
   if ( treeName == "SusyHggTree" )
     {
       if ( invertIso != "yes" )
@@ -232,7 +269,8 @@ int main( int argc, char* argv[])
   float forceSigma = 1.5;
   bool constrainMu = false;
   float forceMu    = -1;
-  TString mggName  = "mgg";
+  //TString mggName  = "mgg";
+  TString mggName  = "mGammaGamma";
   RooWorkspace* w;
   RooWorkspace* w2;
 
@@ -246,18 +284,13 @@ int main( int argc, char* argv[])
   std::map< std::string, double > aic_map;
   std::map< std::string, double > aic_map_2;
   std::map< std::string, double > aic_map_3;
-/*
-  RooWorkspace* w_aic[7];
-  double aic[7];
-  std::map< std::string, double > aic_map;
-*/
-  //--------------------
-  //D e f i n e  c u t s
-  //--------------------
-  //cut = "ptgg > 20 && abs(pho1_eta) < 1.48 && abs(pho2_eta) < 1.48 && (pho1_pt>40 || pho2_pt>40) && pho1_pt > 25 && pho2_pt > 25 && pho1_pass_id == 1 && pho1_pass_iso == 1 && pho2_pass_id == 1 && pho2_pass_iso == 1 && mgg > 103 && mgg < 160." + categoryCutString + BinCutString;
+
+  //-----------------------------------
+  //C o n c a t e n a t i n g   C u t s
+  //-----------------------------------
+  cut = cut + categoryCutString + BinCutString;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
-
-
+  //return -1;
   //-------------------------------
   //O u t p u t   R O O T   f i l e
   //-------------------------------
@@ -271,6 +304,8 @@ int main( int argc, char* argv[])
       fout = new TFile( outputfilename.c_str(), "recreate" );
     }
   
+  TString outName = outputfilename.substr( 0, outputfilename.find(".root") );
+  
   if ( fitMode == "sideband" )
     {
       w = MakeSideBandFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
@@ -279,7 +314,8 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "sb" )
     {
-      w = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      RooWorkspace* w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
     {
@@ -300,6 +336,10 @@ int main( int argc, char* argv[])
     }
   else if(fitMode == "AIC2")
     {
+      //w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "singleExp" );
+      //if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[0]));
+
+      
       w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "doubleExp" );
       if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doubleExp",aic[0]));
       w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], "singleExp" );
@@ -335,15 +375,16 @@ int main( int argc, char* argv[])
       if( aic_map_3.find("poly3") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly3",aic_3[5]));
       if( aic_map_3.find("modExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("modExp",aic_3[6]));
       if( aic_map_3.find("poly4") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly4",aic_3[7]));
+      
     }
   else if ( fitMode == "bias" )
     {
-      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e3, 1e4);
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e4, 1e4);
       w_bias->Write("w_bias");
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e3, _signalFraction );
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e4, _signalFraction, outName );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
@@ -488,8 +529,8 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
 	}
 
-     PrintAICTable(MRcut, RSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
-//     PlotSidebandFit(MRcut,RSQcut,w_aic);
+     PrintAICTable(LowMRcut, LowRSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
+//     PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
 
 }
   

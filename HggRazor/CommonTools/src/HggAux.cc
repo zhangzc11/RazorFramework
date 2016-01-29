@@ -60,6 +60,8 @@ bool Histos::AssignHisto( HistoTypes htype, TH1F h )
   if ( htype == HistoTypes::pho2sigmaEoverE ) pho2sigmaEoverE = h;
   
   if ( htype == HistoTypes::njets ) njets = h;
+  if ( htype == HistoTypes::unrollHighPt ) unrollHighPt = h;
+  if ( htype == HistoTypes::unrollHighRes ) unrollHighRes = h;
   return true;
 };
 
@@ -95,6 +97,8 @@ TH1F Histos::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::pho2sigmaEoverE ) return pho2sigmaEoverE;
   
   if ( htype == HistoTypes::njets ) return njets;
+  if ( htype == HistoTypes::unrollHighPt ) return unrollHighPt;
+  if ( htype == HistoTypes::unrollHighRes ) return unrollHighRes;
   return h;
 };
 
@@ -129,6 +133,8 @@ std::string GetHistoTypesString( HistoTypes htype )
   if ( htype == HistoTypes::pho2sigmaEoverE ) return "pho2sigmaEoverE";
   
   if ( htype == HistoTypes::njets ) return "njets";
+  if ( htype == HistoTypes::unrollHighPt ) return "unrollHighPt";
+  if ( htype == HistoTypes::unrollHighRes ) return "unrollHighRes";
   
   std::cerr << "[ERROR]: Htype not found" << std::endl;
   return "";
@@ -193,7 +199,11 @@ std::string GetProcessString( Process process )
     {
       return "gammaJet";
     }
-  else if( process == Process::data )
+  else if ( process == Process::signal )
+    {
+      return "signal";
+    }
+  else if ( process == Process::data )
     {
       return "data";
     }
@@ -204,6 +214,88 @@ std::string GetProcessString( Process process )
   return "";
 };
 
+
+Process GetProcessString( std::string process )
+{
+  if ( process == "ttH" )
+    {
+      return Process::ttH;
+    }
+  else if ( process == "tt" )
+    {
+      return Process::tt;
+    }
+  else if ( process == "w" )
+    {
+      return Process::w;
+    }
+  else if ( process == "dy" )
+    {
+      return Process::dy;
+    }
+  else if ( process == "top" )
+    {
+      return Process::top;
+    }
+  else if ( process == "vv" )
+    {
+      return Process::vv;
+    }
+  else if ( process == "ww" )
+    {
+      return Process::ww;
+    }
+  else if ( process == "zz" )
+    {
+      return Process::zz;
+    }
+  else if ( process == "wz" )
+    {
+      return Process::wz;
+    }
+  else if ( process == "znunu" )
+    {
+      return Process::znunu;
+    }
+  else if ( process == "vH" )
+    {
+      return Process::vH;
+    }
+  else if ( process == "ggH" )
+    {
+      return Process::ggH;
+    }
+  else if ( process == "vbfH" )
+    {
+      return Process::vbfH;
+    }
+  else if( process == "qcd" )
+    {
+      return Process::qcd;
+    }
+  else if( process == "diphoton" )
+    {
+      return Process::diphoton;
+    }
+  else if( process == "gammaJet" )
+    {
+      return Process::gammaJet;
+    }
+  else if ( process == "signal" )
+    {
+      return Process::signal;
+    }
+  else if( process == "data" )
+    {
+      return Process::data;
+    }
+  else
+    {
+      std::cerr << "[ERROR] (HggAux): Process not found" << std::endl;
+    }
+
+  return Process::unknown;
+};
 std::string GetFitFunctionString( FitFunction  fitf )
 {
   if ( fitf == FitFunction::singleExp )

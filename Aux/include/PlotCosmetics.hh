@@ -6,7 +6,7 @@
 //ROOT INCLUDES
 #include <TChain.h>
 #include <TString.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 #include <THStack.h>
 #include <TLegend.h>
@@ -17,15 +17,15 @@
 
 bool MakeCustomMrRsq( TH2F* h, TString outName );
 bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg = NULL );
-bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outName, TLegend* leg = NULL );
-
+bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg = NULL, TString label = "dummy" );
+bool MakeStackPlotSignal( THStack* s, TH1D* signal, TString var, TString outName, TLegend* leg, TString label = "dummy" );
 //Create Histogram with style based in the process
-TH1F* GetStyledHisto( TH1F* h, Process process );
-bool SetHistoStyle( TH1F* h, Process process );
+TH1D* GetStyledHisto( TH1D* h, Process process );
+bool SetHistoStyle( TH1D* h, Process process );
 
 
 //Legend
-bool AddLegend( TH1F* h, TLegend* leg, Process process );
+bool AddLegend( TH1D* h, TLegend* leg, Process process );
 bool AddCMS( TCanvas* C );
 
 #endif

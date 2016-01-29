@@ -30,7 +30,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "0.59 fb^{-1} (13 TeV)";
+TString lumiText = "1.26 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -143,7 +143,283 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
   return true;
 };
 
-bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outName, TLegend* leg )
+bool MakeStackPlotSignal( THStack* s, TH1D* signal, TString var, TString outName, TLegend* leg, TString label )
+{
+
+   TCanvas* c = new TCanvas( "c1", "c1", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+
+  TPad *pad1 = new TPad("pad1","pad1", .0, 0.0, 1., 1.);
+  pad1->SetBottomMargin(0.13);
+  pad1->SetTopMargin(0.07);
+  pad1->SetRightMargin( rightMargin );
+  pad1->SetLeftMargin( leftMargin );
+  pad1->Draw();
+  pad1->cd();
+  
+  s->SetTitle("");
+  s->Draw();
+  s->GetXaxis()->SetTitleSize( axisTitleSize );
+  s->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  s->GetYaxis()->SetTitleSize( axisTitleSize );
+  s->GetYaxis()->SetTitleOffset( axisTitleOffset );
+    
+  if ( leg != NULL )
+    {
+      leg->SetBorderSize(0);
+      //leg->SetTextSize(0.03);
+      leg->SetLineColor(1);
+      leg->SetLineStyle(1);
+      leg->SetLineWidth(1);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(1001);
+      leg->Draw();
+    }
+  
+  signal->Draw("samehisto");
+  AddCMS( c );
+   if( var == "rsq" )
+    {
+      std::cout << "entering RSQ" << std::endl;
+      s->GetXaxis()->SetRangeUser(0.0, 1.0);
+      signal->GetXaxis()->SetRangeUser(0.0, 1.0);
+      signal->GetXaxis()->SetTitle("R^{2}");
+      s->SetMinimum( 1e-7 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.04");
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "mr" )
+    {
+      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      signal->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      signal->GetXaxis()->SetTitle("M_{R} (GeV)");
+      s->GetYaxis()->SetTitle("events / 50 (GeV)");
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "mgg" )
+    {
+      s->GetXaxis()->SetRangeUser( 50., 160. );
+      signal->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
+      s->SetMinimum( 0 );
+      s->SetMaximum( 1.2*s->GetMaximum() );
+    }
+  else if ( var == "ptgg" )
+    {
+      s->GetXaxis()->SetTitle("p_{T}^{#gamma#gamma} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1pt" )
+    {
+      signal->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1eta" )
+    {
+      signal->GetXaxis()->SetTitle("|#eta|^{#gamma^{1}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho1phi" )
+    {
+      signal->GetXaxis()->SetTitle("#phi^{#gamma^{1}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho1sigmaIetaIeta" )
+    {
+      signal->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{1}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1r9" )
+    {
+      signal->GetXaxis()->SetTitle("R^{#gamma^{1}}_{9}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1HoverE" )
+    {
+      signal->GetXaxis()->SetTitle("H/E^{#gamma^{1}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumChargedHadronPt" )
+    {
+      signal->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{1}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumNeutralHadronEt" )
+    {
+      signal->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{1}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumPhotonEt" )
+    {
+      signal->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{1}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sigmaEoverE" )
+    {
+      signal->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{1}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2pt" )
+    {
+      signal->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2eta" )
+    {
+      signal->GetXaxis()->SetTitle("|#eta|^{#gamma^{2}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2phi" )
+    {
+      signal->GetXaxis()->SetTitle("#phi^{#gamma^{2}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2sigmaIetaIeta" )
+    {
+      signal->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{2}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2r9" )
+    {
+      signal->GetXaxis()->SetTitle("R^{#gamma^{2}}_{9}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2HoverE" )
+    {
+      signal->GetXaxis()->SetTitle("H/E^{#gamma^{2}}");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumChargedHadronPt" )
+    {
+      signal->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{2}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumNeutralHadronEt" )
+    {
+      signal->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{2}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumPhotonEt" )
+    {
+      signal->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{2}} (GeV)");
+      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sigmaEoverE" )
+    {
+      signal->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{2}}");
+      s->GetYaxis()->SetTitle("events");
+      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+    }
+  else if ( var == "njets" )
+    {
+      s->GetXaxis()->SetTitle("N_{jets}");
+      s->GetYaxis()->SetTitle("events");
+      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+
+   //s->GetXaxis()->SetTitle( label );
+  s->GetYaxis()->SetTitle("events");
+  s->SetMaximum( 1e6*signal->GetMaximum() );
+  s->SetMinimum( 1e-7 );
+  pad1->SetLogy();
+  pad1->Update();
+  pad1->SetLogy();
+  pad1->Update();
+  c->SaveAs( outName+".pdf" );
+  c->SaveAs( outName+".C" );
+  delete c;
+  return true;
+};
+
+bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg, TString label )
 {
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -196,9 +472,9 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   pad2->Draw();
   pad2->cd();
 
-  std::cout << "deb" << std::endl;
-  //TH1F* MC = (TH1F*)s->GetHistogram();
-  TH1F* ratio = new TH1F( *data );
+  std::cout << var << " PLOT STACK" << std::endl;
+  //TH1D* MC = (TH1D*)s->GetHistogram();
+  TH1D* ratio = new TH1D( *data );
   ratio->Divide( mc );
   ratio->SetMarkerStyle( 20 );
   ratio->GetXaxis()->SetTitleSize( axisTitleSizeRatioX );
@@ -209,7 +485,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
   ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0., 2.0 );
+  ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
@@ -219,10 +495,11 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
 
   if( var == "rsq" )
     {
+      std::cout << "entering RSQ" << std::endl;
       s->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetTitle("R^{2}");
-      s->SetMinimum( 1e-1 );
+      s->SetMinimum( 1e-7 );
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->GetYaxis()->SetTitle("events / 0.04");
       pad1->SetLogy();
@@ -244,13 +521,13 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
       s->SetMinimum( 0 );
-      s->SetMaximum( 2*s->GetMaximum() );
+      s->SetMaximum( 1.2*s->GetMaximum() );
     }
   else if ( var == "ptgg" )
     {
-      ratio->GetXaxis()->SetTitle("p^{T}_{#gamma#gamma} (GeV)");
+      ratio->GetXaxis()->SetTitle("p_{T}^{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -259,7 +536,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "pho1pt" )
     {
-      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}^{T} (GeV)");
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -270,7 +547,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{1}}");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho1phi" )
@@ -343,7 +620,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     }
   else if ( var == "pho2pt" )
     {
-      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}^{T} (GeV)");
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
@@ -354,7 +631,7 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{2}}");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->SetMaximum( 2.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho2phi" )
@@ -434,21 +711,29 @@ bool MakeStackPlot( THStack* s, TH1F* data, TH1F* mc, TString var, TString outNa
       pad1->SetLogy();
       pad1->Update();
     }
-  
+
+  //ratio->GetXaxis()->SetTitle( label );
+  s->GetYaxis()->SetTitle("events");
+  s->SetMaximum( 1e1*data->GetMaximum() );
+  s->SetMinimum( 1e-7 );
+  pad1->SetLogy();
+  pad1->Update();
+  pad1->SetLogy();
+  pad1->Update();
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
   delete c;
   return true;
 };
 
-TH1F* GetStyledHisto( TH1F* h, Process process )
+TH1D* GetStyledHisto( TH1D* h, Process process )
 {
-  TH1F* h_n = new TH1F( *h );
+  TH1D* h_n = new TH1D( *h );
   SetHistoStyle( h_n, process );
   return h_n;
 };
 
-bool SetHistoStyle( TH1F* h, Process process )
+bool SetHistoStyle( TH1D* h, Process process )
 {
   if ( process == Process::gammaJet )
     {
@@ -485,6 +770,56 @@ bool SetHistoStyle( TH1F* h, Process process )
       h->SetFillColor( kOrange - 2 );
       h->SetLineColor( kOrange - 2 );
     }
+  else if ( process == Process::w )
+    {
+      h->SetFillColor( kGreen - 2 );
+      h->SetLineColor( kGreen - 2 );
+    }
+  else if ( process == Process::znunu )
+    {
+      h->SetFillColor( kAzure - 2 );
+      h->SetLineColor( kAzure - 2 );
+    }
+  else if ( process == Process::dy )
+    {
+      h->SetFillColor( kViolet - 2 );
+      h->SetLineColor( kViolet - 2 );
+    }
+  else if ( process == Process::tt )
+    {
+      h->SetFillColor( kPink - 2 );
+      h->SetLineColor( kPink - 2 );
+    }
+  else if ( process == Process::top )
+    {
+      h->SetFillColor( kBlue - 2 );
+      h->SetLineColor( kBlue - 2 );
+    }
+  else if ( process == Process::vv )
+    {
+      h->SetFillColor( kRed - 2 );
+      h->SetLineColor( kRed - 2 );
+    }
+  else if ( process == Process::ww )
+    {
+      h->SetFillColor( kRed - 2 );
+      h->SetLineColor( kRed - 2 );
+    }
+  else if ( process == Process::zz )
+    {
+      h->SetFillColor( kRed + 4 );
+      h->SetLineColor( kRed + 4 );
+    }
+  else if ( process == Process::wz )
+    {
+      h->SetFillColor( kRed + 6 );
+      h->SetLineColor( kRed + 6 );
+    }
+  else if ( process  == Process::signal )
+    {
+      h->SetLineWidth( 2 );
+      h->SetLineColor( kRed - 2 );
+    }
   else if ( process == Process::data )
     {
       h->SetMarkerStyle( 20 );
@@ -501,13 +836,15 @@ bool SetHistoStyle( TH1F* h, Process process )
 };
 
 
-bool AddLegend( TH1F* h, TLegend* leg, Process process )
+bool AddLegend( TH1D* h, TLegend* leg, Process process )
 {
   if ( leg == NULL ) return false;
 
   if ( process == Process::gammaJet )
     {
-      leg->AddEntry( h, "#gamma + jets", "f" );
+      //leg->AddEntry( h, "#gamma + jets", "f" );
+      //leg->AddEntry( h, "Z/#gamma(ll) + jets", "f" );
+      leg->AddEntry( h, "prompt-fake", "f" );
       return true;
     }
   else if ( process == Process::diphoton )
@@ -538,6 +875,56 @@ bool AddLegend( TH1F* h, TLegend* leg, Process process )
   else if ( process == Process::vbfH )
     {
       leg->AddEntry( h, "VBFH + jets", "f" );
+      return true;
+    }
+   else if ( process == Process::w )
+    {
+      leg->AddEntry( h, "W(l#nu) + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::znunu )
+    {
+      leg->AddEntry( h, "Z(#nu#nu) + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::dy )
+    {
+      leg->AddEntry( h, "Z/#gamma^{*} + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::tt )
+    {
+      leg->AddEntry( h, "t#bar{t} + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::top )
+    {
+      leg->AddEntry( h, "t + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::vv )
+    {
+      leg->AddEntry( h, "vv + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::ww )
+    {
+      leg->AddEntry( h, "WW + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::zz )
+    {
+      leg->AddEntry( h, "ZZ + jets", "f" );
+      return true;
+    }
+  else if ( process == Process::wz )
+    {
+      leg->AddEntry( h, "WZ + jets", "f" );
+      return true;
+    }
+   else if ( process == Process::signal )
+    {
+      leg->AddEntry( h, "signal", "l" );
       return true;
     }
   else if ( process == Process::data )

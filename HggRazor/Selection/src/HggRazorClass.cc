@@ -41,6 +41,7 @@ HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName,
   //razor
   InitMrHisto();
   InitRsqHisto();
+  IntUnrollHistos();
   //photon1
   InitPho1Pt();
   InitPho1Eta();
@@ -417,6 +418,19 @@ bool HggRazorClass::InitMrRsqCustomHisto( int nx, float* bx, int ny, float* by )
   return true; 
 };
 
+bool HggRazorClass::IntUnrollHistos( )
+{
+  if ( n_unroll_highPt <= 0  ||  n_unroll_highRes <= 0 )
+    {
+      std::cerr << "[ERROR]: unrolled plots are no properly initializem, check n_bins" << std::endl;
+      return false;
+    }
+  
+  h_unroll_highPt = new TH1F("unrolledHighPt", "unrolledHighPt", n_unroll_highPt, 0, n_unroll_highPt);
+  h_unroll_highRes = new TH1F("unrolledHighRes", "unrolledHighRes", n_unroll_highRes, 0, n_unroll_highRes);
+  return true;
+};
+
 void HggRazorClass::Loop()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
@@ -438,15 +452,18 @@ void HggRazorClass::Loop()
       // if (Cut(ientry) < 0) continue;
       //double w = xsecSF*hggBF;
       double w;
-      if ( this->processName == "data" )
+      xsecSF = 1.0;
+      if ( this->processName == "data" || this->processName == "signal")
 	{
 	  w = 1.0;
 	}
       else
-	{
+	{ 
+	  //if ( this->processName == "gammaJet" || this->processName == "qcd" ) w = xsecSF*weight*1.3;
+	  //if ( this->processName == "diphoton" ) w = xsecSF*weight*1.12;
 	  w = xsecSF*weight;
-	  //w = xsecSF*weight*3.825885e-01;
 	}
+      w = 1.0;
       total_in += w;
       bool pho1_isFake = false;
       bool pho2_isFake = false;
@@ -454,8 +471,8 @@ void HggRazorClass::Loop()
       bool isFake = false;
       bool prompt_prompt = false;
       bool prompt_fake = false;
-      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 ) pho2_isFake = true;
+      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
+      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho1MotherID != 2212) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
@@ -464,7 +481,7 @@ void HggRazorClass::Loop()
       //removing events which are not prompt-fake
       if ( prompt_prompt && this->processName == "gammaJet" )
 	{
-	  std::cout << "[INFO]: avoding prompt-prompt in gammaJet sample" << std::endl;
+	  //std::cout << "[INFO]: avoding prompt-prompt in gammaJet sample" << std::endl;
 	  total_rm += w;
 	  continue;
 	}
@@ -472,7 +489,7 @@ void HggRazorClass::Loop()
       //remove events which are not fake-fake
       if ( !isFakeFake && this->processName == "qcd" )
 	{
-	  std::cout << "[INFO]: avoding prompt-fake and prompt-prompt in qcd sample" << std::endl;
+	  //std::cout << "[INFO]: avoding prompt-fake and prompt-prompt in qcd sample" << std::endl;
 	  total_rm += w;
 	  continue;
 	}
@@ -484,8 +501,8 @@ void HggRazorClass::Loop()
       h_sigmaMoverM->Fill( sigmaMoverM, w );
       
       h_mr->Fill( MR, w );
-      h_rsq->Fill( Rsq, w );
-      h_mr_rsq->Fill( MR, Rsq, w );
+      h_rsq->Fill( t1Rsq, w );
+      h_mr_rsq->Fill( MR, t1Rsq, w );
       //photon1
       h_pho1pt->Fill( pho1Pt, w );
       h_pho1eta->Fill( pho1Eta, w );
@@ -511,13 +528,123 @@ void HggRazorClass::Loop()
       h_pho2sigmaEoverE->Fill( pho2sigmaEOverE, w );
       
       h_njets->Fill( n_Jets, w );
-      
+      if ( pTGammaGamma > 110. ) h_unroll_highPt->Fill( GetHighPtGB(MR, t1Rsq), w);
+      if ( pTGammaGamma < 110. ) h_unroll_highRes->Fill( GetHighResGB(MR, t1Rsq), w);
       if ( h_mr_rsq_c != NULL ) h_mr_rsq_c->Fill( MR, Rsq, w );
     }
   
   std::cout << "[DEBUG]: " << this->processName << " removing " << (total_rm/total_in)*100. << " % of events" << std::endl;
+  std::cout << "[DEBUG]: " << this->processName << "Yield: " <<  h_mgg->Integral() << std::endl;
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
+
+float HggRazorClass::GetHighPtGB( double mr, double r2 )
+{
+  int mr_bin = -1;
+  int r2_bin = -1;
+  for ( int i = 1; i < 6; i++ )
+    {
+      if ( mr > highPt_MR[i-1] && mr < highPt_MR[i] ) mr_bin = i-1;
+    }
+  int max_r2_bins = 6;
+  if ( mr_bin == 0 )
+    {
+      for (  int i = 1; i < max_r2_bins; i++ )
+	{
+	  if ( r2 > highPt_R0[i-1] && r2 < highPt_R0[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 1 )
+    {
+      for (  int i = 1; i < max_r2_bins-1; i++ )
+	{
+	  if ( r2 > highPt_R1[i-1] && r2 < highPt_R1[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 2 )
+    {
+      for (  int i = 1; i < max_r2_bins-2; i++ )
+	{
+	  if ( r2 > highPt_R2[i-1] && r2 < highPt_R2[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 3 )
+    {
+      for (  int i = 1; i < max_r2_bins-3; i++ )
+	{
+	  if ( r2 > highPt_R3[i-1] && r2 < highPt_R3[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 4 )
+    {
+      for (  int i = 1; i < max_r2_bins-4; i++ )
+	{
+	  if ( r2 > highPt_R4[i-1] && r2 < highPt_R4[i] ) r2_bin = i-1;
+	}
+    }
+  else
+    {
+      if ( mr > highPt_MR[0] ) std::cerr << "MR HighPt BIN NOT FOUND!!!, check bin boundaries! MR: " << mr  << ", Rsq: " << t1Rsq << std::endl;
+    }
+  
+  if ( r2_bin < 0  || mr_bin < 0 ) return -1;
+  if ( mr_bin == 0 ) return  r2_bin;
+  if ( mr_bin == 1 ) return  5 + r2_bin;
+  if ( mr_bin == 2 ) return  9 + r2_bin;
+  if ( mr_bin == 3 ) return  12 + r2_bin;
+  if ( mr_bin == 4 ) return  14 + r2_bin;
+};
+
+float HggRazorClass::GetHighResGB( double mr, double r2 )
+{
+  int mr_bin = -1;
+  int r2_bin = -1;
+  for ( int i = 1; i < 5; i++ )
+    {
+      if ( mr > highRes_MR[i-1] && mr < highRes_MR[i] ) mr_bin = i-1;
+    }
+  int max_r2_bins = 5;
+  if ( mr_bin == 0 )
+    {
+      for (  int i = 1; i < max_r2_bins; i++ )
+	{
+	  if ( r2 > highRes_R0[i-1] && r2 < highRes_R0[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 1 )
+    {
+      for (  int i = 1; i < max_r2_bins-1; i++ )
+	{
+	  if ( r2 > highRes_R1[i-1] && r2 < highRes_R1[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 2 )
+    {
+      for (  int i = 1; i < max_r2_bins-2; i++ )
+	{
+	  if ( r2 > highRes_R2[i-1] && r2 < highRes_R2[i] ) r2_bin = i-1;
+	}
+    }
+  else if ( mr_bin == 3 )
+    {
+      for (  int i = 1; i < max_r2_bins-3; i++ )
+	{
+	  if ( r2 > highRes_R3[i-1] && r2 < highRes_R3[i] ) r2_bin = i-1;
+	}
+    }
+  else
+    {
+      if ( mr > highRes_MR[0] ) std::cerr << "MR HighRes BIN NOT FOUND!!!, check bin boundaries! MR: " << mr  << ", Rsq: " << t1Rsq << std::endl;
+    }
+  
+  if ( r2_bin < 0  || mr_bin < 0 ) return -1;
+  if ( mr_bin == 0 ) return  r2_bin;
+  if ( mr_bin == 1 ) return  4 + r2_bin;
+  if ( mr_bin == 2 ) return  7 + r2_bin;
+  if ( mr_bin == 3 ) return  9 + r2_bin;
+};
+
+
 
 float HggRazorClass::GetYields( float mr, float rsq, float mgg_l, float mgg_h )
 {
@@ -641,6 +768,9 @@ TH1F HggRazorClass::GetHisto( HistoTypes htype )
   if ( htype == HistoTypes::pho2sigmaEoverE ) return *h_pho2sigmaEoverE;
   
   if ( htype == HistoTypes::njets ) return *h_njets;
+  if ( htype == HistoTypes::unrollHighPt ) return *h_unroll_highPt;
+  if ( htype == HistoTypes::unrollHighRes ) return *h_unroll_highRes;
+  
   std::cerr << "[ERROR]: HISTOGRAM TO BE RETURNED HAS NOT BEEN DEFINED, RETURNING AN EMPTY HISTO (see HggRazorClass.cc:GetHisto)" << std::endl;
 
   return h;

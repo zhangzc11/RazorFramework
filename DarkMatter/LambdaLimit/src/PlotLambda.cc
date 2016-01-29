@@ -47,11 +47,15 @@ void  PlotLambda( )
   TGraph* Ldown = (TGraph*)f3->Get("RazorDM_AV_8TeV_Combined_Expected_down");
   
   //Getting Direct Detection SI TGraphs
-  TFile* f4 = new TFile("inputData/no_btag/DirectDetection_SD_Lambda_Graphs.root");
+  //TFile* f4 = new TFile("inputData/no_btag/DirectDetection_SD_Lambda_Graphs.root");
+  TFile* f4 = new TFile("inputData/no_btag/SD_Lambda_Graphs_FINAL.root");
   TGraph* COUPP_2012_SD = (TGraph*)f4->Get("COUPP_2012_SD");
   TGraph* SIMPLE_2012_SD = (TGraph*)f4->Get("SIMPLE_2012_SD");
   TGraph* SUPER_K_SD = (TGraph*)f4->Get("SUPER-K_SD");
   TGraph* ICE_CUBE_WW = (TGraph*)f4->Get("ICE_CUBE_WW");
+  TGraph* XENON_SD = (TGraph*)f4->Get("XENON_SD_FINAL");
+  TGraph* PICO_SD = (TGraph*)f4->Get("PICO");
+  TGraph* PICASSO_SD = (TGraph*)f4->Get("PICASSO");
   
   TString labelX = "M_{#chi} (GeV)";
   TString labelY = "#Lambda (GeV)";
@@ -117,17 +121,29 @@ void  PlotLambda( )
   COUPP_2012_SD->SetLineWidth( 3 );
   COUPP_2012_SD->SetLineStyle( 6 );
   
-  SIMPLE_2012_SD->SetLineColor( kGray );
+  SIMPLE_2012_SD->SetLineColor( kOrange-3 );
   SIMPLE_2012_SD->SetLineWidth( 3 );
-  SIMPLE_2012_SD->SetLineStyle( 1 );
+  SIMPLE_2012_SD->SetLineStyle( 2 );
   
   SUPER_K_SD->SetLineColor( kViolet-2 );
   SUPER_K_SD->SetLineWidth( 3 );
   SUPER_K_SD->SetLineStyle( 6 );
   
-  ICE_CUBE_WW->SetLineColor( kAzure+6 );
+  ICE_CUBE_WW->SetLineColor( kAzure+1 );
   ICE_CUBE_WW->SetLineWidth( 3 );
   ICE_CUBE_WW->SetLineStyle( 4 );
+
+  XENON_SD->SetLineColor( kAzure+6 );
+  XENON_SD->SetLineWidth( 3 );
+  XENON_SD->SetLineStyle( 5 );
+  
+  PICO_SD->SetLineColor( kGreen-6 );
+  PICO_SD->SetLineWidth( 3 );
+  PICO_SD->SetLineStyle( 2 );
+
+  PICASSO_SD->SetLineColor( kBlue-2 );
+  PICASSO_SD->SetLineWidth( 3 );
+  PICASSO_SD->SetLineStyle( 2 );
   
   TMultiGraph *mg = new TMultiGraph();
   mg->Add( Lup );
@@ -138,6 +154,9 @@ void  PlotLambda( )
   mg->Add( SIMPLE_2012_SD );
   mg->Add( SUPER_K_SD );
   mg->Add( ICE_CUBE_WW );
+  mg->Add( XENON_SD );
+  mg->Add( PICO_SD );
+  mg->Add( PICASSO_SD );
   mg->Draw("L");
   
   TLegend *leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");
@@ -161,6 +180,9 @@ void  PlotLambda( )
   leg2->AddEntry( COUPP_2012_SD, "COUPP 2012", "l" );
   leg2->AddEntry( SIMPLE_2012_SD, "SIMPLE 2012", "l" );
   leg2->AddEntry( SUPER_K_SD, "Super-K W^{+}W^{-}", "l" );
+  leg2->AddEntry( XENON_SD, "XENON 100", "l" );
+  leg2->AddEntry( PICO_SD, "PICO", "l" );
+  leg2->AddEntry( PICASSO_SD, "PICASSO", "l" );
   leg2->SetBorderSize(0);
   leg2->SetTextSize(0.03);
   leg2->SetLineColor(1);
@@ -204,7 +226,7 @@ void  PlotLambda( )
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
   latex.SetTextSize(extraTextSize);
-  latex.DrawLatex(extrax, extray, extraText);
+  //latex.DrawLatex(extrax, extray, extraText);
   
   std::cout << "here" << std::endl;
   c->cd();
@@ -230,8 +252,11 @@ void  PlotLambda( )
   
   //Loading direct detection limits
   delete f4;
-  f4 = new TFile("inputData/no_btag/DirectDetection_SI_Lambda_Graphs.root");
+  //f4 = new TFile("inputData/no_btag/DirectDetection_SI_Lambda_Graphs.root");
+  f4 = new TFile("inputData/no_btag/SI_Lambda_Graphs_FINAL.root");
   TGraph* CDMSII_SI = (TGraph*)f4->Get("CDMSII_SI");
+  TGraph* CRESTII_NEW = (TGraph*)f4->Get("CRESTII_NEW");
+  TGraph* CRESTII_LT = (TGraph*)f4->Get("CRESTII_LowThreshold");
   TGraph* COUPP_2012_SI = (TGraph*)f4->Get("COUPP_2012_SI");
   TGraph* LUX2013 = (TGraph*)f4->Get("LUX2013");
   TGraph* SIMPLE_2012_SI = (TGraph*)f4->Get("SIMPLE_2012_SI");
@@ -282,9 +307,17 @@ void  PlotLambda( )
   Ldown->SetLineWidth(1);
   Ldown->SetLineStyle(1);
 
-  CDMSII_SI->SetLineColor( kOrange+1 );
+  CDMSII_SI->SetLineColor( kPink-3 );
   CDMSII_SI->SetLineWidth( 3 );
-  CDMSII_SI->SetLineStyle( 1 );
+  CDMSII_SI->SetLineStyle( 2 );
+
+  CRESTII_NEW->SetLineColor( kGreen - 3 );
+  CRESTII_NEW->SetLineWidth( 3 );
+  CRESTII_NEW->SetLineStyle( 2 );
+
+  CRESTII_LT->SetLineColor( kGreen-3 );
+  CRESTII_LT->SetLineWidth( 3 );
+  CRESTII_LT->SetLineStyle( 3 );
   
   COUPP_2012_SI->SetLineColor( kBlue-7 );
   COUPP_2012_SI->SetLineWidth( 3 );
@@ -292,12 +325,13 @@ void  PlotLambda( )
   
   LUX2013->SetLineColor( kGreen+3 );
   LUX2013->SetLineWidth( 3 );
-  LUX2013->SetLineStyle( 1 );
+  LUX2013->SetLineStyle( 2 );
   
-  SIMPLE_2012_SI->SetLineColor( kGray );
+  
+  SIMPLE_2012_SI->SetLineColor( kOrange-3 );
   SIMPLE_2012_SI->SetLineWidth( 3 );
-  SIMPLE_2012_SI->SetLineStyle( 1 );
-  
+  SIMPLE_2012_SI->SetLineStyle( 2 );
+    
   XENON100_SI->SetLineColor( kAzure+6 );
   XENON100_SI->SetLineWidth( 3 );
   XENON100_SI->SetLineStyle( 5 ); 
@@ -312,6 +346,8 @@ void  PlotLambda( )
   mg->Add( Ldown ); 
   mg->Add( Lc );
   mg->Add( CDMSII_SI );
+  mg->Add( CRESTII_NEW );
+  mg->Add( CRESTII_LT );
   mg->Add( COUPP_2012_SI );
   mg->Add( LUX2013 );
   mg->Add( SIMPLE_2012_SI );
@@ -344,6 +380,8 @@ void  PlotLambda( )
   leg2->AddEntry( COUPP_2012_SI, "COUPP 2012", "l" );
   leg2->AddEntry( superCDMS_SI, "superCDMS", "l" );
   leg2->AddEntry( CDMSII_SI, "CDMSII", "l" );
+  leg2->AddEntry( CRESTII_NEW, "CRESTII", "l" );
+  leg2->AddEntry( CRESTII_LT, "CRESTII LT", "l" );
   leg2->AddEntry( LUX2013, "LUX 2013", "l" );
   leg2->SetBorderSize(0);
   leg2->SetTextSize(0.03);
@@ -368,7 +406,7 @@ void  PlotLambda( )
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
   latex.SetTextSize(extraTextSize);
-  latex.DrawLatex(extrax, extray, extraText);
+  //latex.DrawLatex(extrax, extray, extraText);
   
   c->cd();
   c->SetLogx();

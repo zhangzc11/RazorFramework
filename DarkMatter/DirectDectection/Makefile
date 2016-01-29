@@ -39,5 +39,5 @@ $(TARGET1) : $(OBJ1)
 	@echo $@	
 	@echo $<
 clean :
-	rm -f *.o src/*.o $(TARGET) $(TARGET1) *~
+	rm -f *.o app/*.o src/*.o $(TARGET) $(TARGET1) *~
 

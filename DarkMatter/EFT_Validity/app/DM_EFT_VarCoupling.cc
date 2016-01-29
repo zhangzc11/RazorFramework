@@ -353,8 +353,8 @@ int main ( int argc, char* argv[] ){
   grshade->SetLineStyle(1);
   leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
-  leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
-  leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
+  leg->AddEntry(g_2m, "#Lambda < 2M_{#chi}" ,"lf");
+  leg->AddEntry(g_2mover4pi, "#Lambda < M_{#chi}/2#pi" ,"lf");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.03);
   leg->SetLineColor(1);
@@ -422,7 +422,7 @@ int main ( int argc, char* argv[] ){
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
   latex.SetTextSize(extraTextSize);
-  latex.DrawLatex(extrax, extray, extraText);
+  //latex.DrawLatex(extrax, extray, extraText);
 
   std::cout << "here" << std::endl;
   c->cd();
@@ -528,8 +528,8 @@ int main ( int argc, char* argv[] ){
   grshade->SetLineStyle(1);
   leg->AddEntry(grshade, "Expected limit, with uncertainty" ,"lf");
   leg->AddEntry(Lc, "Observed limit" ,"l");
-  leg->AddEntry(g_2m, "#Lambda < 2m_{#chi}" ,"lf");
-  leg->AddEntry(g_2mover4pi, "#Lambda < m_{#chi}/2#pi" ,"lf");
+  leg->AddEntry(g_2m, "#Lambda < 2M_{#chi}" ,"lf");
+  leg->AddEntry(g_2mover4pi, "#Lambda < M_{#chi}/2#pi" ,"lf");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.03);
   leg->SetLineColor(1);
@@ -570,7 +570,7 @@ int main ( int argc, char* argv[] ){
    latex.SetTextFont(extraTextFont);
    latex.SetTextAlign(31); 
    latex.SetTextSize(extraTextSize);
-   latex.DrawLatex(extrax, extray, extraText);
+   //latex.DrawLatex(extrax, extray, extraText);
    //tex->Draw(); 
    c->cd();
    c->SetLogx();

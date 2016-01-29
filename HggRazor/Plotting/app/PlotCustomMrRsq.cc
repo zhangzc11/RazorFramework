@@ -3,7 +3,7 @@
 #include <map>
 //ROOT INCLUDES
 #include <TString.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TFile.h>
 //LOCAL INCLUDES
 #include "HggAux.hh"
@@ -35,9 +35,9 @@ int main ( int argc, char* argv[] )
   
   TFile* f;
   TH2F* h_mr_rsq;
-  TH1F* h;
-  TH1F* data;
-  TH1F* mc = NULL;
+  TH1D* h;
+  TH1D* data;
+  TH1D* mc = NULL;
   THStack* stack = new THStack( "hs" , "Hgg Stack " );
   TLegend* leg = new TLegend( 0.7, 0.58, 0.95, 0.89, NULL, "brNDC" );
   
@@ -70,8 +70,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  else if ( histoName == "mgg" )
 	    {
-	      h = (TH1F*)f->Get( "mgg" );
-	      TH1F* h_s = GetStyledHisto( h, process );
+	      h = (TH1D*)f->Get( "mgg" );
+	      TH1D* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
 		  if ( process != Process::data )
@@ -79,7 +79,7 @@ int main ( int argc, char* argv[] )
 		      stack->Add( h_s, "histo" );
 		      if ( mc == NULL )
 			{
-			  mc = new TH1F( *h );
+			  mc = new TH1D( *h );
 			}
 		      else
 			{
@@ -95,8 +95,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  else if ( histoName == "ptgg" )
 	    {
-	      h = (TH1F*)f->Get( "ptgg" );
-	      TH1F* h_s = GetStyledHisto( h, process );
+	      h = (TH1D*)f->Get( "ptgg" );
+	      TH1D* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
 		  if ( process != Process::data )
@@ -104,7 +104,7 @@ int main ( int argc, char* argv[] )
 		      stack->Add( h_s, "histo" );
 		      if ( mc == NULL )
 			{
-			  mc = new TH1F( *h );
+			  mc = new TH1D( *h );
 			}
 		      else
 			{
@@ -120,8 +120,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  else if ( histoName == "mr" )
 	    {
-	      h = (TH1F*)f->Get( "mr" );
-	      TH1F* h_s = GetStyledHisto( h, process );
+	      h = (TH1D*)f->Get( "mr" );
+	      TH1D* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
 		  if ( process != Process::data )
@@ -129,7 +129,7 @@ int main ( int argc, char* argv[] )
 		      stack->Add( h_s, "histo" );
 		      if ( mc == NULL )
 			{
-			  mc = new TH1F( *h );
+			  mc = new TH1D( *h );
 			}
 		      else
 			{
@@ -145,8 +145,8 @@ int main ( int argc, char* argv[] )
 	    }
 	  else if ( histoName == "rsq" )
 	    {
-	      h = (TH1F*)f->Get( "rsq" );
-	      TH1F* h_s = GetStyledHisto( h, process );
+	      h = (TH1D*)f->Get( "rsq" );
+	      TH1D* h_s = GetStyledHisto( h, process );
 	      if ( option == "stack" )
 		{
 		  if ( process != Process::data )
@@ -154,7 +154,7 @@ int main ( int argc, char* argv[] )
 		      stack->Add( h_s, "histo" );
 		      if ( mc == NULL )
 			{
-			  mc = new TH1F( *h );
+			  mc = new TH1D( *h );
 			}
 		      else
 			{
@@ -214,8 +214,8 @@ int main ( int argc, char* argv[] )
 		}
 	      else if ( histoName == "mgg" )
 		{
-		  h = (TH1F*)f->Get( "mgg" );
-		  TH1F* h_s = GetStyledHisto( h, process );
+		  h = (TH1D*)f->Get( "mgg" );
+		  TH1D* h_s = GetStyledHisto( h, process );
 		  if ( process == Process::gammaJet ) h_s->Smooth( 1 );
 		  if ( option == "stack" )
 		    {
@@ -225,8 +225,8 @@ int main ( int argc, char* argv[] )
 		}
 	      else if ( histoName == "ptgg" )
 		{
-		  h = (TH1F*)f->Get( "ptgg" );
-		  TH1F* h_s = GetStyledHisto( h, process );
+		  h = (TH1D*)f->Get( "ptgg" );
+		  TH1D* h_s = GetStyledHisto( h, process );
 		  if ( option == "stack" )
 		    {
 		      stack->Add( h_s, "histo" );
@@ -235,8 +235,8 @@ int main ( int argc, char* argv[] )
 		}
 	      else if ( histoName == "mr" )
 		{
-		  h = (TH1F*)f->Get( "mr" );
-		  TH1F* h_s = GetStyledHisto( h, process );
+		  h = (TH1D*)f->Get( "mr" );
+		  TH1D* h_s = GetStyledHisto( h, process );
 		  if ( option == "stack" )
 		    {
 		      stack->Add( h_s, "histo" );
@@ -245,8 +245,8 @@ int main ( int argc, char* argv[] )
 		}
 	      else if ( histoName == "rsq" )
 		{
-		  h = (TH1F*)f->Get( "rsq" );
-		  TH1F* h_s = GetStyledHisto( h, process );
+		  h = (TH1D*)f->Get( "rsq" );
+		  TH1D* h_s = GetStyledHisto( h, process );
 		  if ( option == "stack" )
 		    {
 		      stack->Add( h_s, "histo" );

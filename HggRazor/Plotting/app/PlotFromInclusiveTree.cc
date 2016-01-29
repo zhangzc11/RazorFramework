@@ -14,17 +14,17 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-int HggRazorClass::n_mgg = 100;
-float HggRazorClass::mgg_l = 50.;
-float HggRazorClass::mgg_h = 150.;
+int HggRazorClass::n_mgg = 38;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
 
 int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
 float HggRazorClass::ptgg_h = 720.;
 
-int HggRazorClass::n_sigmaMoverM = 50;
+int HggRazorClass::n_sigmaMoverM = 100;
 float HggRazorClass::sigmaMoverM_l = .0;
-float HggRazorClass::sigmaMoverM_h = .05;
+float HggRazorClass::sigmaMoverM_h = .02;
 
 int HggRazorClass::n_mr = 160;
 float HggRazorClass::mr_l = 130.;
@@ -33,6 +33,23 @@ float HggRazorClass::mr_h = 8130.;
 int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
+
+int HggRazorClass::n_unroll_highPt  = 15;
+int HggRazorClass::n_unroll_highRes = 10;
+
+float HggRazorClass::highPt_MR[6] = {150., 200., 300., 500., 1600., 10000.};
+float HggRazorClass::highPt_R0[6] = {0.0, 0.05, 0.1, 0.15, 0.2, 2.0};
+float HggRazorClass::highPt_R1[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highPt_R2[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highPt_R3[3] = {0.0, 0.05, 2.0};
+float HggRazorClass::highPt_R4[2] = {0.0, 2.0};
+
+float HggRazorClass::highRes_MR[5] = {150., 250., 400., 1400., 10000.};
+float HggRazorClass::highRes_R0[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highRes_R1[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highRes_R2[3] = {0.0, 0.05, 1.0};
+float HggRazorClass::highRes_R3[2] = {0.0, 2.0};
+
 
 //photon1
 int HggRazorClass::n_pho1pt = 70;
@@ -71,9 +88,9 @@ int HggRazorClass::n_pho1sumPhotonEt = 50;
 float HggRazorClass::pho1sumPhotonEt_l = 0.0;
 float HggRazorClass::pho1sumPhotonEt_h = 30.0;
 
-int HggRazorClass::n_pho1sigmaEoverE = 50;
-float HggRazorClass::pho1sigmaEoverE_l = .0;
-float HggRazorClass::pho1sigmaEoverE_h = .05;
+int HggRazorClass::n_pho1sigmaEoverE = 150;
+float HggRazorClass::pho1sigmaEoverE_l = .006;
+float HggRazorClass::pho1sigmaEoverE_h = .015;
 
 //photon2
 int HggRazorClass::n_pho2pt = 70;
@@ -112,9 +129,10 @@ int HggRazorClass::n_pho2sumPhotonEt = 50;
 float HggRazorClass::pho2sumPhotonEt_l = 0.0;
 float HggRazorClass::pho2sumPhotonEt_h = 30.0;
 
-int HggRazorClass::n_pho2sigmaEoverE = 50;
-float HggRazorClass::pho2sigmaEoverE_l = .0;
-float HggRazorClass::pho2sigmaEoverE_h = .05;
+int HggRazorClass::n_pho2sigmaEoverE = 150;
+float HggRazorClass::pho2sigmaEoverE_l = .006;
+float HggRazorClass::pho2sigmaEoverE_h = .02;
+
 int HggRazorClass::n_njets = 11;
 float HggRazorClass::njets_l = .0;
 float HggRazorClass::njets_h = 10;
@@ -141,14 +159,35 @@ float hres_k[2] = { 1.0, 1.0};
 float lres_k[2] = { 1.0, 1.0};
 //A p p l y   B a s e l i n e   C u t
 //-----------------------------------
+//DATA
+//GammaGamma
+TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[65] && pho1passIso == 1 && pho2passIso == 1";
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 )";
+//EBEB
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
-//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && HLTDecision[70] && pho1passIso == 1 && pho2passIso == 1";
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 )";
-//TString cut = "1";
-//TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
+//EBEE
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+//EEEE
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+
+//MC
+//GammaGamma
+TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+
+//Zee
+//EBEB
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+
+//EBEE
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+//EEEE
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+
 TString mggCut = "1";
 
 #define _debug 1
@@ -202,10 +241,13 @@ int main ( int argc, char* argv[] )
   HggRazorClass* hggclass;
   THStack* stack;
   TLegend* leg;
-  TH1F* data;
-  TH1F* mc;
+  TLegend* leg2;
+  TH1D* data;
+  TH1D* signal;
+  TH1D* mc;
+  TH1D* mc2 = new TH1D();
 
-  const int nprocesses = 2;
+  const int nprocesses = 4;
   const int nplots = 4;
   double k_f = 1.0;
   const double lumi_frac = 1.0; // (5./19.8)
@@ -218,6 +260,7 @@ int main ( int argc, char* argv[] )
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
+	  std::cout << "---------> PROCESS: " << processName << " ,process #: " << ctr << std::endl;
 	  //-----------------------------
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
@@ -225,9 +268,8 @@ int main ( int argc, char* argv[] )
 	  AddTChain( chain, mapList[processName] );
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
-	  if ( process == Process::ggH || process == Process::vbfH || process == Process::vH || process == Process::ttH ) continue;
-	  if ( process == Process::qcd || process == Process::diphoton ) continue;
-	  std::cout << "---------> PROCESS: " << processName << " ctr: " << ctr << std::endl;
+	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::signal) ) continue;
+	  	  
 	  if ( chain == NULL )
 	    {
 	      std::cout << "[WARNING]: Empty selected tree in process: " << processName << std::endl;
@@ -262,63 +304,81 @@ int main ( int argc, char* argv[] )
 	  //-----------------------------
 	  //Assigning Histograms to Array
 	  //-----------------------------
+	  std::cout << "DEB3" << std::endl;
 	  for ( const auto& htmp : HistoTypes() )
 	    {
+	      std::cout << GetHistoTypesString( htmp ) << std::endl;
 	      TH1F h_scale = hggclass->GetHisto( htmp );
 	      //if ( run == "run2" ) h_scale.Scale( k_f ); 
 	      histos[ctr].AssignHisto( htmp, h_scale );
 	    }
+	  std::cout << "DEB4" << std::endl;
 	  ctr++;
 	}
       //---------------
       //P l o t t i n g
       //---------------
+      std::cout << "PLOTTING" << std::endl;
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::string histoName = GetHistoTypesString( htmp );
-	  std::cout << "making " <<  histoName << std::endl;
+	  //std::cout << "histoName: " << histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
+	  leg2 = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
 	  bool _isFirstMC = true;
+	  //std::cout << "deb1: " << histoName << std::endl;
+	  float NormFactor = 1.0;//Scale mc to unity if required
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
-	      std::cout << "DEB "<< std::endl;
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
-	      std::cout << "DEB "<< std::endl;
-	      TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
-	      std::cout << "DEB "<< std::endl;
+	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      if ( histos[i].process == Process::data )
 		{
-		  std::cout << "DEBdata "<< std::endl;
-		  data = new TH1F ( *h_s ); 
+		  data = new TH1D ( *h_s );
+		  data->Scale(1.0/data->Integral());
 		}
-	      else
+	      else if ( histos[i].process != Process::signal )
 		{
-		  stack->Add( h_s, "histo" );
+		  //stack->Add( h_s, "histo" );
+		  std::cout << "stacking " << GetProcessString( histos[i].process ) << std::endl;
 		  if ( mc == NULL || _isFirstMC )
 		    {
-		      std::cout << "creating mc" << std::endl;
-		      mc = new TH1F( *h_s );
+		      mc = new TH1D( *h_s );
 		      _isFirstMC = false;
 		    }
 		  else
 		    {
-		      std::cout << "DEBmc "<< std::endl;
 		      mc->Add( h_s );
 		    }
 		}
-	      std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
+	      else
+		{
+		  signal = new TH1D ( *h_s );
+		  signal->Scale(1.0/signal->Integral());
+		}
+	      //std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
+	      //if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
+	      //else std::cout << histoName << "-> " << mc->Integral() << std::endl;
+	      
 	      AddLegend( h_s, leg, histos[i].process );
+	      if (  histos[i].process != Process::data ) AddLegend( h_s, leg2, histos[i].process );
+	      //
+	    }
+	  NormFactor = mc->Integral();
+	  mc->Scale(1.0/NormFactor);
+	  for (  int i  = 0; i < nprocesses; i++ )
+	    {
+	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
+	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
+	      h_s->Scale(1.0/NormFactor);
+	      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
+	       
 	    }
 	  if ( run == "run2" )
 	    {
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/" + histoName + "_" + boxName + "_Mr250Rsq0p05_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/" + histoName + "_" + boxName + "_Inclusive_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Resonant/" + histoName + "_" + boxName + "_Mr400_Rsq0p05_Resonant", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + boxName + "_Mr200_Rsq0p02_Full", leg );
-	      //MakeStackPlot( stack, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + "INCLUSIVE" + "_Inclusive_Full", leg );
-	      MakeStackPlot( stack, data, mc, histoName, "plots/13TeV/Hybrid/Full/" + histoName + "_" + "INCLUSIVE" + "_Inclusive_Full", leg );
+	      MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
+	      MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
 	    }
 	}
       return -1;
@@ -415,12 +475,12 @@ int main ( int argc, char* argv[] )
 		  std::cout << "DEB "<< std::endl;
 		  TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 		  std::cout << "DEB "<< std::endl;
-		  TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
+		  TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 		  std::cout << "DEB "<< std::endl;
 		  if ( histos[i].process == Process::data )
 		    {
 		      std::cout << "DEBdata "<< std::endl;
-		      data = new TH1F ( *h_s ); 
+		      data = new TH1D ( *h_s ); 
 		    }
 		  else
 		    {
@@ -428,7 +488,7 @@ int main ( int argc, char* argv[] )
 		      if ( mc == NULL || _isFirstMC )
 			{
 			  std::cout << "creating mc" << std::endl;
-			  mc = new TH1F( *h_s );
+			  mc = new TH1D( *h_s );
 			  _isFirstMC = false;
 			}
 		      else

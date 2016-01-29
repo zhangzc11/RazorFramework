@@ -39,6 +39,22 @@ int HggRazorClass::n_rsq = 125;
 float HggRazorClass::rsq_l = .0;
 float HggRazorClass::rsq_h = 5.0;
 
+int HggRazorClass::n_unroll_highPt  = 15;
+int HggRazorClass::n_unroll_highRes = 10;
+
+float HggRazorClass::highPt_MR[6] = {150., 200., 300., 500., 1600., 3000.};
+float HggRazorClass::highPt_R0[6] = {0.0, 0.05, 0.1, 0.15, 0.2, 2.0};
+float HggRazorClass::highPt_R1[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highPt_R2[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highPt_R3[3] = {0.0, 0.05, 2.0};
+float HggRazorClass::highPt_R4[2] = {0.0, 2.0};
+
+float HggRazorClass::highRes_MR[5] = {150., 250., 400., 1400., 3000.};
+float HggRazorClass::highRes_R0[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highRes_R1[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highRes_R2[3] = {0.0, 0.05, 1.0};
+float HggRazorClass::highRes_R3[2] = {0.0, 2.0};
+
 //photon1
 int HggRazorClass::n_pho1pt = 70;
 float HggRazorClass::pho1pt_l = .0;
@@ -196,8 +212,8 @@ int main ( int argc, char* argv[] )
   HggRazorClass* hggclass;
   THStack* stack;
   TLegend* leg;
-  TH1F* data;
-  TH1F* mc;
+  TH1D* data;
+  TH1D* mc;
 
   const int nprocesses = 6;
   const int nplots = 4;
@@ -294,12 +310,12 @@ int main ( int argc, char* argv[] )
 	      std::cout << "DEB "<< std::endl;
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 	      std::cout << "DEB "<< std::endl;
-	      TH1F* h_s = GetStyledHisto( tmp_h, histos[i].process );
+	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      std::cout << "DEB "<< std::endl;
 	      if ( histos[i].process == Process::data )
 		{
 		  std::cout << "DEBdata "<< std::endl;
-		  data = new TH1F ( *h_s ); 
+		  data = new TH1D ( *h_s ); 
 		}
 	      else
 		{
@@ -307,7 +323,7 @@ int main ( int argc, char* argv[] )
 		  if ( mc == NULL || _isFirstMC )
 		    {
 		      std::cout << "creating mc" << std::endl;
-		      mc = new TH1F( *h_s );
+		      mc = new TH1D( *h_s );
 		      _isFirstMC = false;
 		    }
 		  else
