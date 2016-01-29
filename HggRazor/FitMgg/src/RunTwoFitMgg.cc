@@ -1376,7 +1376,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
     }
   else if ( ffName == "doublePow" )
     {
-      tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      //tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      tag = MakeDoublePowN1N2( "sideband_fit_doublePow", mgg, *ws );
       std::cout << "[INFO]: Running double pow fit" << std::endl; 
     }
   else if ( ffName == "poly2" )
@@ -1400,8 +1401,11 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
       std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
       exit (EXIT_FAILURE);
     }
-  
+
+  std::cout << "====================" << std::endl;
   std::cout << "[INFO]: ENTERING FIT" << std::endl;
+  std::cout << "====================" << std::endl;
+  
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
@@ -1409,14 +1413,17 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
   //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-    
+  std::cout << "===================" << std::endl;
+  std::cout << "[INFO]: LEAVING FIT" << std::endl;
+  std::cout << "===================" << std::endl;
+  
   bres->SetName( tag + "_b_fitres" );
   std::cout << "[INFO]: PASS FIT" << std::endl;
   //---------------------
   //g e t t i n g   n l l 
   //---------------------
   double minNll = bres->minNll();
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data,  RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;

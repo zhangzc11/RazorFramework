@@ -31,12 +31,15 @@ int main( int argc, char* argv[])
       treeName = "HighRes";
     }
 
-  std::string MRcut = ParseCommandLine( argc, argv, "-MRcut=" );
-  std::string RSQcut = ParseCommandLine( argc, argv, "-RSQcut=" );
+  std::string LowMRcut = ParseCommandLine( argc, argv, "-LowMRcut=" );
+  std::string HighMRcut = ParseCommandLine( argc, argv, "-HighMRcut=" );
+  std::string LowRSQcut = ParseCommandLine( argc, argv, "-LowRSQcut=" );
+  std::string HighRSQcut = ParseCommandLine( argc, argv, "-HighRSQcut=" );
+  
   std::string BinSelection = ParseCommandLine( argc, argv, "-BinSelection=" );
-  if (  BinSelection == "" && ( MRcut == "" || RSQcut == "" ) )
+  if (  BinSelection == "" && ( LowMRcut == "" || LowRSQcut == "" ) )
     {
-      std::cout << "[ERROR]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --MRcut=<yourMRCut> --RSQcut=<yourRSQCut>" << std::endl;
+      std::cout << "[ERROR]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --LowMRcut=<yourMRCut> --LowRSQcut=<yourRSQCut>" << std::endl;
       return -1;
     }
 
@@ -142,10 +145,21 @@ int main( int argc, char* argv[])
   //MR-Rsq Bin Cut String
   //****************************************************  
   TString BinCutString = "";
-  if (  MRcut != "" || RSQcut != "" )
+  if (  LowMRcut != "" || LowRSQcut != "" )
     {
-      BinCutString = " && MR > " + MRcut + " && t1Rsq > " + RSQcut;
+      BinCutString = " && MR > " + LowMRcut + " && t1Rsq > " + LowRSQcut;
     }
+  
+  if (  HighMRcut != "" )
+    {
+      BinCutString += " && MR < " + HighMRcut;
+    }
+  
+  if ( HighRSQcut != "" )
+    {
+      BinCutString += " && t1Rsq < " + HighRSQcut;
+    }
+  
   if (categoryMode == "highpt") {
     if (BinSelection == "0") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq < 0.05 ";
     if (BinSelection == "1") BinCutString = " && MR > 150 && MR <= 200 && t1Rsq >= 0.05 && t1Rsq < 0.10 ";
@@ -317,11 +331,10 @@ int main( int argc, char* argv[])
     }
   else if(fitMode == "AIC2")
     {
-      w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "poly3" );
-      if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("poly3",aic[0]));
+      //w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "singleExp" );
+      //if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[0]));
 
       
-      /*
       w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "doubleExp" );
       if( aic_map.find("doubleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("doubleExp",aic[0]));
       w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], "singleExp" );
@@ -357,7 +370,7 @@ int main( int argc, char* argv[])
       if( aic_map_3.find("poly3") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly3",aic_3[5]));
       if( aic_map_3.find("modExp") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("modExp",aic_3[6]));
       if( aic_map_3.find("poly4") == aic_map_3.end() ) aic_map_3.insert( std::pair<std::string, double>("poly4",aic_3[7]));
-      */
+      
     }
   else if ( fitMode == "bias" )
     {
@@ -511,8 +524,8 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
 	}
 
-     PrintAICTable(MRcut, RSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
-//     PlotSidebandFit(MRcut,RSQcut,w_aic);
+     PrintAICTable(LowMRcut, LowRSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
+//     PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
 
 }
   
