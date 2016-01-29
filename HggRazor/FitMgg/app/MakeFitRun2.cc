@@ -39,8 +39,13 @@ int main( int argc, char* argv[])
   std::string BinSelection = ParseCommandLine( argc, argv, "-BinSelection=" );
   if (  BinSelection == "" && ( LowMRcut == "" || LowRSQcut == "" ) )
     {
-      std::cout << "[ERROR]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --LowMRcut=<yourMRCut> --LowRSQcut=<yourRSQCut>" << std::endl;
+      std::cout << "[ERROR]: user must provide either a BinSelection or an MR cut and Rsq cut. use --BinSelection=<yourBin> or --LowMRcut=<yourLowMRCut> --LowRSQcut=<yourLowRSQCut>" << std::endl;
       return -1;
+    }
+
+  if (  BinSelection == "" && ( HighMRcut == "" || HighRSQcut == "" ) )
+    {
+      std::cout << "[WARNING]: user does not provide either a High-MR cut or High-Rsq cut. use --HighMRcut=<yourHighMRCut> --HighRSQcut=<HighRSQCut>" << std::endl;
     }
 
 
