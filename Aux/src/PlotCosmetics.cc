@@ -714,11 +714,11 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
 
   //ratio->GetXaxis()->SetTitle( label );
   s->GetYaxis()->SetTitle("events");
-  s->SetMaximum( 1e1*data->GetMaximum() );
+  s->SetMaximum( 2e0*data->GetMaximum() );
   s->SetMinimum( 1e-7 );
-  pad1->SetLogy();
+  //pad1->SetLogy();
   pad1->Update();
-  pad1->SetLogy();
+  //pad1->SetLogy();
   pad1->Update();
   c->SaveAs( outName+".pdf" );
   c->SaveAs( outName+".C" );
