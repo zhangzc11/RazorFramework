@@ -529,7 +529,7 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
 	}
 
-     PrintAICTable(LowMRcut, LowRSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
+     PrintAICTable(categoryMode, LowMRcut, LowRSQcut,delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
 //     PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
 
 }
