@@ -15,7 +15,7 @@
 #include <RooWorkspace.h>
 #include <RooPlot.h>
 
-void PrintAICTable(std::string category, std::string MRcut,std::string RSQcut,std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[]) 
+void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[]) 
 {
 
 	std::map< std::string, std::string > func_name;
@@ -39,7 +39,9 @@ void PrintAICTable(std::string category, std::string MRcut,std::string RSQcut,st
 	if( num_par.find("modExp") == num_par.end() ) num_par.insert( std::pair<std::string, int>("modExp",2));
 
     //print the table to a file
-	FILE* m_outfile = fopen("AIC_output/FitChoices_Table.tex", "a");
+    	std::string str_table = "AIC_output/FitChoices_Table_"+category+".tex";
+        const char * file_Name_table = str_table.c_str();
+	FILE* m_outfile = fopen(file_Name_table, "a");
 	fprintf(m_outfile,"\\begin{table}[H] \n");
 	fprintf(m_outfile,"\\begin{center} \n");
 	fprintf(m_outfile,"\\begin{tabular}{|c|c|cc|cc|cc|} \n");
@@ -56,17 +58,19 @@ void PrintAICTable(std::string category, std::string MRcut,std::string RSQcut,st
 	 }
 	fprintf(m_outfile,"\\hline \n");
 	fprintf(m_outfile,"\\end{tabular} \n");
-	fprintf(m_outfile,"\\caption{$M_R$ cut = %s \\&\\& $R^2$ cut = %s.} \n", MRcut.c_str(),RSQcut.c_str());
-	fprintf(m_outfile,"\\label{tab:FitChoices_%s_%s} \n", MRcut.c_str(),RSQcut.c_str());
+	fprintf(m_outfile,"\\caption{%s < $M_R$ < %s \\&\\& %s < $R^2$ < %s in the %s category.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile,"\\end{center} \n");
 	fprintf(m_outfile,"\\end{table} \n \n \n");
 	//pring the plot to a file
-	FILE* m_outfile2 = fopen("AIC_output/FitChoices_Plot.tex", "a");
+	std::string str_plot = "AIC_output/FitChoices_Plot_"+category+".tex";
+        const char * file_Name_plot = str_plot.c_str();
+	FILE* m_outfile2 = fopen(file_Name_plot, "a");
 	fprintf(m_outfile2,"\\begin{figure}[H] \n");
 	fprintf(m_outfile2,"\\begin{center} \n");
-	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{Figure/%s_%s.pdf} \n", MRcut.c_str(),RSQcut.c_str());
-	fprintf(m_outfile2,"\\caption{$M_R$ cut = %s \\&\\& $R^2$ cut = %s.} \n", MRcut.c_str(),RSQcut.c_str());
-	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", MRcut.c_str(),RSQcut.c_str());
+	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{Figure/%s/%s_%s.pdf} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile2,"\\caption{%s < $M_R$ < %s \\&\\& %s < $R^2$ < %s in the %s category.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile2,"\\end{center} \n");
 	fprintf(m_outfile2,"\\end{figure} \n \n \n");
 	
@@ -284,14 +288,14 @@ void PrintAICTable(std::string category, std::string MRcut,std::string RSQcut,st
 	
 /*	myC->cd(8);
 	TLegend* leg8 = new TLegend(0.2, 0.25, 0.8, 0.75);
-	leg8->AddEntry(p1,Form("M_{R} cut: %s", MRcut.c_str()),"");
-	leg8->AddEntry(p1,Form(" R^{2} cut: %s", RSQcut.c_str()),"");
+	leg8->AddEntry(p1,Form("M_{R} cut: %s", LowMRcut.c_str()),"");
+	leg8->AddEntry(p1,Form(" R^{2} cut: %s", LowRSQcut.c_str()),"");
 	leg8->SetFillStyle(0);
 	leg8->SetBorderSize(0);
 	leg8->SetTextColor(kRed);
 	leg8->Draw();
 */
-	std::string str = "AIC_output/"+category+ "/" + MRcut+"_"+RSQcut+".pdf";
+	std::string str = "AIC_output/"+category+ "/" + LowMRcut+"_"+LowRSQcut+".pdf";
 	const char * file_Name = str.c_str();
 	myC->SaveAs(file_Name);
 
