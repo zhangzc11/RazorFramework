@@ -15,7 +15,7 @@
 #include <RooWorkspace.h>
 #include <RooPlot.h>
 
-void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[]) 
+void PrintAICTable(std::string category, std::string MRcut,std::string RSQcut,std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[]) 
 {
 
 	std::map< std::string, std::string > func_name;
@@ -291,7 +291,7 @@ void PrintAICTable(std::string MRcut,std::string RSQcut,std::map<std::string, do
 	leg8->SetTextColor(kRed);
 	leg8->Draw();
 */
-	std::string str = "AIC_output/"+MRcut+"_"+RSQcut+".pdf";
+	std::string str = "AIC_output/"+category+ "/" + MRcut+"_"+RSQcut+".pdf";
 	const char * file_Name = str.c_str();
 	myC->SaveAs(file_Name);
 
