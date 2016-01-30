@@ -4,6 +4,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TMath.h>
+#include <TH1F.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
 #include "CommandLineInput.hh"
@@ -392,6 +393,17 @@ int main( int argc, char* argv[])
     {
       RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
       w_sFit->Write("w_sFit");
+    }
+  else if ( fitMode == "chooseBinning")
+    {
+      TTree* newTree = tree->CopyTree( cut );
+      newTree->Draw("mGammaGamma>>tmp1(38,103.,160)", "weight*(1)", "goff");
+      double lumi = 2300.0;
+      double kf   = 1.37;
+      TH1F* massHisto = (TH1F*)gDirectory->Get("tmp1");
+      massHisto->Scale( kf*lumi );
+      RooWorkspace* w_binning = SelectBinning( massHisto, mggName, "singleExp", f2, 1e2, 100 );
+      w_binning->Write("w_binning");
     }
   else
     {
