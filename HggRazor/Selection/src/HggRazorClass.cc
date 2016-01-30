@@ -463,7 +463,6 @@ void HggRazorClass::Loop()
 	  //if ( this->processName == "diphoton" ) w = xsecSF*weight*1.12;
 	  w = xsecSF*weight;
 	}
-      w = 1.0;
       total_in += w;
       bool pho1_isFake = false;
       bool pho2_isFake = false;

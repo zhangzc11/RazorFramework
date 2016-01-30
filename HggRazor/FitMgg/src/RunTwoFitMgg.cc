@@ -32,6 +32,7 @@
 #include <RooMinuit.h>
 #include <RooNLLVar.h>
 #include <RooRandom.h>
+#include <RooDataHist.h>
 //#include <RealVar.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
@@ -1479,5 +1480,85 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   ws->import( *pdfFrame );
   ws->import( mgg );
 
+  return ws;
+};
+
+RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString f2, int ntoys, int npoints )
+{
+  RooRandom::randomGenerator()->SetSeed( 0 );
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  
+  RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
+  mgg.setBins(38);
+  mgg.setRange("low", 103, 120);
+  mgg.setRange("high", 135, 160);
+  mgg.setRange("Full", 103, 160);
+
+  TString tag1;
+  if ( f1 == "doubleExp" )
+    {
+      tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "singleExp" )
+    {
+      tag1 = MakeSingleExp( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "modExp" )
+    {
+      tag1 = MakeModExp( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "singlePow" )
+    {
+      tag1 = MakeSinglePow( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "doublePow" )
+    {
+      tag1 = MakeDoublePow( f1 + "_2", mgg, *ws );
+    }
+  else if ( f1 == "poly2" )
+    {
+      tag1 = MakePoly2( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "poly3" )
+    {
+      tag1 = MakePoly3( f1 + "_1", mgg, *ws );
+    }
+  else if ( f1 == "poly4" )
+    {
+      tag1 = MakePoly4( f1 + "_1", mgg, *ws );
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  //-------------------
+  //Creatin RooDataHist
+  //-------------------
+  RooDataHist data( "data", "my_data", RooArgList(mgg), mggData );
+  TString totalEntriesStr = Form("(%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 160.);
+  TString sbEntriesStr = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 120., mggName.Data(), 135., mggName.Data(), 160.);
+  npoints = data.sumEntries( totalEntriesStr );
+  int sbpoints =  data.sumEntries( sbEntriesStr );
+  
+  RooDataSet* data_toys;
+  std::cout << "=====================" << std::endl;
+  std::cout << "[INFO]: total Str: " << totalEntriesStr << std::endl;
+  std::cout << "[INFO]: sb Str: " << sbEntriesStr << std::endl;
+  std::cout << "[INFO]: mgg variable name: " << mggName << std::endl;
+  std::cout << "[INFO]: sideband entries: " << sbpoints << std::endl;
+  std::cout << "[INFO]: total entries: "    << npoints << std::endl;
+  std::cout << "=====================" << std::endl;
+  
+  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  bres->SetName( tag1 + "_b_fitRes");
+  ws->import( *bres );
+
+  RooPlot* fmgg = mgg.frame();
+  data.plotOn( fmgg );
+  ws->pdf( tag1 )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high") );
+  fmgg->SetName( tag1 + "frame" );
+  ws->import( *fmgg );
   return ws;
 };

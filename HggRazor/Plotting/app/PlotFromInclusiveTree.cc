@@ -219,6 +219,23 @@ int main ( int argc, char* argv[] )
       std::cout << "[WARNING]: please provide a valid treeType, use --treeType=<inclusive/category>" << std::endl;
       treeType = "inclusive";
     }
+
+  std::string shapeOnly = ParseCommandLine( argc, argv, "-shapeOnly=" );
+  bool _shapeOnly = false;
+  if (  shapeOnly == "yes" )
+    {
+      std::cout << "[INFO]: re-scaling all histograms to unity" << std::endl;
+      _shapeOnly = true;
+    }
+  
+  std::string useKF = ParseCommandLine( argc, argv, "-useKF=" );
+  bool _useKF = false;
+  if (  useKF == "yes" )
+    {
+      std::cout << "[INFO]: Using k-factor(s) hardcoded in main application" << std::endl;
+      _useKF = true;
+    }
+  
   
   std::cout << "=================================" << std::endl;
   std::cout << "===========set parameters========" << std::endl;
@@ -247,10 +264,11 @@ int main ( int argc, char* argv[] )
   TH1D* mc;
   TH1D* mc2 = new TH1D();
 
-  const int nprocesses = 4;
+  const int nprocesses = 3;
   const int nplots = 4;
-  double k_f = 1.0;
+  double k_f = 1.37;//Difference in data/mc normalization
   const double lumi_frac = 1.0; // (5./19.8)
+  const double lumi = 2300.0;
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {
@@ -268,7 +286,8 @@ int main ( int argc, char* argv[] )
 	  AddTChain( chain, mapList[processName] );
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp","recreate");
-	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::signal) ) continue;
+	  //if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::signal) ) continue;
+	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet) ) continue;
 	  	  
 	  if ( chain == NULL )
 	    {
@@ -336,11 +355,12 @@ int main ( int argc, char* argv[] )
 	      if ( histos[i].process == Process::data )
 		{
 		  data = new TH1D ( *h_s );
-		  data->Scale(1.0/data->Integral());
+		  if ( _shapeOnly ) data->Scale(1.0/data->Integral());
 		}
 	      else if ( histos[i].process != Process::signal )
 		{
-		  //stack->Add( h_s, "histo" );
+		  h_s->Scale( lumi );
+		  if ( _useKF ) h_s->Scale( k_f );
 		  std::cout << "stacking " << GetProcessString( histos[i].process ) << std::endl;
 		  if ( mc == NULL || _isFirstMC )
 		    {
@@ -355,7 +375,7 @@ int main ( int argc, char* argv[] )
 	      else
 		{
 		  signal = new TH1D ( *h_s );
-		  signal->Scale(1.0/signal->Integral());
+		  if ( _shapeOnly ) signal->Scale(1.0/signal->Integral());
 		}
 	      //std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
 	      //if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
@@ -363,21 +383,25 @@ int main ( int argc, char* argv[] )
 	      
 	      AddLegend( h_s, leg, histos[i].process );
 	      if (  histos[i].process != Process::data ) AddLegend( h_s, leg2, histos[i].process );
-	      //
 	    }
+	  std::cout << "===================================" << std::endl;
+	  std::cout << "data-> " << data->Integral() << std::endl;
+	  std::cout << "MC-> " << mc->Integral() << std::endl;
+	  std::cout << "===================================" << std::endl;
 	  NormFactor = mc->Integral();
-	  mc->Scale(1.0/NormFactor);
+	  if ( _shapeOnly ) mc->Scale(1.0/NormFactor);
 	  for (  int i  = 0; i < nprocesses; i++ )
 	    {
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
-	      h_s->Scale(1.0/NormFactor);
+	      h_s->Scale( lumi );
+	      if ( _useKF ) h_s->Scale( k_f );
+	      if ( _shapeOnly ) h_s->Scale(1.0/NormFactor);
 	      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
-	       
 	    }
 	  if ( run == "run2" )
 	    {
-	      MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
+	      //MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
 	      MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
 	    }
 	}

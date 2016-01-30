@@ -18,6 +18,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, TString ffName );
 RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, int ntoys = 1e2, int npoints = 1e4 );
+RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString f2, int ntoys = 1e2, int npoints = 1e4 );
 RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TString f2, int ntoys = 1e2, double frac = 1.0, TString outName = "dummy" );
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys);
 RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3, TString ffName );
