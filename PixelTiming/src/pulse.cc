@@ -83,7 +83,11 @@ void pulse::Loop()
       for(int k = 0; k < 4; k++ )
 	{
 	  float timeGroup = 0;
-	  for ( int i = 0; i < 7; i++ ) timeGroup += gauspeak[k*9 + (i+1)]/7.;
+	  for ( int i = 0; i < 7; i++ )
+	    {
+	      if ( amp[k*9 + (i+1)] > 0.05 ) timeGroup += gauspeak[k*9 + (i+1)]/7.;
+	    }
+	  
 	  deltaTGroup[k]->Fill( timeGroup - gauspeak[k*9] );
 	  for ( int i = 0; i < 8; i++ )
 	    {
