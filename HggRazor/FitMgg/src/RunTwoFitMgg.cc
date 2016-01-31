@@ -33,6 +33,7 @@
 #include <RooNLLVar.h>
 #include <RooRandom.h>
 #include <RooDataHist.h>
+#include <RooHistPdf.h>
 //#include <RealVar.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
@@ -1541,8 +1542,12 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   TString sbEntriesStr = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 120., mggName.Data(), 135., mggName.Data(), 160.);
   npoints = data.sumEntries( totalEntriesStr );
   int sbpoints =  data.sumEntries( sbEntriesStr );
+
+  // Represent data in dh as pdf in x
+  RooHistPdf histpdf("histpdf", "histpdf", mgg, data, 0) ;
+    
+  RooDataHist* data_toys = histpdf.generateBinned( mgg,100);
   
-  RooDataSet* data_toys;
   std::cout << "=====================" << std::endl;
   std::cout << "[INFO]: total Str: " << totalEntriesStr << std::endl;
   std::cout << "[INFO]: sb Str: " << sbEntriesStr << std::endl;
@@ -1551,12 +1556,12 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   std::cout << "[INFO]: total entries: "    << npoints << std::endl;
   std::cout << "=====================" << std::endl;
   
-  RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   bres->SetName( tag1 + "_b_fitRes");
   ws->import( *bres );
 
   RooPlot* fmgg = mgg.frame();
-  data.plotOn( fmgg );
+  data_toys->plotOn( fmgg );
   ws->pdf( tag1 )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high") );
   fmgg->SetName( tag1 + "frame" );
   ws->import( *fmgg );
