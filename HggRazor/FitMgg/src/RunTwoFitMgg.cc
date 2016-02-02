@@ -1546,7 +1546,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   // Represent data in dh as pdf in x
   RooHistPdf histpdf("histpdf", "histpdf", mgg, data, 0) ;
     
-  RooDataHist* data_toys = histpdf.generateBinned( mgg,100);
+  RooDataHist* data_toys = histpdf.generateBinned( mgg, npoints );
   
   std::cout << "=====================" << std::endl;
   std::cout << "[INFO]: total Str: " << totalEntriesStr << std::endl;
@@ -1557,6 +1557,16 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   std::cout << "=====================" << std::endl;
   
   RooFitResult* bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+
+  //--------
+  //INTEGRAL
+  //--------
+  mgg.setRange("sig", 122.08, 128.92);
+  RooAbsReal* fIntegral  = ws->pdf( tag1 )->createIntegral(mgg);
+  RooAbsReal* fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  
+  std::cout << "test Int: " << fIntegral->getVal() << std::endl;
+  std::cout << "test Int2: " << fIntegral2->getVal() << std::endl;
   bres->SetName( tag1 + "_b_fitRes");
   ws->import( *bres );
 
