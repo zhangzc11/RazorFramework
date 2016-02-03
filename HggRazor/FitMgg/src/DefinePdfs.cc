@@ -139,7 +139,8 @@ TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
   Nbkg->setConstant(kFALSE);
   //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg);
   
-  RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
+  //RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
+  RooExponential* se = new RooExponential( tag + "_se","", mgg, *a);
   
   TString pdfName = tag+"_pdf_sExp_ext";
   //RooAddPdf* ext_singleExp = new RooAddPdf( pdfName,"", RooArgList( *se ), RooArgList( *NbkgSq ) );

@@ -1486,6 +1486,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
 
 RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString f2, int ntoys, int npoints )
 {
+  TFile* fout = new TFile("biasTree.root", "RECREATE");
   RooRandom::randomGenerator()->SetSeed( 0 );
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -1494,39 +1495,49 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   mgg.setRange("low", 103, 120);
   mgg.setRange("high", 135, 160);
   mgg.setRange("Full", 103, 160);
-
-  TString tag1;
+  //HighRes Signal Region
+  mgg.setRange("sig", 122.08, 128.92);
+  
+  TString tag1, tag2;
   if ( f1 == "doubleExp" )
     {
       tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+      tag2 = MakeDoubleExpN1N2( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "singleExp" )
     {
       tag1 = MakeSingleExp( f1 + "_1", mgg, *ws );
+      tag2 = MakeSingleExp( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "modExp" )
     {
       tag1 = MakeModExp( f1 + "_1", mgg, *ws );
+      tag2 = MakeModExp( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "singlePow" )
     {
       tag1 = MakeSinglePow( f1 + "_1", mgg, *ws );
+      tag2 = MakeSinglePow( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "doublePow" )
     {
-      tag1 = MakeDoublePow( f1 + "_2", mgg, *ws );
+      tag1 = MakeDoublePow( f1 + "_1", mgg, *ws );
+      tag2 = MakeDoublePow( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "poly2" )
     {
       tag1 = MakePoly2( f1 + "_1", mgg, *ws );
+      tag2 = MakePoly2( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "poly3" )
     {
       tag1 = MakePoly3( f1 + "_1", mgg, *ws );
+      tag2 = MakePoly3( f1 + "_1_clone", mgg, *ws );
     }
   else if ( f1 == "poly4" )
     {
       tag1 = MakePoly4( f1 + "_1", mgg, *ws );
+      tag2 = MakePoly4( f1 + "_1_clone", mgg, *ws );
     }
   else
     {
@@ -1544,9 +1555,10 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   int sbpoints =  data.sumEntries( sbEntriesStr );
 
   // Represent data in dh as pdf in x
-  RooHistPdf histpdf("histpdf", "histpdf", mgg, data, 0) ;
-    
-  RooDataHist* data_toys = histpdf.generateBinned( mgg, npoints );
+  RooHistPdf histpdf("histpdf", "histpdf", mgg, data, 0);
+  RooAbsReal* fHistInt   = histpdf.createIntegral( mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  //mc toys dataHist
+  RooDataHist* data_toys;
   
   std::cout << "=====================" << std::endl;
   std::cout << "[INFO]: total Str: " << totalEntriesStr << std::endl;
@@ -1556,24 +1568,70 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   std::cout << "[INFO]: total entries: "    << npoints << std::endl;
   std::cout << "=====================" << std::endl;
   
-  RooFitResult* bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-
+  TTree* biasTree = new TTree("biasTree", "Tree containing bias test information");
+  double alpha_hat, alpha_true, n_hat, n_true, sigInt_hat, sigInt_true;
+  biasTree->Branch("alpha_hat", &alpha_hat, "alpha_hat/D");
+  biasTree->Branch("alpha_true", &alpha_true, "alpha_true/D");
+  biasTree->Branch("n_hat", &n_hat, "n_hat/D");
+  biasTree->Branch("n_true", &n_true, "n_true/D");
+  biasTree->Branch("sigInt_hat", &sigInt_hat, "sigInt_hat/D");
+  biasTree->Branch("sigInt_true", &sigInt_true, "sigInt_true/D");
+  
+  
+  RooFitResult* bres;
+  RooAbsReal* fIntegral2;
+  npoints = 10;
+  RooDataHist* data_toys2 = histpdf.generateBinned( mgg, npoints );
+  RooFitResult* bres2 = ws->pdf( tag2 )->fitTo( *data_toys2, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  fIntegral2 = ws->pdf( tag2 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  double alpha_clone = ws->var( f1 + "_1_clone_a")->getVal();
+  
+  sigInt_true = fIntegral2->getVal();
+  //setting true value for TTree
+  sigInt_true = fIntegral2->getVal();
+  n_true      = (double)npoints;
+  alpha_true  = alpha_clone;
+  for ( int i = 0; i < 10000; i++ )
+    {
+      data_toys = ws->pdf( tag2 )->generateBinned( mgg, npoints );
+      ws->var( f1 + "_1_Nbkg" )->setVal( npoints );
+      ws->var( f1 + "_1_a" )->setVal( alpha_clone );
+      std::cout << "===========================" << std::endl;
+      std::cout << "[INFO]: Setting N_bkg-> " << npoints << "; and alpha-> " << alpha_clone << std::endl;
+      std::cout << "===========================" << std::endl;
+      bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+      //absoluteBias = fIntegral2->getVal() - fHistInt->getVal();
+      std::cout << "Nbkg--->: " << fIntegral2->getVal()*ws->var( f1 + "_1_Nbkg" )->getVal() << std::endl;
+      //absoluteBias = ws->var( f1 + "_1_Nbkg" )->getVal()*fIntegral2->getVal()/trueSignalEvents - 1.0;
+      //absoluteBias = ws->var( f1 + "_1_Nbkg" )->getVal()/(double)npoints - 1.0;
+      //absoluteBias = fIntegral2->getVal()/trueSignalEvents - 1.0;
+      alpha_hat  = ws->var( f1 + "_1_a" )->getVal();
+      n_hat      = ws->var( f1 + "_1_Nbkg" )->getVal();
+      sigInt_hat = fIntegral2->getVal();
+      biasTree->Fill();
+    }
   //--------
   //INTEGRAL
   //--------
-  mgg.setRange("sig", 122.08, 128.92);
   RooAbsReal* fIntegral  = ws->pdf( tag1 )->createIntegral(mgg);
-  RooAbsReal* fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  
   
   std::cout << "test Int: " << fIntegral->getVal() << std::endl;
   std::cout << "test Int2: " << fIntegral2->getVal() << std::endl;
-  bres->SetName( tag1 + "_b_fitRes");
+  std::cout << "hist Int: " << fHistInt->getVal() << std::endl;
+  bres2->SetName( tag2 + "_b_fitRes");
   ws->import( *bres );
 
   RooPlot* fmgg = mgg.frame();
-  data_toys->plotOn( fmgg );
-  ws->pdf( tag1 )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high") );
-  fmgg->SetName( tag1 + "frame" );
+  data_toys2->plotOn( fmgg );
+  ws->pdf( tag2 )->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("low,high") );
+  fmgg->SetName( tag2 + "frame" );
   ws->import( *fmgg );
+
+  
+  biasTree->Write();
+  ws->Write("my_ws");
+  fout->Close();
   return ws;
 };
