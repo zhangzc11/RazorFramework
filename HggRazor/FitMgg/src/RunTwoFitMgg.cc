@@ -14,6 +14,10 @@
 #include <TLegend.h>
 #include <TMath.h>
 #include <TBox.h>
+#include <TMath.h>
+#include <TROOT.h>
+#include <Math/GaussIntegrator.h>
+#include <Math/IntegratorOptions.h>
 //ROOFIT INCLUDES
 #include <RooWorkspace.h>
 #include <RooDataSet.h>
@@ -1570,45 +1574,86 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   
   TTree* biasTree = new TTree("biasTree", "Tree containing bias test information");
   double alpha_hat, alpha_true, n_hat, n_true, sigInt_hat, sigInt_true;
+  double alpha_sigma, n_sigma, sigInt_sigma;
+  double intTF1, intErr, intTF1_tot;
   biasTree->Branch("alpha_hat", &alpha_hat, "alpha_hat/D");
   biasTree->Branch("alpha_true", &alpha_true, "alpha_true/D");
+  biasTree->Branch("alpha_sigma", &alpha_sigma, "alpha_sigma/D");
   biasTree->Branch("n_hat", &n_hat, "n_hat/D");
   biasTree->Branch("n_true", &n_true, "n_true/D");
+  biasTree->Branch("n_sigma", &n_sigma, "n_sigma/D");
   biasTree->Branch("sigInt_hat", &sigInt_hat, "sigInt_hat/D");
   biasTree->Branch("sigInt_true", &sigInt_true, "sigInt_true/D");
+  biasTree->Branch("sigInt_sigma", &sigInt_sigma, "sigInt_sigma/D");
+  biasTree->Branch("intTF1", &intTF1, "intTF1/D");
+  biasTree->Branch("intErr", &intErr, "intErr/D");
+  biasTree->Branch("intTF1_tot", &intTF1_tot, "intTF1_tot/D");
   
   
   RooFitResult* bres;
   RooAbsReal* fIntegral2;
-  npoints = 10;
+  npoints = 100;
   RooDataHist* data_toys2 = histpdf.generateBinned( mgg, npoints );
+  ws->var("singleExp_1_clone_Nbkg")->setVal( npoints );
   RooFitResult* bres2 = ws->pdf( tag2 )->fitTo( *data_toys2, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   fIntegral2 = ws->pdf( tag2 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
   double alpha_clone = ws->var( f1 + "_1_clone_a")->getVal();
   
-  sigInt_true = fIntegral2->getVal();
+  TF1* myPdf;
+  TRandom3* rnd = new TRandom3( 0 );
+  ROOT::Math::IntegratorOneDimOptions::SetDefaultIntegrator( "ADAPTIVE" );
+  
+  RooArgSet* paramSet = ws->pdf( tag2 )->getParameters( RooArgSet(mgg) );
+  myPdf = ws->pdf( tag2 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
+  TMatrixDSym covMatrix = bres2->covarianceMatrix();
+  double* params = myPdf->GetParameters();
+  
+  //sigInt_true = fIntegral2->getVal();
+  sigInt_true = myPdf->Integral( 122.08, 128.92, 1e-17 );
   //setting true value for TTree
   sigInt_true = fIntegral2->getVal();
-  n_true      = (double)npoints;
   alpha_true  = alpha_clone;
+  
   for ( int i = 0; i < 10000; i++ )
     {
-      data_toys = ws->pdf( tag2 )->generateBinned( mgg, npoints );
-      ws->var( f1 + "_1_Nbkg" )->setVal( npoints );
+      n_true = rnd->PoissonD( (double)npoints );
+      data_toys = ws->pdf( tag2 )->generateBinned( mgg, n_true );
+      ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
       ws->var( f1 + "_1_a" )->setVal( alpha_clone );
       std::cout << "===========================" << std::endl;
       std::cout << "[INFO]: Setting N_bkg-> " << npoints << "; and alpha-> " << alpha_clone << std::endl;
       std::cout << "===========================" << std::endl;
       bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
-      //absoluteBias = fIntegral2->getVal() - fHistInt->getVal();
-      std::cout << "Nbkg--->: " << fIntegral2->getVal()*ws->var( f1 + "_1_Nbkg" )->getVal() << std::endl;
-      //absoluteBias = ws->var( f1 + "_1_Nbkg" )->getVal()*fIntegral2->getVal()/trueSignalEvents - 1.0;
-      //absoluteBias = ws->var( f1 + "_1_Nbkg" )->getVal()/(double)npoints - 1.0;
-      //absoluteBias = fIntegral2->getVal()/trueSignalEvents - 1.0;
-      alpha_hat  = ws->var( f1 + "_1_a" )->getVal();
-      n_hat      = ws->var( f1 + "_1_Nbkg" )->getVal();
-      sigInt_hat = fIntegral2->getVal();
+      RooAbsReal* f2int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("sig") );
+      RooAbsReal* f3int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("Full") );
+
+      paramSet = ws->pdf( tag1 )->getParameters( RooArgSet(mgg) );
+      myPdf = ws->pdf( tag1 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
+      covMatrix = bres->covarianceMatrix();
+      params = myPdf->GetParameters();
+      intTF1     = myPdf->Integral( 122.08, 128.92, 1e-17 );
+      intErr     = myPdf->IntegralError( 122.08, 128.92, params, covMatrix.GetMatrixArray(), 1e-14 );
+      intTF1_tot = myPdf->Integral( 103., 160., 1e-17 );
+      std::cout << "=================================================" << std::endl;
+      std::cout << "Int RooFit Normalized " << fIntegral2->getVal() << std::endl;
+      std::cout << "Int TF1 normalized: " << intTF1/intTF1_tot << std::endl;
+      std::cout << "Int RooFit " << f2int->getVal() << std::endl;
+      std::cout << "Int TF1 " << intTF1 << std::endl;
+      std::cout << "Int RooFit Total" << f3int->getVal() << std::endl;
+      std::cout << "Int TF1 Total" << intTF1_tot << std::endl;
+      std::cout << "=================================================" << std::endl;
+      
+      //alpha
+      alpha_hat   = ws->var( f1 + "_1_a" )->getVal();
+      alpha_sigma = ws->var( f1 + "_1_a" )->getError();
+      //n
+      n_hat       = ws->var( f1 + "_1_Nbkg" )->getVal();
+      n_sigma     = ws->var( f1 + "_1_Nbkg" )->getError();
+      //signal integral
+      //sigInt_hat   = fIntegral2->getVal();
+      sigInt_hat = intTF1;
+      sigInt_sigma = intErr;
       biasTree->Fill();
     }
   //--------
