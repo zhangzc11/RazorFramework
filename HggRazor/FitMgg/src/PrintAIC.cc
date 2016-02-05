@@ -108,21 +108,23 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	    grshade[0]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
 	    grshade[0]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
 	  }
-	//grshade->SetFillStyle(3013);
-	grshade[0]->SetFillStyle(1001);  
+	grshade[0]->SetFillStyle(3344);//1001  
 	grshade[0]->SetFillColor(kRed-9);
 	grshade[0]->Draw("f same");
 	
 	TLegend* leg[8];
 	for(int idx=0;idx<8;idx++)
 	{
-	leg[idx] = new TLegend(0.75, 0.7, 0.99, 0.99);
-	leg[idx]->AddEntry(p1,Form("#Delta A = %5.2f", delta_aic_2[idx]),"");
-	leg[idx]->AddEntry(p1,Form("   #omega_{i} = %5.2f", weight_aic_2[idx]),"");
+	leg[idx] = new TLegend(0.75, 0.75, 0.99, 0.99);
+	leg[idx]->AddEntry(p1,Form("    #Delta A = %5.2f", delta_aic_2[idx]),"");
+	leg[idx]->AddEntry(p1,Form("      #omega = %5.2f", weight_aic_2[idx]),"");
 	leg[idx]->SetFillStyle(0);
 	leg[idx]->SetBorderSize(0);
 	leg[idx]->SetTextColor(kRed);
 	}
+
+	leg[0]->AddEntry(p1,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
+	
 	leg[0]->Draw();
 		
 	myC->cd(2);
@@ -143,9 +145,10 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[1]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[1]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-	grshade[1]->SetFillStyle(1001);
+	grshade[1]->SetFillStyle(3344);//1001
         grshade[1]->SetFillColor(kRed-9);
         grshade[1]->Draw("f same");
+	leg[1]->AddEntry(p2,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
 	leg[1]->Draw();
 	myC->cd(3);
 	RooPlot * p3 = (RooPlot*)w[3]->obj("sideband_fit_doublePow_dpow_ext_frame");
@@ -165,10 +168,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[2]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[2]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[2]->SetFillStyle(1001);
+        grshade[2]->SetFillStyle(3344);//1001
         grshade[2]->SetFillColor(kRed-9);
         grshade[2]->Draw("f same");
 	
+	leg[2]->AddEntry(p3,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
 	leg[2]->Draw();
 	myC->cd(4);
 	RooPlot * p4 = (RooPlot*)w[2]->obj("sideband_fit_singlePow_spow_ext_frame");
@@ -188,10 +192,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[3]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[3]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[3]->SetFillStyle(1001);
+        grshade[3]->SetFillStyle(3344);//1001
         grshade[3]->SetFillColor(kRed-9);
         grshade[3]->Draw("f same");
 	
+	leg[3]->AddEntry(p4,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
 	leg[3]->Draw();
 	myC->cd(5);
 	RooPlot * p5 = (RooPlot*)w[4]->obj("sideband_fit_poly2_pol2_ext_frame");
@@ -211,10 +216,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[4]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[4]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[4]->SetFillStyle(1001);
+        grshade[4]->SetFillStyle(3344);//1001
         grshade[4]->SetFillColor(kRed-9);
         grshade[4]->Draw("f same");
 	
+	leg[4]->AddEntry(p5,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
 	leg[4]->Draw();
 	myC->cd(6);
 	RooPlot * p6 = (RooPlot*)w[5]->obj("sideband_fit_poly3_pol3_ext_frame");
@@ -234,10 +240,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[5]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[5]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[5]->SetFillStyle(1001);
+        grshade[5]->SetFillStyle(3344);//1001
         grshade[5]->SetFillColor(kRed-9);
         grshade[5]->Draw("f same");
 	
+	leg[5]->AddEntry(p6,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(4)),"");
 	leg[5]->Draw();
 	myC->cd(7);
 	RooPlot * p7 = (RooPlot*)w[7]->obj("sideband_fit_poly4_pol4_ext_frame");
@@ -257,10 +264,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[6]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[6]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[6]->SetFillStyle(1001);
+        grshade[6]->SetFillStyle(3344);//1001
         grshade[6]->SetFillColor(kRed-9);
         grshade[6]->Draw("f same");
 	
+	leg[6]->AddEntry(p7,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(5)),"");
 	leg[6]->Draw();
 	myC->cd(8);
 	RooPlot * p8 = (RooPlot*)w[6]->obj("sideband_fit_modExp_mexp_ext_frame");
@@ -280,10 +288,11 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
             grshade[7]->SetPoint(ig, 120., (float)ig*(top_y/(float)n_g) );
             grshade[7]->SetPoint( (n_g+1) + ig, 135., top_y - (float)ig*(top_y/(float)n_g) );
           }
-        grshade[7]->SetFillStyle(1001);
+        grshade[7]->SetFillStyle(3344);//1001
         grshade[7]->SetFillColor(kRed-9);
         grshade[7]->Draw("f same");
 	
+	leg[7]->AddEntry(p8,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(2)),"");
 	leg[7]->Draw();
 	
 /*	myC->cd(8);
