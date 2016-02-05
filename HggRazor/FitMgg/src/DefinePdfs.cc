@@ -150,11 +150,13 @@ TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
 };
 
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w) {
-  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
+  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-0.5, -1.0,0.0, "");
   alpha->setConstant(kFALSE);
   RooFormulaVar* alphasq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
-  RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
+  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
+  RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 2.0,"");
   m->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}", 10, "events");  
   Nbkg->setConstant(kFALSE);
