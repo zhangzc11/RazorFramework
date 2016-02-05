@@ -132,14 +132,15 @@ TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a = new RooRealVar( tag + "_a", "", 0.6, "a.u"); 
+  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
   a->setConstant(kFALSE);
   RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *a);
   RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events"); 
   Nbkg->setConstant(kFALSE);
   //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_NbkgSq","","@0*@0", *Nbkg);
   
-  RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
+  //RooExponential* se = new RooExponential( tag + "_se","", mgg, *asq);
+  RooExponential* se = new RooExponential( tag + "_se","", mgg, *a);
   
   TString pdfName = tag+"_pdf_sExp_ext";
   //RooAddPdf* ext_singleExp = new RooAddPdf( pdfName,"", RooArgList( *se ), RooArgList( *NbkgSq ) );

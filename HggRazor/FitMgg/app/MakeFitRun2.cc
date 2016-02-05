@@ -73,7 +73,7 @@ int main( int argc, char* argv[])
   std::string fitMode = ParseCommandLine( argc, argv, "-fitMode=" );
   if (  fitMode == "" )
     {
-      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nbias\nsignalFit\nbiasSignal" << std::endl;
+      std::cerr << "[ERROR]: please provide a fit mode using --fitMode=<mode> , options are: \nsideband\nsb (signal+bkg)\nAIC\nAIC2\nbias\nsignalFit\nbiasSignal\nchooseBinning" << std::endl;
       return -1;
     }
 
