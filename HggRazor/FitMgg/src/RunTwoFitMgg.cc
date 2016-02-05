@@ -1601,7 +1601,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   
   TF1* myPdf;
   TRandom3* rnd = new TRandom3( 0 );
-  ROOT::Math::IntegratorOneDimOptions::SetDefaultIntegrator( "ADAPTIVE" );
+  //ROOT::Math::IntegratorOneDimOptions::SetDefaultIntegrator( "ADAPTIVE" );
   
   RooArgSet* paramSet = ws->pdf( tag2 )->getParameters( RooArgSet(mgg) );
   myPdf = ws->pdf( tag2 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
@@ -1609,9 +1609,9 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   double* params = myPdf->GetParameters();
   
   //sigInt_true = fIntegral2->getVal();
-  sigInt_true = myPdf->Integral( 122.08, 128.92, 1e-17 );
+  sigInt_true = myPdf->Integral( 122.08-5., 128.92+5., 1e-15 );
   //setting true value for TTree
-  sigInt_true = fIntegral2->getVal();
+  //sigInt_true = fIntegral2->getVal();
   alpha_true  = alpha_clone;
   
   for ( int i = 0; i < 10000; i++ )
@@ -1632,9 +1632,9 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       myPdf = ws->pdf( tag1 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
       covMatrix = bres->covarianceMatrix();
       params = myPdf->GetParameters();
-      intTF1     = myPdf->Integral( 122.08, 128.92, 1e-17 );
-      intErr     = myPdf->IntegralError( 122.08, 128.92, params, covMatrix.GetMatrixArray(), 1e-14 );
-      intTF1_tot = myPdf->Integral( 103., 160., 1e-17 );
+      intTF1     = myPdf->Integral( 122.08-5., 128.92+5., 1e-15 );
+      intErr     = myPdf->IntegralError( 122.08-5., 128.92+5., params, covMatrix.GetMatrixArray(), 1e-14 );
+      intTF1_tot = myPdf->Integral( 103., 160., 1e-15 );
       std::cout << "=================================================" << std::endl;
       std::cout << "Int RooFit Normalized " << fIntegral2->getVal() << std::endl;
       std::cout << "Int TF1 normalized: " << intTF1/intTF1_tot << std::endl;
