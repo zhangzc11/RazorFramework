@@ -58,7 +58,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	 }
 	fprintf(m_outfile,"\\hline \n");
 	fprintf(m_outfile,"\\end{tabular} \n");
-	fprintf(m_outfile,"\\caption{%s < $M_R$ < %s \\&\\& %s < $R^2$ < %s in the %s category.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile,"\\end{center} \n");
 	fprintf(m_outfile,"\\end{table} \n \n \n");
@@ -69,7 +69,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	fprintf(m_outfile2,"\\begin{figure}[H] \n");
 	fprintf(m_outfile2,"\\begin{center} \n");
 	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{Figure/%s/%s_%s.pdf} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
-	fprintf(m_outfile2,"\\caption{%s < $M_R$ < %s \\&\\& %s < $R^2$ < %s in the %s category.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s -  %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile2,"\\end{center} \n");
 	fprintf(m_outfile2,"\\end{figure} \n \n \n");
