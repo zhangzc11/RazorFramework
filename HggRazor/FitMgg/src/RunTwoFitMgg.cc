@@ -1596,7 +1596,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   RooDataHist* data_toys2 = histpdf.generateBinned( mgg, npoints );
   ws->var("singleExp_1_clone_Nbkg")->setVal( npoints );
   RooFitResult* bres2 = ws->pdf( tag2 )->fitTo( *data_toys2, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  fIntegral2 = ws->pdf( tag2 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+  RooAbsReal* fIntTrue = ws->pdf( tag2 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
   double alpha_clone = ws->var( f1 + "_1_clone_a")->getVal();
   
   TF1* myPdf;
@@ -1605,18 +1605,25 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   
   RooArgSet* paramSet = ws->pdf( tag2 )->getParameters( RooArgSet(mgg) );
   myPdf = ws->pdf( tag2 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
-  TMatrixDSym covMatrix = bres2->covarianceMatrix();
+  //TMatrixDSym covMatrix = bres2->covarianceMatrix();
+  TMatrixDSym covMatrix = bres2->correlationMatrix();
+  std::cout << "Number Of Elements: " << covMatrix.GetNoElements() << std::endl;
+  const double* pData = covMatrix.GetMatrixArray();
+  for ( int j = 0; j < covMatrix.GetNoElements(); j++ )
+    {
+      std::cout << "par " << j << " = " << pData[j] << std::endl;
+    }
+  
   double* params = myPdf->GetParameters();
   
-  //sigInt_true = fIntegral2->getVal();
-  sigInt_true = myPdf->Integral( 122.08-5., 128.92+5., 1e-15 );
-  //setting true value for TTree
-  //sigInt_true = fIntegral2->getVal();
+  //sigInt_true = myPdf->Integral( 103, 160, 1e-15 );
+  //sigInt_true = fIntTrue->getVal();
   alpha_true  = alpha_clone;
-  
-  for ( int i = 0; i < 10000; i++ )
+  double normTrueInt = fIntTrue->getVal();
+  for ( int i = 0; i < 1; i++ )
     {
       n_true = rnd->PoissonD( (double)npoints );
+      sigInt_true = n_true*normTrueInt;
       data_toys = ws->pdf( tag2 )->generateBinned( mgg, n_true );
       ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
       ws->var( f1 + "_1_a" )->setVal( alpha_clone );
@@ -1625,23 +1632,27 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       std::cout << "===========================" << std::endl;
       bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
+      
       RooAbsReal* f2int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("sig") );
       RooAbsReal* f3int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("Full") );
+      RooAbsReal* f4int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("Full") );
 
       paramSet = ws->pdf( tag1 )->getParameters( RooArgSet(mgg) );
       myPdf = ws->pdf( tag1 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
       covMatrix = bres->covarianceMatrix();
       params = myPdf->GetParameters();
-      intTF1     = myPdf->Integral( 122.08-5., 128.92+5., 1e-15 );
-      intErr     = myPdf->IntegralError( 122.08-5., 128.92+5., params, covMatrix.GetMatrixArray(), 1e-14 );
+      //Getting Integrals
+      intTF1     = fIntegral2->getVal();
+      intErr     = myPdf->IntegralError( 103., 160., params, covMatrix.GetMatrixArray(), 1e-14 );
       intTF1_tot = myPdf->Integral( 103., 160., 1e-15 );
       std::cout << "=================================================" << std::endl;
-      std::cout << "Int RooFit Normalized " << fIntegral2->getVal() << std::endl;
-      std::cout << "Int TF1 normalized: " << intTF1/intTF1_tot << std::endl;
-      std::cout << "Int RooFit " << f2int->getVal() << std::endl;
-      std::cout << "Int TF1 " << intTF1 << std::endl;
-      std::cout << "Int RooFit Total" << f3int->getVal() << std::endl;
-      std::cout << "Int TF1 Total" << intTF1_tot << std::endl;
+      std::cout << "Int RooFit Normalized --> " << fIntegral2->getVal() << std::endl;
+      std::cout << "Int TF1 normalized --> " << intTF1/intTF1_tot << std::endl;
+      std::cout << "Int RooFit --> " << f2int->getVal() << std::endl;
+      std::cout << "Int TF1 --> " << intTF1 << std::endl;
+      std::cout << "Int RooFit Total --> " << f3int->getVal() << std::endl;
+      std::cout << "Int RooFit Total Normalized --> " << f4int->getVal() << std::endl;
+      std::cout << "Int TF1 Total --> " << intTF1_tot << std::endl;
       std::cout << "=================================================" << std::endl;
       
       //alpha
@@ -1651,8 +1662,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       n_hat       = ws->var( f1 + "_1_Nbkg" )->getVal();
       n_sigma     = ws->var( f1 + "_1_Nbkg" )->getError();
       //signal integral
-      //sigInt_hat   = fIntegral2->getVal();
-      sigInt_hat = intTF1;
+      sigInt_hat = intTF1*n_hat;
       sigInt_sigma = intErr;
       biasTree->Fill();
     }
