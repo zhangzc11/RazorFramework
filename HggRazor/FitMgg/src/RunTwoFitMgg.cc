@@ -1574,7 +1574,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   
   TTree* biasTree = new TTree("biasTree", "Tree containing bias test information");
   double alpha_hat, alpha_true, n_hat, n_true, sigInt_hat, sigInt_true;
-  double alpha_sigma, n_sigma, sigInt_sigma;
+  double alpha_sigma, n_sigma, sigInt_sigma, sigInt_sigma2;
   double intTF1, intErr, intTF1_tot;
   biasTree->Branch("alpha_hat", &alpha_hat, "alpha_hat/D");
   biasTree->Branch("alpha_true", &alpha_true, "alpha_true/D");
@@ -1585,6 +1585,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   biasTree->Branch("sigInt_hat", &sigInt_hat, "sigInt_hat/D");
   biasTree->Branch("sigInt_true", &sigInt_true, "sigInt_true/D");
   biasTree->Branch("sigInt_sigma", &sigInt_sigma, "sigInt_sigma/D");
+  biasTree->Branch("sigInt_sigma2", &sigInt_sigma2, "sigInt_sigma2/D");
   biasTree->Branch("intTF1", &intTF1, "intTF1/D");
   biasTree->Branch("intErr", &intErr, "intErr/D");
   biasTree->Branch("intTF1_tot", &intTF1_tot, "intTF1_tot/D");
@@ -1608,19 +1609,20 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   //TMatrixDSym covMatrix = bres2->covarianceMatrix();
   TMatrixDSym covMatrix = bres2->correlationMatrix();
   std::cout << "Number Of Elements: " << covMatrix.GetNoElements() << std::endl;
-  const double* pData = covMatrix.GetMatrixArray();
+  /*const double* pData = covMatrix.GetMatrixArray();
   for ( int j = 0; j < covMatrix.GetNoElements(); j++ )
     {
       std::cout << "par " << j << " = " << pData[j] << std::endl;
     }
   
   double* params = myPdf->GetParameters();
-  
+  */
   //sigInt_true = myPdf->Integral( 103, 160, 1e-15 );
   //sigInt_true = fIntTrue->getVal();
   alpha_true  = alpha_clone;
   double normTrueInt = fIntTrue->getVal();
-  for ( int i = 0; i < 1; i++ )
+  double* params;
+  for ( int i = 0; i < 10000; i++ )
     {
       n_true = rnd->PoissonD( (double)npoints );
       sigInt_true = n_true*normTrueInt;
@@ -1632,7 +1634,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       std::cout << "===========================" << std::endl;
       bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
-      
+            
       RooAbsReal* f2int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("sig") );
       RooAbsReal* f3int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("Full") );
       RooAbsReal* f4int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("Full") );
@@ -1663,7 +1665,24 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       n_sigma     = ws->var( f1 + "_1_Nbkg" )->getError();
       //signal integral
       sigInt_hat = intTF1*n_hat;
-      sigInt_sigma = intErr;
+      //Single Exp Uncertainty Calculation
+      //122.08, 128.92
+      //getting correlation matrix parameters from correlation matrix
+      TMatrixDSym corrMatrix = bres2->correlationMatrix();
+      const double* pData = corrMatrix.GetMatrixArray();
+      //propagation of uncertainty
+      double eta    = exp(-alpha_hat*122.08) - exp(-alpha_hat*128.92);
+      double etaMod = 128.92*exp(-alpha_hat*128.92) - 122.08*exp(-alpha_hat*122.08);
+      double xi     = exp(-alpha_hat*103.) - exp(-alpha_hat*160.);
+      double xiMod  = 103.*exp(-alpha_hat*103.) - 160.*exp(-alpha_hat*160.);
+      double dIdN = eta/xi;
+      double dIdAlpha = n_hat*( eta*xiMod/(xi*xi) + etaMod/xi );
+      
+      std::cout << "dIdN: " << dIdN << " , dIdAlpha: " << dIdAlpha << std::endl;
+      double sigmaI = sqrt(dIdN*dIdN*n_sigma*n_sigma + dIdAlpha*dIdAlpha*alpha_sigma*alpha_sigma + dIdN*dIdAlpha*pData[1]*n_sigma*alpha_sigma);
+      std::cout << "Int: " << sigInt_hat << " +/- " << sigmaI << std::endl;
+      sigInt_sigma = sigmaI;
+      sigInt_sigma2 = sqrt(dIdN*dIdN*n_sigma*n_sigma + dIdAlpha*dIdAlpha*alpha_sigma*alpha_sigma);
       biasTree->Fill();
     }
   //--------
