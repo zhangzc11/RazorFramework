@@ -114,6 +114,27 @@ int main( int argc, char* argv[])
       std::cerr << "[WARNING] to set a signal fraction use --signalFraction=<sfrac>: " << std::endl;
     }
   
+  std::string _ntoys = ParseCommandLine( argc, argv, "-nToys=" );
+  int ntoys = 0;
+  if ( _ntoys != "" )
+    {
+      ntoys = atoi( _ntoys.c_str() );
+    }
+  else
+    {
+      std::cerr << "[INFO] nToys has not been set, please use --nToys=" << std::endl;
+    }
+
+  std::string _ndataset = ParseCommandLine( argc, argv, "-nDataset=" );
+  int ndataset = 10;
+  if ( _ndataset != "" )
+    {
+      ndataset = atoi( _ndataset.c_str() );
+    }
+  else
+    {
+      std::cerr << "[INFO] nDataset has not been set, please use --nDataset=" << std::endl;
+    }
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
   std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
@@ -122,6 +143,9 @@ int main( int argc, char* argv[])
   std::cout << "[INFO]: fit mode      :" << fitMode << std::endl;
   std::cout << "[INFO]: outputfile    :" << outputfilename << std::endl;
   std::cout << "[INFO]: inverted Iso  :" << invertIso << std::endl;
+  std::cout << "[INFO]: nToys         :" << ntoys << std::endl;
+  std::cout << "[INFO]: nDataset      :" << ndataset << std::endl;
+  
   if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << _signalFraction << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
@@ -402,7 +426,7 @@ int main( int argc, char* argv[])
       double kf   = 1.37;
       TH1F* massHisto = (TH1F*)gDirectory->Get("tmp1");
       massHisto->Scale( kf*lumi );
-      RooWorkspace* w_binning = SelectBinning( massHisto, mggName, "singleExp", f2, 1e2, 100 );
+      RooWorkspace* w_binning = SelectBinning( massHisto, mggName, "singleExp", f2, ntoys, ndataset, outName );
       w_binning->Write("w_binning");
     }
   else

@@ -25,6 +25,7 @@
 #include <RooExponential.h>
 #include <RooAddPdf.h>
 #include <RooGaussian.h>
+#include <RooMinimizer.h>
 #include <RooFitResult.h>
 #include <RooPlot.h>
 #include <RooExtendPdf.h>
@@ -46,14 +47,15 @@
 RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  /*RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(57);
-  mgg.setRange( "signal", 120, 130. );*/
-  
+  mgg.setRange( "signal", 110, 140. );
+
+  /*
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 100, 1000, "GeV" );
   mgg.setBins(180);
-  mgg.setRange( "signal", 650, 850. );
-  
+  mgg.setRange( "signal", 600, 850. );
+  */
   //C r e a t e  doubleGaus
   TString tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
   //ws->var("dGauss_signal_gauss_Ns")->setVal( 1600 );
@@ -865,8 +867,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   s_mgg->SetName("signal_toys_plot");
   signal_toys->plotOn( s_mgg );
   ws->import( *signal_toys );
+  ws->import( *signal_toys );
   ws->import( *s_mgg );
-  
   
   TString tag1, tag2, tag2p;
   if ( f1 == "doubleExp" )
@@ -1488,9 +1490,9 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   return ws;
 };
 
-RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString f2, int ntoys, int npoints )
+RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString f2, int ntoys, int npoints, TString outName )
 {
-  TFile* fout = new TFile("biasTree.root", "RECREATE");
+  TFile* fout = new TFile( outName + "_biasTree.root", "RECREATE");
   RooRandom::randomGenerator()->SetSeed( 0 );
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -1555,7 +1557,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   RooDataHist data( "data", "my_data", RooArgList(mgg), mggData );
   TString totalEntriesStr = Form("(%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 160.);
   TString sbEntriesStr = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 120., mggName.Data(), 135., mggName.Data(), 160.);
-  npoints = data.sumEntries( totalEntriesStr );
+  //npoints = data.sumEntries( totalEntriesStr );
   int sbpoints =  data.sumEntries( sbEntriesStr );
 
   // Represent data in dh as pdf in x
@@ -1575,6 +1577,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   TTree* biasTree = new TTree("biasTree", "Tree containing bias test information");
   double alpha_hat, alpha_true, n_hat, n_true, sigInt_hat, sigInt_true;
   double alpha_sigma, n_sigma, sigInt_sigma, sigInt_sigma2;
+  double _status, _covStatus, _status2, _covStatus2, _status3, _covStatus3;
   double intTF1, intErr, intTF1_tot;
   biasTree->Branch("alpha_hat", &alpha_hat, "alpha_hat/D");
   biasTree->Branch("alpha_true", &alpha_true, "alpha_true/D");
@@ -1589,11 +1592,17 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   biasTree->Branch("intTF1", &intTF1, "intTF1/D");
   biasTree->Branch("intErr", &intErr, "intErr/D");
   biasTree->Branch("intTF1_tot", &intTF1_tot, "intTF1_tot/D");
+  biasTree->Branch("status", &_status,"status/D");
+  biasTree->Branch("covStatus", &_covStatus,"covStatus/D");
+  biasTree->Branch("status2", &_status2,"status2/D");
+  biasTree->Branch("covStatus2", &_covStatus2,"covStatus2/D");
+  biasTree->Branch("status3", &_status3,"status3/D");
+  biasTree->Branch("covStatus3", &_covStatus3,"covStatus3/D");
   
   
   RooFitResult* bres;
   RooAbsReal* fIntegral2;
-  npoints = 100;
+  //npoints = 1000;
   RooDataHist* data_toys2 = histpdf.generateBinned( mgg, npoints );
   ws->var("singleExp_1_clone_Nbkg")->setVal( npoints );
   RooFitResult* bres2 = ws->pdf( tag2 )->fitTo( *data_toys2, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
@@ -1622,32 +1631,67 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   alpha_true  = alpha_clone;
   double normTrueInt = fIntTrue->getVal();
   double* params;
-  for ( int i = 0; i < 10000; i++ )
+  for ( int i = 0; i < ntoys; i++ )
     {
       n_true = rnd->PoissonD( (double)npoints );
       sigInt_true = n_true*normTrueInt;
       data_toys = ws->pdf( tag2 )->generateBinned( mgg, n_true );
+      /*
+      std::cout << "===========================" << std::endl;
+      std::cout << "[INFO]: Setting N_bkg-> " << npoints << " , ntrue: " << n_true << "; and alpha-> " << alpha_clone << std::endl;
+      std::cout << "===========================" << std::endl;
+      */
+      /*
       ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
       ws->var( f1 + "_1_a" )->setVal( alpha_clone );
-      std::cout << "===========================" << std::endl;
-      std::cout << "[INFO]: Setting N_bkg-> " << npoints << "; and alpha-> " << alpha_clone << std::endl;
-      std::cout << "===========================" << std::endl;
-      bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      bres = ws->pdf( tag1 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      */
+      _status = -1;
+      _covStatus = -1;
+      _status2 = -1;
+      _covStatus2 = -1;
+      _status3 = -1;
+      _covStatus3 = -1;
+
+      ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
+      ws->var( f1 + "_1_a" )->setVal( alpha_clone );
+      RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag1 )->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+      RooMinimizer m(*nll) ;
+      //m.fit("mhvr0");
+      //ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
+      //ws->var( f1 + "_1_a" )->setVal( alpha_clone );
+      m.migrad(); 
+      RooFitResult* r = m.save() ; 
+      _status    = r->status();
+      _covStatus = r->covQual();
+      
+      m.hesse(); 
+      RooFitResult* r2 = m.save() ; 
+      _status2    = r2->status();
+      _covStatus2 = r2->covQual();
+      
+      m.minos();
+      RooFitResult* r3 = m.save() ; 
+      _status3    = r3->status();
+      _covStatus3 = r3->covQual();
+      
       fIntegral2 = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("sig") );
-            
       RooAbsReal* f2int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("sig") );
       RooAbsReal* f3int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::Range("Full") );
       RooAbsReal* f4int = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("Full") );
 
       paramSet = ws->pdf( tag1 )->getParameters( RooArgSet(mgg) );
       myPdf = ws->pdf( tag1 )->asTF( RooArgList(mgg), RooArgList(*paramSet) );
-      covMatrix = bres->covarianceMatrix();
+      /*covMatrix = bres->covarianceMatrix();*/
+      covMatrix = r3->covarianceMatrix();
       params = myPdf->GetParameters();
       //Getting Integrals
       intTF1     = fIntegral2->getVal();
-      intErr     = myPdf->IntegralError( 103., 160., params, covMatrix.GetMatrixArray(), 1e-14 );
-      intTF1_tot = myPdf->Integral( 103., 160., 1e-15 );
-      std::cout << "=================================================" << std::endl;
+      //intErr     = myPdf->IntegralError( 103., 160., params, covMatrix.GetMatrixArray(), 1e-14 );
+      //intTF1_tot = myPdf->Integral( 103., 160., 1e-15 );
+
+      /*
+	std::cout << "=======================" << i << "==========================" << std::endl;
       std::cout << "Int RooFit Normalized --> " << fIntegral2->getVal() << std::endl;
       std::cout << "Int TF1 normalized --> " << intTF1/intTF1_tot << std::endl;
       std::cout << "Int RooFit --> " << f2int->getVal() << std::endl;
@@ -1656,7 +1700,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       std::cout << "Int RooFit Total Normalized --> " << f4int->getVal() << std::endl;
       std::cout << "Int TF1 Total --> " << intTF1_tot << std::endl;
       std::cout << "=================================================" << std::endl;
-      
+      */
       //alpha
       alpha_hat   = ws->var( f1 + "_1_a" )->getVal();
       alpha_sigma = ws->var( f1 + "_1_a" )->getError();
@@ -1668,7 +1712,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       //Single Exp Uncertainty Calculation
       //122.08, 128.92
       //getting correlation matrix parameters from correlation matrix
-      TMatrixDSym corrMatrix = bres2->correlationMatrix();
+      TMatrixDSym corrMatrix = r3->correlationMatrix();
       const double* pData = corrMatrix.GetMatrixArray();
       //propagation of uncertainty
       double eta    = exp(-alpha_hat*122.08) - exp(-alpha_hat*128.92);
@@ -1677,10 +1721,10 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       double xiMod  = 103.*exp(-alpha_hat*103.) - 160.*exp(-alpha_hat*160.);
       double dIdN = eta/xi;
       double dIdAlpha = n_hat*( eta*xiMod/(xi*xi) + etaMod/xi );
-      
-      std::cout << "dIdN: " << dIdN << " , dIdAlpha: " << dIdAlpha << std::endl;
       double sigmaI = sqrt(dIdN*dIdN*n_sigma*n_sigma + dIdAlpha*dIdAlpha*alpha_sigma*alpha_sigma + dIdN*dIdAlpha*pData[1]*n_sigma*alpha_sigma);
-      std::cout << "Int: " << sigInt_hat << " +/- " << sigmaI << std::endl;
+
+      //std::cout << "dIdN: " << dIdN << " , dIdAlpha: " << dIdAlpha << std::endl;
+      //std::cout << "Int: " << sigInt_hat << " +/- " << sigmaI << std::endl;
       sigInt_sigma = sigmaI;
       sigInt_sigma2 = sqrt(dIdN*dIdN*n_sigma*n_sigma + dIdAlpha*dIdAlpha*alpha_sigma*alpha_sigma);
       biasTree->Fill();
@@ -1695,7 +1739,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   std::cout << "test Int2: " << fIntegral2->getVal() << std::endl;
   std::cout << "hist Int: " << fHistInt->getVal() << std::endl;
   bres2->SetName( tag2 + "_b_fitRes");
-  ws->import( *bres );
+  //ws->import( *bres );
 
   RooPlot* fmgg = mgg.frame();
   data_toys2->plotOn( fmgg );
