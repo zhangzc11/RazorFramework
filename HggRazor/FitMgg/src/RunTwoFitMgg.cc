@@ -1634,6 +1634,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   for ( int i = 0; i < ntoys; i++ )
     {
       n_true = rnd->PoissonD( (double)npoints );
+      //n_true = (double)npoints;//avoid poisson fluctuations
       sigInt_true = n_true*normTrueInt;
       data_toys = ws->pdf( tag2 )->generateBinned( mgg, n_true );
       /*
@@ -1655,7 +1656,8 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
 
       ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
       ws->var( f1 + "_1_a" )->setVal( alpha_clone );
-      RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag1 )->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+      //RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag1 )->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+      RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag1 )->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("Full") );
       RooMinimizer m(*nll) ;
       //m.fit("mhvr0");
       //ws->var( f1 + "_1_Nbkg" )->setVal( n_true );
