@@ -380,8 +380,8 @@ void  PlotLambda( )
   leg2->AddEntry( COUPP_2012_SI, "COUPP 2012", "l" );
   leg2->AddEntry( superCDMS_SI, "superCDMS", "l" );
   leg2->AddEntry( CDMSII_SI, "CDMSII", "l" );
-  leg2->AddEntry( CRESTII_NEW, "CRESTII", "l" );
-  leg2->AddEntry( CRESTII_LT, "CRESTII LT", "l" );
+  leg2->AddEntry( CRESTII_NEW, "CRESSTII", "l" );
+  leg2->AddEntry( CRESTII_LT, "CRESSTII LT", "l" );
   leg2->AddEntry( LUX2013, "LUX 2013", "l" );
   leg2->SetBorderSize(0);
   leg2->SetTextSize(0.03);
