@@ -42,13 +42,17 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   /*RooRealVar* mu     = new RooRealVar( tag+"_gauss_mu", "#mu", 125, 0., 1000. );
     RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 1.0, .0, 5000. );
     RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 1.0, .0, 5000. );*/
-  RooRealVar* mu     = new RooRealVar( tag+"_gauss_mu", "#mu", 750, 0., 1000. );
-  RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 5.0, .0, 5000. );
-  RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 5.0, .0, 5000. );
+
+  RooRealVar* mu     = new RooRealVar( tag+"_gauss_mu", "#mu", 125, "" );
+  RooRealVar* sigma1 = new RooRealVar( tag+"_gauss_sigma1", "#sigma_{1}", 1.0, "" );
+  RooRealVar* sigma2 = new RooRealVar( tag+"_gauss_sigma2", "#sigma_{2}", 3.0, "" );
+  mu->setConstant(kFALSE);
+  sigma1->setConstant(kFALSE);
+  sigma2->setConstant(kFALSE);
   
-  RooRealVar* frac   = new RooRealVar( tag+"_frac", "frac", 0.1, .0, 1.0 );
-  //RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 0.0, "events");
-  RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1e4, "events");
+  RooRealVar* frac   = new RooRealVar( tag+"_frac", "frac", 0.5, .0, 1.0 );
+  
+  RooRealVar* Ns     = new RooRealVar( tag+"_gauss_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
   //------------------
   //C r e a t e  p.d.f
@@ -150,11 +154,13 @@ TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w )
 };
 
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w) {
-  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
+  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-0.5, -1.0,0.0, "");
   alpha->setConstant(kFALSE);
   RooFormulaVar* alphasq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
-  RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
+  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
+  RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 2.0,"");
   m->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}", 10, "events");  
   Nbkg->setConstant(kFALSE);
