@@ -1,0 +1,22 @@
+
+source /afs/cern.ch/work/c/cpena/public/myRootHacked6/bin/thisroot.sh
+
+
+AIC test:
+./MakeFitRun2 --inputFile=/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root --treeName=HggRazor --LowMRcut=300 --HighMRcut=500 --LowRSQcut=0.05 --HighRSQcut=0.10 --dataMode=data --category=highpt --fitMode=AIC2 --outputFile=/afs/cern.ch/work/z/zhicaiz/private/RazorFramework/CMSSW_7_6_3/src/RazorFramework/HggRazor/FitMgg/AIC_output/highpt/highpt_300_0.05.root
+
+Bias test:
+./MakeFitRun2 --inputFile=/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root --treeName=HggRazor --LowMRcut=400 --HighMRcut=1200 --LowRSQcut=0.00 --HighRSQcut=0.05 --dataMode=data --category=lowres --fitMode=biasSignal --signalFraction=0.5 --f1=singlePow --f2=singlePow --outputFile=/afs/cern.ch/work/z/zhicaiz/private/RazorFramework/CMSSW_7_6_3/src/RazorFramework/HggRazor/FitMgg/BiasSignal_output/lowres/lowres_400_0.00_singlePow_singlePow.root
+
+
+run bias plot:
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_1.0/list.list --mode=plot --outputDir=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/plots/highpt_300_0.00/SoB_1.0
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_3.0/list.list --mode=plot --outputDir=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/plots/highpt_300_0.00/SoB_3.0
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_5.0/list.list --mode=plot --outputDir=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/plots/highpt_300_0.00/SoB_5.0
+
+run bias table:
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_1.0/list.list --mode=table > /afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/tables/highpt_300_0.00_SoB_1.0.tex
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_3.0/list.list --mode=table > /afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/tables/highpt_300_0.00_SoB_3.0.tex
+./PlotAllBiasTest --inputFile=/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/trees/highpt_300_0.00/SoB_5.0/list.list --mode=table > /afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result/tables/highpt_300_0.00_SoB_5.0.tex
+
+

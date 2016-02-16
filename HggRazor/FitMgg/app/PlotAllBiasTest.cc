@@ -15,6 +15,14 @@
 int main( int argc, char* argv[])
 {
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+  std::string outputDir = ParseCommandLine( argc, argv, "-outputDir=" );
+
+  if (outputDir == "")
+	{
+		outputDir = "plot_bias";
+	}
+  std::string cmd_mkdir = "mkdir -p "+outputDir;
+  system(cmd_mkdir.c_str());	
   if (  inputFile == "" )
     {
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
@@ -23,7 +31,7 @@ int main( int argc, char* argv[])
     }
 
   std::string mode = ParseCommandLine( argc, argv, "-mode=" );
-
+  
   std::map< std::pair <std::string, std::string>, double > mean_map;//mean values for bias or fit error are strored
   std::map< std::pair <std::string, std::string>, double > mean_map_aux;//use to obtain both bias and fit errors.
   std::map< std::pair <std::string, std::string>, double > rms_map;
@@ -43,7 +51,7 @@ int main( int argc, char* argv[])
 	  if ( ifs.eof() ) break;
 	  if ( mode == "plot" )
 	    {
-	      PlotBias( biasFile, "plot_bias" );
+	      PlotBias( biasFile, outputDir );
 	    }
 	  else if ( mode == "table" )
 	    {

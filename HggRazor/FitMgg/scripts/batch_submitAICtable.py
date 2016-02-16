@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #this script submit the jobs to lxplus batch to run multiple bins of AIC test, the bins are from bin_list.list
-# example: cd ../; make; cd scripts; cmsenv; python submitAICtable.py bin_list.list
+# example: cd ../; make; cd scripts; cmsenv; python batch_submitAICtable.py bin_list.list
 # modify the inputFile and queue to your own situation. Usually you need to modify the queue because the example "cmscaf1nd" is not open to everyone.
 
 import subprocess, time, sys, os, shlex

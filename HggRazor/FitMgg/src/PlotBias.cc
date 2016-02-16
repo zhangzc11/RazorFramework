@@ -139,8 +139,8 @@ std::pair<double,double> GetMeanRms( std::string fname, std::string dataSet, std
   //-----------------------
   TFile* f = new TFile( fname.c_str() , "READ" );
   //Getting Workspace
-  RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
-  //RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
+  //RooWorkspace* w = (RooWorkspace*)f->Get("w_bias");
+  RooWorkspace* w = (RooWorkspace*)f->Get("w_biasSignal");
   //Getting bias RooRealVar
   RooRealVar* bias = w->var( var.c_str() );
   //Getting data_bias RooDataSet
