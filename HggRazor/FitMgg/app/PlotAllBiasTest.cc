@@ -94,7 +94,7 @@ int main( int argc, char* argv[])
 	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
 	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
 	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
-	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str() );
+	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir );
 	       if ( mean_map.find( tmp_p ) == mean_map.end() )
 		 {
 		   mean_map[tmp_p] = mean;

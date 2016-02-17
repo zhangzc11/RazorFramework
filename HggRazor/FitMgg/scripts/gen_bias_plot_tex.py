@@ -5,7 +5,7 @@
 
 import subprocess, time, sys, os, shlex
 
-SoverB = ["1.0","3.0","5.0"]
+SoverB = ["0.0","1.0","3.0","5.0"]
 
 queue = "cmscaf1nd" # change this to the queue you want to use in lxplus batch
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 					for f2 in range(len(fitName)): 
 						env_script_f.write("\\begin{figure}[H] \n")
 						env_script_f.write("\\begin{center}\n")	
-						env_script_f.write("\\includegraphics[width=\\columnwidth]{../BiasSignalTest_result/plots/highpt_300_0.00/SoB_1.0/"+fitName[f1]+"_"+fitName[f2]+".pdf} \n")	
+						env_script_f.write("\\includegraphics[width=\\columnwidth]{../BiasSignalTest_result/plots/"+bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"/SoB_"+SoverB[SoverB_index]+"/"+fitName[f1]+"_"+fitName[f2]+".pdf} \n")	
 						env_script_f.write("\\caption{f1="+fitName[f1]+", f2="+fitName[f2]+", S/B="+SoverB[SoverB_index]+", "+bin_array[0]+", $"+bin_array[1]+"<M_R<"+bin_array[2]+", "+bin_array[3]+"<R^2<"+bin_array[4]+"$.} \n")	
 						env_script_f.write("\\end{center} \n")	
 						env_script_f.write("\\end{figure} \n")	
