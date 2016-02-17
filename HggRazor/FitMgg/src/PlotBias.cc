@@ -214,7 +214,7 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" )
+double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots" )
 {
   TFile* f = new TFile( fname , "READ" );
   TTree* tree = (TTree*)f->Get("biasTree");
@@ -228,8 +228,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   //double _xlow = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.5*_max ) );
   //double _xhigh = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow );
 
-  double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
-  double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
+  //double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
+  double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 4.0 );
+  //double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
+  double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 4.0 );
 
   double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
   double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
@@ -249,6 +251,9 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   C->SetFrameBorderMode(0);
   
   TF1* gaus = new TF1( "gaus", "gaus(0)", _xlow, _xhigh );
+  gaus->SetParameter(0,2000.0);
+  gaus->SetParameter(1,0.0);
+  gaus->SetParameter(2,1.0);
   hbias->Fit( gaus, "R");
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -4, 4 );
@@ -292,6 +297,8 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2" 
   latex.DrawLatex(lumix, lumiy, lumiText);
   latex.DrawLatex(lumix, lumiy-0.1, lumiText2);
   
-  C->SaveAs( "biasFits/" + f1 + "_" + f2 + ".pdf" );
+  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
+  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
+  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".C" );
   return gaus->GetParameter(1);
 };
