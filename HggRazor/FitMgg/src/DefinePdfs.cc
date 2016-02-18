@@ -77,15 +77,18 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
-  RooRealVar* alpha1 = new RooRealVar( tag + "_dexp_alpha1", "#alpha_{1}", 0.6, -10, 10 );
-  RooRealVar* alpha2 = new RooRealVar( tag + "_dexp_alpha2", "#alpha_{2}", 0.00001, -10, 10 );
+  RooRealVar* alpha1 = new RooRealVar( tag + "_a1", "#alpha_{1}", 0.6, "" );
+  RooRealVar* alpha2 = new RooRealVar( tag + "_a2", "#alpha_{2}", 0.00001, "" );
+  alpha1->setConstant(kFALSE);
+  alpha2->setConstant(kFALSE);
   //--------------------------------------------
   //Square variables to avoid rising exponential
   //--------------------------------------------
-  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_dexp_alpha1Sq", "#alpha^{2}_{1}", "-1*@0*@0", *alpha1);
-  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_dexp_alpha2Sq", "#alpha^{2}_{2}", "-1*@0*@0", *alpha2);
-  RooRealVar* frac    = new RooRealVar( tag+"_dexp_frac", "frac", 0.99, .0, 1.0 );
-  RooRealVar* Nbkg    = new RooRealVar( tag+"_dexp_Nbkg", "N_{bkg}", 10, 1e-10, 1e8 );
+  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_a1Sq", "#alpha^{2}_{1}", "-1*@0*@0", *alpha1);
+  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_a2Sq", "#alpha^{2}_{2}", "-1*@0*@0", *alpha2);
+  RooRealVar* frac    = new RooRealVar( tag+"_frac", "frac", 0.99, .0, 1.0 );
+  RooRealVar* Nbkg    = new RooRealVar( tag+"_Nbkg", "N_{bkg}", 10, "events" );
+  Nbkg->setConstant(kFALSE);
   
   //------------------
   //C r e a t e  p.d.f
@@ -98,8 +101,8 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //C r e a t e   E x t e n d e d  p.d.f
   //------------------------------------
   TString ex_pdf_name          = tag+"_doubleExp_ext";
-  RooExtendPdf* ex_doubleExp = new RooExtendPdf( ex_pdf_name, "extDexp", *doubleExp, *Nbkg);
-  w.import( *ex_doubleExp );
+  RooAddPdf* ext_doubleExp = new RooAddPdf( ex_pdf_name,"", RooArgList( *doubleExp ), RooArgList( *Nbkg ) );
+  w.import( *ext_doubleExp );
   
   return ex_pdf_name;
 };

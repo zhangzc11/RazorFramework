@@ -894,7 +894,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   TString tag1, tag2, tag2p;
   if ( f1 == "doubleExp" )
     {
-      tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+      //tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+      tag1 = MakeDoubleExp( f1 + "_1", mgg, *ws );
     }
   else if ( f1 == "singleExp" )
     {
@@ -936,8 +937,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //------------------
   if ( f2 == "doubleExp" )
     {
-      tag2  = MakeDoubleExpN1N2( f2 + "_2", mgg, *ws );
-      tag2p = MakeDoubleExpN1N2( f2 + "_prime", mgg, *ws );
+      //tag2  = MakeDoubleExpN1N2( f2 + "_2", mgg, *ws );
+      //tag2p = MakeDoubleExpN1N2( f2 + "_prime", mgg, *ws );
+      tag2  = MakeDoubleExp( f2 + "_2", mgg, *ws );
+      tag2p = MakeDoubleExp( f2 + "_prime", mgg, *ws );
     }
   else if ( f2 == "singleExp" )
     {
@@ -994,7 +997,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //Sideband Fit to data set using parent function
   //----------------------------------------------
   RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  _alpha = ws->var( f1 + "_1_a" )->getVal();
+  //_alpha = ws->var( f1 + "_1_a" )->getVal();
   //FullFit
   //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
 
@@ -1053,8 +1056,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //----------------------------------
   if ( f2 == "doubleExp" )
     {
-      ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
-      ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
+      //ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
+      //ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
+      std::cout << "Setting Npoints" << std::endl;
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
     }
   else if ( f2 == "singleExp" )
     {
@@ -1120,8 +1125,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double pC, p0, p1, p2, p3, pN;//poly2,pol3;
   if ( f2 == "doubleExp" )
     {
-      dE_N1  = ws->var( f2 + "_prime_Nbkg1" )->getVal();
-      dE_N2  = ws->var( f2 + "_prime_Nbkg2" )->getVal();
+      //dE_N1  = ws->var( f2 + "_prime_Nbkg1" )->getVal();
+      //dE_N2  = ws->var( f2 + "_prime_Nbkg2" )->getVal();
+      dE_N1  = ws->var( f2 + "_prime_Nbkg" )->getVal();
       dE_a1  = ws->var( f2 + "_prime_a1" )->getVal();
       dE_a2  = ws->var( f2 + "_prime_a2" )->getVal();
     }
@@ -1182,6 +1188,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   int _countPass = 0;
   TRandom3* r = new TRandom3(0);
   TRandom3* r2 = new TRandom3(0);
+  std::cout << "ENTERING LOOP" << std::endl;
   for ( int i = 0; i < ntoys; i++ )
     {
       //-----------------------------------------------------------
@@ -1213,8 +1220,13 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //--------------------------------
       if ( f2 == "doubleExp" )
       	{
+	  /*
 	  ws->var( f2 + "_2_Nbkg1")->setVal( dE_N1 );
 	  ws->var( f2 + "_2_Nbkg2")->setVal( dE_N2 );
+	  ws->var( f2 + "_2_a1")->setVal( dE_a1 );
+	  ws->var( f2 + "_2_a2")->setVal( dE_a2 );
+	  */
+	  ws->var( f2 + "_2_Nbkg")->setVal( dE_N1 );
 	  ws->var( f2 + "_2_a1")->setVal( dE_a1 );
 	  ws->var( f2 + "_2_a2")->setVal( dE_a2 );
 	}
@@ -1331,8 +1343,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //---------------------------
       //Saving paramenters to TTree
       //---------------------------
-      _alpha_hat = ws->var( f2 + "_2_a" )->getVal();
-      _alpha_sigma = ws->var( f2 + "_2_a" )->getError();
+      //_alpha_hat = ws->var( f2 + "_2_a" )->getVal();
+      //_alpha_sigma = ws->var( f2 + "_2_a" )->getError();
       _Nbkg = npointsP;
       _Nbkg_hat = ws->var( f2 + "_2_Nbkg" )->getVal();
       _Nbkg_sigma = ws->var( f2 + "_2_Nbkg" )->getError();
