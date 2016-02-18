@@ -5,6 +5,7 @@
 #include <TTree.h>
 #include <TMath.h>
 #include <TH1F.h>
+#include <TROOT.h>
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
 #include "CommandLineInput.hh"
@@ -12,6 +13,7 @@
 
 int main( int argc, char* argv[])
 {
+  gROOT->Reset();
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
   if (  inputFile == "" )
     {
@@ -150,6 +152,10 @@ int main( int argc, char* argv[])
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
+
+  //-------------------------------
+  //O u t p u t   R O O T   f i l e
+  //-------------------------------
   TFile* f;
   TTree* tree;
   if ( dataMode == "data" )
@@ -316,9 +322,8 @@ int main( int argc, char* argv[])
   cut = cut + categoryCutString + BinCutString;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
   //return -1;
-  //-------------------------------
-  //O u t p u t   R O O T   f i l e
-  //-------------------------------
+  
+  TString outName = outputfilename.substr( 0, outputfilename.find(".root") );
   TFile* fout = 0;
   if (outputfilename == "")
     {
@@ -328,8 +333,6 @@ int main( int argc, char* argv[])
     {
       fout = new TFile( outputfilename.c_str(), "recreate" );
     }
-  
-  TString outName = outputfilename.substr( 0, outputfilename.find(".root") );
   
   if ( fitMode == "sideband" )
     {
@@ -404,12 +407,12 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "bias" )
     {
-      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e4, 1e4);
+      RooWorkspace* w_bias = DoBiasTest( tree->CopyTree( cut ), mggName, f1, f2, 1e4, ntoys);
       w_bias->Write("w_bias");
     }
   else if ( fitMode == "biasSignal")
     {
-      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, 1e4, _signalFraction, outName );
+      RooWorkspace* w_biasSignal = DoBiasTestSignal( tree->CopyTree( cut ), mggName, f1, f2, ntoys, _signalFraction, outName );
       fout->cd();
       w_biasSignal->Write("w_biasSignal");
     }
@@ -481,8 +484,8 @@ int main( int argc, char* argv[])
 	}
       
     }
-else if( fitMode == "AIC2")
-{
+  else if( fitMode == "AIC2")
+    {
       w_aic[0]->Write("w3");
       w_aic[1]->Write("w4");
       w_aic[2]->Write("w5");
@@ -507,7 +510,7 @@ else if( fitMode == "AIC2")
 	      func_min = tmp.first;
 	    }
 	}
-       for ( auto tmp : aic_map_2 )
+      for ( auto tmp : aic_map_2 )
 	{
 	  if (  tmp.second < min_aic_2 )
 	    {
@@ -515,7 +518,7 @@ else if( fitMode == "AIC2")
 	      func_min_2 = tmp.first;
 	    }
 	}
-       for ( auto tmp : aic_map_3 )
+      for ( auto tmp : aic_map_3 )
 	{
 	  if (  tmp.second < min_aic_3 )
 	    {
@@ -523,7 +526,7 @@ else if( fitMode == "AIC2")
 	      func_min_3 = tmp.first;
 	    }
 	}
-std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func_min] << std::endl;
+      std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func_min] << std::endl;
       //------------------------------
       //c o m p u t e   d e l t a  AIC
       //------------------------------
@@ -539,19 +542,19 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	  sumweights += TMath::Exp( -0.5*delta_aic_map[tmp.first] ); 
 	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
 	}
-       for ( auto tmp : aic_map_2 )
+      for ( auto tmp : aic_map_2 )
 	{
 	  delta_aic_map_2[tmp.first] = tmp.second - min_aic_2;
 	  sumweights_2 += TMath::Exp( -0.5*delta_aic_map_2[tmp.first] ); 
 	  std::cout << tmp.first << " deltaAICc2: " << delta_aic_map_2[tmp.first] << std::endl;
 	}
-    for ( auto tmp : aic_map_3 )
+      for ( auto tmp : aic_map_3 )
 	{
 	  delta_aic_map_3[tmp.first] = tmp.second - min_aic_3;
 	  sumweights_3 += TMath::Exp( -0.5*delta_aic_map_3[tmp.first] ); 
 	  //std::cout << tmp.first << " deltaAICc: " << delta_aic_map[tmp.first] << std::endl;
 	}
- //------------------------------
+      //------------------------------
       //c o m p u t e   AIC  weights
       //------------------------------
       std::map<std::string, double> aic_weight_map;
@@ -564,13 +567,17 @@ std::cout << "MIN AIC function is: " << func_min << " AICc is: " << aic_map[func
 	  aic_weight_map_3[tmp.first] = TMath::Exp( -0.5*delta_aic_map_3[tmp.first] )/sumweights_3;
 	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
 	}
+      
+      PrintAICTable(categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
+      //PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
+      
+    }
 
-     PrintAICTable(categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic);
-//     PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
-
-}
-  
+  std::cout << "[INFO]: CLOSING FILE" << std::endl;
   fout->Close();
-    
+  gDirectory->Clear();
+  gDirectory->Close();
+  std::cout << "[INFO]: FILE CLOSED" << std::endl;
+  
   return 0;	
 }
