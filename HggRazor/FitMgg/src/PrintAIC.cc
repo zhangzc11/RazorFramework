@@ -91,7 +91,8 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 
 	myC->Divide(2,4,0);
 	myC->cd(1);
-	RooPlot * p1 = (RooPlot*)w[0]->obj("sideband_fit_doubleExp_pdf_dExp_N1N2_frame");
+	//RooPlot * p1 = (RooPlot*)w[0]->obj("sideband_fit_doubleExp_pdf_dExp_N1N2_frame");
+	RooPlot * p1 = (RooPlot*)w[0]->obj("sideband_fit_doubleExp_doubleExp_ext_frame");
 	p1->SetTitle("double exponential");
 	p1->GetXaxis()->SetTitleSize(0.09);
 	p1->GetXaxis()->SetLabelSize(0.11);
