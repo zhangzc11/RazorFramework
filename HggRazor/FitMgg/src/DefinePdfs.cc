@@ -183,10 +183,12 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   RooRealVar *alpha  = new RooRealVar(tag+"_a","#alpha",-1);
   alpha->setConstant(kFALSE);
+  RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
   RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10, "events");
   Nbkg->setConstant(kFALSE);
 
-  RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*alpha));
+  //RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*alpha));
+  RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*asq));
   TString pdfName     = tag+"_spow_ext";
   //RooFormulaVar* NbkgSq = new RooFormulaVar( tag + "_Nbkg1Sq","","@0*@0", *Nbkg );
   //w.import( *(new RooAddPdf( pdfName,"", RooArgList(*pow), RooArgList(*NbkgSq) )) );
@@ -199,17 +201,21 @@ TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,-10,-0.0001);
   //RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2,-10,-0.0001);
   RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,"");
-  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-0.00001,"");
+  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-1,"");
   alpha1->setConstant(kFALSE);
   alpha2->setConstant(kFALSE);
+  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_aSq1","","-1*@0*@0", *alpha1);
+  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_aSq2","","-1*@0*@0", *alpha2);
   
-  RooRealVar *f       = new RooRealVar(tag+"_f","f",0.01, 0.0, 1.0);
+  RooRealVar *f       = new RooRealVar(tag+"_f","f",0.5, 0.0, 1.0);
   //RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,1,1E9);
   RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,"events");
   Nbkg->setConstant(kFALSE);
   
-  RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
-  RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
+  //RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
+  //RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
+  RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*asq1));
+  RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*asq2));
 
   TString pdfName = tag+"_dpow_ext";
   RooAddPdf *add      = new RooAddPdf( tag+"_dpow","",*pow1,*pow2,*f);  
