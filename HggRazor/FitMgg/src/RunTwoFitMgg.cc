@@ -1219,6 +1219,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //--------------------------------
       //Update f2 (test pdf) paramenters
       //--------------------------------
+      //ws->var( f2 + "_2_Nbkg" )->setRange(0, 1e3);
       if ( f2 == "doubleExp" )
       	{
 	  /*
@@ -1313,6 +1314,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       RooNLLVar* nll = (RooNLLVar*)sbModel->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("Full") );
       //Defininf RooMinimizer Object;
       RooMinimizer m(*nll);
+      m.setStrategy(2);
+      m.setPrintLevel(-1);
       m.minimize("Minuit2", "Migrad");
       //RooMinuit m(*nll) ; 
 
@@ -1491,11 +1494,30 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
   ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n );
-  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
-  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+   RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag )->createNLL( data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+   //Defining RooMinimizer Object;
+   RooMinimizer m(*nll);
+   m.setStrategy(2);
+   //m.setEps(1e-4);
+   //m.setMaxIterations(10000);
+   //m.setMaxFunctionCalls(10000);
+   //m.setPrintLevel(-1);
+   m.minimize("Minuit2", "Migrad");
+
+   //m.migrad(); 
+   RooFitResult* bres = m.save() ; 
+   //_status    = r->status();
+   //_covStatus = r->covQual();
+   
+   m.minimize("Minuit2", "Hesse");
+   RooFitResult* r2 = m.save() ; 
+   //_status2    = r2->status();
+   //_covStatus2 = r2->covQual();
+  
+
+  
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
   std::cout << "===================" << std::endl;
@@ -1506,7 +1528,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //g e t t i n g   n l l 
   //---------------------
   double minNll = bres->minNll();
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
