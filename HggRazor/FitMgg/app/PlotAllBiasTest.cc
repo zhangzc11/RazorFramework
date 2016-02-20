@@ -49,7 +49,17 @@ int main( int argc, char* argv[])
     }
   
   if ( fitStatus == "yes" || fitStatus == "Yes" || fitStatus == "YES" ) _fitStatus = true;
+ 
+  std::string doubleGaus = ParseCommandLine( argc, argv, "-useDoubleGaus=" );
+  bool _doubleGaus = false;
+  if (  doubleGaus == "" )
+    {
+      std::cerr << "[WARNING]: please indicate whether to use double gaus to fit bias or not by using --useDoubleGaus=<yes/no>" << std::endl;
+    }
   
+  if ( doubleGaus == "yes" || doubleGaus == "Yes" || doubleGaus == "YES" ) _doubleGaus = true;
+  
+ 
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
   if ( ifs.is_open() )
     {
@@ -103,7 +113,7 @@ int main( int argc, char* argv[])
 	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
 	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
 	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
-	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus );
+	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus, _doubleGaus );
 	       if ( mean_map.find( tmp_p ) == mean_map.end() )
 		 {
 		   mean_map[tmp_p] = mean;
