@@ -21,7 +21,7 @@
 #include "PlotBias.hh"
 #include "HggAux.hh"
 
-
+/*
 //Axis
 const float axisTitleSize = 0.06;
 const float axisTitleOffset = .8;
@@ -39,6 +39,45 @@ const float leftMargin   = 0.12;
 const float rightMargin  = 0.05;
 const float topMargin    = 0.07;
 const float bottomMargin = 0.12;
+*/
+
+const float lumi = 2.3;
+//Axis
+const float axisTitleSize = 0.06;
+const float axisTitleOffset = .8;
+
+const float axisTitleSizeRatioX   = 0.18;
+const float axisLabelSizeRatioX   = 0.12;
+const float axisTitleOffsetRatioX = 0.84;
+
+const float axisTitleSizeRatioY   = 0.15;
+const float axisLabelSizeRatioY   = 0.108;
+const float axisTitleOffsetRatioY = 0.32;
+
+//Margins
+const float leftMargin   = 0.12;
+const float rightMargin  = 0.05;
+const float topMargin    = 0.07;
+const float bottomMargin = 0.12;
+
+//CMS STANDARD
+TString CMSText = "CMS";
+TString extraText   = "Preliminary";
+TString lumiText = "2.3 fb^{-1} (13 TeV)";
+
+float lumix = 0.955;
+float lumiy = 0.945;
+float lumifont = 42;
+
+float cmsx = 0.28;
+float cmsy = 0.875;
+float cmsTextFont   = 61;  // default is helvetic-bold
+float extrax = cmsx + 0.078;
+float extray = cmsy - 0.04;
+float extraTextFont = 52;  // default is helvetica-italics
+// ratio of "CMS" and extra text size
+float extraOverCmsTextSize  = 0.76;
+float cmsSize = 0.06;
 
 void PlotBias( std::string fname = "", std::string outDir = "bias_plots")
 {
@@ -214,13 +253,34 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots" )
+double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false )
 {
   TFile* f = new TFile( fname , "READ" );
+
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+
+
+
   TTree* tree = (TTree*)f->Get("biasTree");
+  if ( _status )
+    {
+      tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+    }
+  else
+    {
+      tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
+    }
   
-  //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-  tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff"); 
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
   double mean_val = hbias->GetMean();
   
@@ -236,69 +296,91 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
   double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
   
- 
-  TCanvas *C = new TCanvas("c", "c",2119,33,800,700);
-  C->SetHighLightColor(2);
-  //C->Range(-0.6543224,-1290.871,3.177829,8696.391);
-  C->SetFillColor(0);
-  C->SetBorderMode(0);
-  C->SetBorderSize(2);
-  C->SetLeftMargin(0.16);
-  C->SetRightMargin(0.05);
-  C->SetTopMargin(0.07);
-  C->SetBottomMargin(0.12);
-  C->SetFrameBorderMode(0);
-  C->SetFrameBorderMode(0);
-  
+  /*
   TF1* gaus = new TF1( "gaus", "gaus(0)", _xlow, _xhigh );
   gaus->SetParameter(0,2000.0);
   gaus->SetParameter(1,0.0);
   gaus->SetParameter(2,1.0);
-  hbias->Fit( gaus, "R");
+  */
+  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[5])*(x-[5])/(2*[3]*[3]) )", -2., 2.);
+  myF->SetParameter(0, 300 );
+  myF->SetParameter(1, hbias->GetMean() );
+  myF->SetParameter(5, hbias->GetMean() );
+  myF->SetParameter(2, hbias->GetStdDev() );
+  myF->SetParameter(3, 3*hbias->GetStdDev() );
+  myF->SetParameter(4, 50 );
+  
+  myF->SetParLimits(2, 0.0, 999);
+  myF->SetParLimits(3, 0.0, 999);
+  myF->SetLineColor( kBlue );
+  myF->SetLineWidth( 3 );
+  
+  hbias->Fit( myF, "LR");
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -4, 4 );
   hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
-  std::cout << "Gaussian Mean: " << gaus->GetParameter(1) << std::endl;
+  std::cout << "Double gaussian Peak: " << myF->GetMaximumX(-4,4) << std::endl;
+  
+  hbias->SetMarkerStyle(20);
+  hbias->SetMarkerSize(1.);
+  hbias->SetMarkerColor(kBlack);
+  hbias->SetLineColor(kBlack);
   hbias->SetStats( kFALSE );
+
+  //cosmetics
+  hbias->SetStats(0);
+  hbias->SetTitle("");
+  hbias->GetXaxis()->SetTitleSize(0.05);
+  hbias->GetXaxis()->SetTitleOffset(0.8);
+  hbias->GetXaxis()->SetTitleSize( axisTitleSize );
+  hbias->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  hbias->GetYaxis()->SetTitleSize( axisTitleSize );
+  hbias->GetYaxis()->SetTitleOffset( axisTitleOffset );
+  hbias->SetXTitle("#delta_{N_{s}}/#sigma_{N_{s}}");
+  
   hbias->Draw("e");
   
+  
+  //TString lumiText;
+  //TString lumiText2;
+  //lumiText = Form("mean: %.2f", mean_val );
+  //lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
+  
+  TString _mu    = Form("%.1f", 100.0*myF->GetMaximumX(-4,4) );
+  //TString _mu    = Form("%.1f", 100.0*myF->GetParameter(1) );
+  TString _sigma = Form("%.1f", 100.0*myF->GetParameter(2) );
+  TLatex tex2;
+  tex2.SetNDC();
+  tex2.SetTextFont(52);
+  tex2.SetTextAlign(31);
+  tex2.SetTextSize(0.05);
+  tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
+  //tex2.DrawLatex( 0.90, 0.80, "#sigma = " + _sigma + " %");
+  
 
-  //-----------------
-  //LATEX
-  //-----------------
-  float lumix = 0.92;
-  float lumiy = 0.85;
-  float lumifont = 42;
-   
-  float cmsx = 0.28;
-  float cmsy = 0.875;
-  TString CMSText = "CMS";
-  float cmsTextFont   = 61;  // default is helvetic-bold
-  float extrax = cmsx + 0.067;
-  float extray = cmsy - 0.04;
-  TString extraText   = "Preliminary";
-  float extraTextFont = 52;  // default is helvetica-italics
-  // ratio of "CMS" and extra text size
-  float extraOverCmsTextSize  = 0.76;
-  float cmsSize = 0.05;
-  
   TLatex latex;
-  TString lumiText;
-  TString lumiText2;
-  lumiText = Form("mean: %.2f", mean_val );
-  lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
-  
   latex.SetNDC();
   latex.SetTextAngle(0);
   latex.SetTextColor(kBlack);    
+  float extraTextSize = extraOverCmsTextSize*cmsSize;
   latex.SetTextFont(lumifont);
   latex.SetTextAlign(31); 
   latex.SetTextSize(cmsSize);    
-  latex.DrawLatex(lumix, lumiy, lumiText);
-  latex.DrawLatex(lumix, lumiy-0.1, lumiText2);
+  latex.DrawLatex(lumix, lumiy,lumiText);
+
+  latex.SetTextFont(cmsTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);
+  latex.DrawLatex(cmsx, cmsy, CMSText);
+   
+  latex.SetTextFont(extraTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(extraTextSize);
+  latex.DrawLatex(extrax, extray, extraText);
   
-  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
-  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
-  C->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".C" );
-  return gaus->GetParameter(1);
+  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
+  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
+  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".C" );
+  //return myF->GetParameter(1);
+  return myF->GetMaximumX(-4,4);
 };

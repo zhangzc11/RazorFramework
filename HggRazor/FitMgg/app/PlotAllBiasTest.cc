@@ -18,9 +18,9 @@ int main( int argc, char* argv[])
   std::string outputDir = ParseCommandLine( argc, argv, "-outputDir=" );
 
   if (outputDir == "")
-	{
-		outputDir = "plot_bias";
-	}
+    {
+      outputDir = "plot_bias";
+    }
   std::string cmd_mkdir = "mkdir -p "+outputDir;
   system(cmd_mkdir.c_str());	
   if (  inputFile == "" )
@@ -40,6 +40,15 @@ int main( int argc, char* argv[])
       std::cerr << "[ERROR]: please provide a mode by using --mode=<plot/table/tableFitErr>" << std::endl;
       return -1;
     }
+
+  std::string fitStatus = ParseCommandLine( argc, argv, "-requireFitStatus=" );
+  bool _fitStatus = false;
+  if (  fitStatus == "" )
+    {
+      std::cerr << "[WARNING]: please provide a fitStatus option by using --requireFitStatus=<yes/no>" << std::endl;
+    }
+  
+  if ( fitStatus == "yes" || fitStatus == "Yes" || fitStatus == "YES" ) _fitStatus = true;
   
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
   if ( ifs.is_open() )
@@ -94,7 +103,7 @@ int main( int argc, char* argv[])
 	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
 	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
 	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
-	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir );
+	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus );
 	       if ( mean_map.find( tmp_p ) == mean_map.end() )
 		 {
 		   mean_map[tmp_p] = mean;
