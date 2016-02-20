@@ -253,7 +253,7 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false )
+double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , bool _doubleGaus = false)
 {
   TFile* f = new TFile( fname , "READ" );
 
@@ -274,11 +274,13 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   TTree* tree = (TTree*)f->Get("biasTree");
   if ( _status )
     {
-      tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(600,-30, 30)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
-      tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
+      //tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
+      tree->Draw("biasNorm>>hbias(600,-30, 30)", "", "goff");
     }
   
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
@@ -290,9 +292,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
 
   //double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
   double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 4.0 );
+  double fit_xlow = 0.1*(hbias->GetMaximumBin()-300.0) - 1.2 ;
   //double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
   double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 4.0 );
-
+  double fit_xhigh = 0.1*(hbias->GetMaximumBin()-300.0) + 1.2 ;
   double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
   double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
   
@@ -302,24 +305,53 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   gaus->SetParameter(1,0.0);
   gaus->SetParameter(2,1.0);
   */
-  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[5])*(x-[5])/(2*[3]*[3]) )", -2., 2.);
-  myF->SetParameter(0, 300 );
-  myF->SetParameter(1, hbias->GetMean() );
-  myF->SetParameter(5, hbias->GetMean() );
-  myF->SetParameter(2, hbias->GetStdDev() );
-  myF->SetParameter(3, 3*hbias->GetStdDev() );
-  myF->SetParameter(4, 50 );
-  
-  myF->SetParLimits(2, 0.0, 999);
-  myF->SetParLimits(3, 0.0, 999);
-  myF->SetLineColor( kBlue );
-  myF->SetLineWidth( 3 );
-  
-  hbias->Fit( myF, "LR");
+  //TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[5])*(x-[5])/(2*[3]*[3]) )", -1., 1.5);
+  double mu_value = 0.0;
+  double sigma_value = 0.0;
+
+  if( _doubleGaus )
+	{
+	  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[1])*(x-[1])/(2*[3]*[3]) )", -1., 1.5);
+	  //myF->SetParameter(0, 300 );
+	  myF->SetParameter(0, 0.8*hbias->GetMaximum() );
+	  myF->SetParameter(1, hbias->GetMean() );
+	//  myF->SetParameter(5, hbias->GetMean() );
+	  myF->SetParameter(2, hbias->GetStdDev() );
+	  myF->SetParameter(3, 3*hbias->GetStdDev() );
+	  //myF->SetParameter(4, 50 );
+	  myF->SetParameter(4, 0.2*hbias->GetMaximum() );
+	  
+	  myF->SetParLimits(2, 0.0, 999);
+	  myF->SetParLimits(3, 0.0, 999);
+	  myF->SetLineColor( kBlue );
+	  myF->SetLineWidth( 3 );
+	  
+	  hbias->Fit( myF, "LR");
+  	  std::cout << "Double gaussian Peak: " << myF->GetMaximumX(-4,4) << std::endl;
+	  mu_value = myF->GetMaximumX(-4,4);
+	  sigma_value = myF->GetParameter(2); 
+	}
+  else
+	{
+	  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) )", -1.2, 2.0);
+//	  std::cout<<"fit range:  "<<fit_xlow<<"  -  "<<fit_xhigh<<std::endl;
+ 	  myF->SetParameter(0, hbias->GetMaximum() );
+	  myF->SetParameter(1, hbias->GetMean() );
+	  myF->SetParameter(2, hbias->GetStdDev() );
+	  
+	 // myF->SetParLimits(2, 0.0, 999);
+	  myF->SetLineColor( kBlue );
+	  myF->SetLineWidth( 3 );
+	  
+	  hbias->Fit( myF, "LR");
+	  mu_value = myF->GetParameter(1);
+	  sigma_value = myF->GetParameter(2); 
+
+	}
+
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -4, 4 );
   hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
-  std::cout << "Double gaussian Peak: " << myF->GetMaximumX(-4,4) << std::endl;
   
   hbias->SetMarkerStyle(20);
   hbias->SetMarkerSize(1.);
@@ -346,17 +378,19 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   //lumiText = Form("mean: %.2f", mean_val );
   //lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
   
-  TString _mu    = Form("%.1f", 100.0*myF->GetMaximumX(-4,4) );
+  TString _mu    = Form("%.1f", 100.0*mu_value );
   //TString _mu    = Form("%.1f", 100.0*myF->GetParameter(1) );
-  TString _sigma = Form("%.1f", 100.0*myF->GetParameter(2) );
+  TString _sigma = Form("%.1f", 100.0*sigma_value );
   TLatex tex2;
   tex2.SetNDC();
   tex2.SetTextFont(52);
   tex2.SetTextAlign(31);
   tex2.SetTextSize(0.05);
   tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
-  //tex2.DrawLatex( 0.90, 0.80, "#sigma = " + _sigma + " %");
-  
+  if(!_doubleGaus )
+ {
+  tex2.DrawLatex( 0.90, 0.80, "#sigma = " + _sigma + " %");
+ } 
 
   TLatex latex;
   latex.SetNDC();
@@ -377,10 +411,19 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   latex.SetTextAlign(31); 
   latex.SetTextSize(extraTextSize);
   latex.DrawLatex(extrax, extray, extraText);
-  
+ 
+  if( _doubleGaus)
+ { 
+  c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".pdf" );
+  c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".png" );
+  c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".C" );
+ }  
+else 
+{ 
   c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
   c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
   c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".C" );
-  //return myF->GetParameter(1);
-  return myF->GetMaximumX(-4,4);
+ } 
+//return myF->GetParameter(1);
+  return mu_value;
 };
