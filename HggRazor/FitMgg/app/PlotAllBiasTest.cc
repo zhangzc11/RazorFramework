@@ -41,6 +41,7 @@ int main( int argc, char* argv[])
       return -1;
     }
 
+   
   std::string fitStatus = ParseCommandLine( argc, argv, "-requireFitStatus=" );
   bool _fitStatus = false;
   if (  fitStatus == "" )
@@ -49,7 +50,7 @@ int main( int argc, char* argv[])
     }
   
   if ( fitStatus == "yes" || fitStatus == "Yes" || fitStatus == "YES" ) _fitStatus = true;
- 
+  /*
   std::string doubleGaus = ParseCommandLine( argc, argv, "-useDoubleGaus=" );
   bool _doubleGaus = false;
   if (  doubleGaus == "" )
@@ -58,8 +59,16 @@ int main( int argc, char* argv[])
     }
   
   if ( doubleGaus == "yes" || doubleGaus == "Yes" || doubleGaus == "YES" ) _doubleGaus = true;
-  
  
+*/
+  std::string fitFunc = ParseCommandLine( argc, argv, "-fitFunc=" );
+  if (fitFunc == "") 
+  {
+      std::cerr << "[WARNING]: please provide the bias fit function by using --fitFunc=<singleGaus/doubleGaus/crystalBall>" << std::endl;
+      std::cerr << "[WARNING]: fit function not indicated, use default one: singleGaus" <<std::endl;
+      fitFunc = "singleGaus";
+  }
+
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
   if ( ifs.is_open() )
     {
@@ -113,7 +122,7 @@ int main( int argc, char* argv[])
 	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
 	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
 	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
-	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus, _doubleGaus );
+	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus, fitFunc );
 	       if ( mean_map.find( tmp_p ) == mean_map.end() )
 		 {
 		   mean_map[tmp_p] = mean;

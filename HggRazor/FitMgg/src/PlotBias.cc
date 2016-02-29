@@ -253,7 +253,7 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , bool _doubleGaus = false)
+double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
 {
   TFile* f = new TFile( fname , "READ" );
 
@@ -309,7 +309,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   double mu_value = 0.0;
   double sigma_value = 0.0;
 
-  if( _doubleGaus )
+  if( fitFunc == "doubleGaus" )
 	{
 	  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[1])*(x-[1])/(2*[3]*[3]) )", -1., 1.5);
 	  //myF->SetParameter(0, 300 );
@@ -331,7 +331,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
 	  mu_value = myF->GetMaximumX(-4,4);
 	  sigma_value = myF->GetParameter(2); 
 	}
-  else
+  else if (fitFunc == "singleGaus")
 	{
 	  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) )", -1.2, 2.0);
 //	  std::cout<<"fit range:  "<<fit_xlow<<"  -  "<<fit_xhigh<<std::endl;
@@ -348,7 +348,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
 	  sigma_value = myF->GetParameter(2); 
 
 	}
-
+   else if (fitFunc == "crystalBall")
+  	{
+		
+	}
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -4, 4 );
   hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
@@ -387,7 +390,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   tex2.SetTextAlign(31);
   tex2.SetTextSize(0.05);
   tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
-  if(!_doubleGaus )
+  if(fitFunc == "singleGaus"  )
  {
   tex2.DrawLatex( 0.90, 0.80, "#sigma = " + _sigma + " %");
  } 
@@ -412,13 +415,13 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   latex.SetTextSize(extraTextSize);
   latex.DrawLatex(extrax, extray, extraText);
  
-  if( _doubleGaus)
+  if( fitFunc == "doubleGaus")
  { 
   c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".pdf" );
   c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".png" );
   c->SaveAs(outDir+ "/doubleGaus_biasFits_" + f1 + "_" + f2 + ".C" );
  }  
-else 
+if (fitFunc == "singleGaus") 
 { 
   c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
   c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
@@ -427,3 +430,12 @@ else
 //return myF->GetParameter(1);
   return mu_value;
 };
+
+
+
+
+
+
+
+
+
