@@ -281,13 +281,15 @@ int main ( int argc, char* argv[] ){
    c->SetBottomMargin(0.12);
    c->SetFrameBorderMode(0);
    c->SetFrameBorderMode(0);
-   
+   c->SetTickx();
+   c->SetTicky();
       
   TMultiGraph *mg0 = new TMultiGraph();
   mg0->Add(grshade);
   
   mg0->Draw("af");
   mg0->GetYaxis()->SetRangeUser(0, max_y);
+  mg0->GetXaxis()->SetRangeUser(0.001, 1000 );
   mg0->GetXaxis()->SetTitle(labelX);
   mg0->GetYaxis()->SetTitle(labelY);
   std::cout << "size: " << mg0->GetYaxis()->GetTitleSize() << std::endl;
@@ -411,13 +413,13 @@ int main ( int argc, char* argv[] ){
   float extraTextSize = extraOverCmsTextSize*cmsSize;
   latex.SetTextFont(lumifont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);    
+  latex.SetTextSize(0.75*cmsSize);    
   latex.DrawLatex(lumix, lumiy,lumiText);
 
   latex.SetTextFont(cmsTextFont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);
-  latex.DrawLatex(cmsx, cmsy, CMSText);
+  latex.SetTextSize(0.75*cmsSize);
+  latex.DrawLatex(cmsx-0.055, cmsy-0.008, CMSText);
    
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
@@ -426,6 +428,7 @@ int main ( int argc, char* argv[] ){
 
   std::cout << "here" << std::endl;
   c->cd();
+  c->RedrawAxis();
   c->SetLogx();
   c->Update();
   
@@ -474,6 +477,7 @@ int main ( int argc, char* argv[] ){
   mg0->Draw("af");
   //mg0->GetYaxis()->SetRangeUser(1, 4000.0*TMath::Pi()*4.0*1e3);
   mg0->GetYaxis()->SetRangeUser(0, max_y);
+  mg0->GetXaxis()->SetRangeUser( 0.001, 1000 );
   mg0->GetXaxis()->SetTitle(labelX);
   mg0->GetYaxis()->SetTitle(labelY);
   mg0->GetYaxis()->SetTitleSize( 0.05 );
@@ -559,13 +563,14 @@ int main ( int argc, char* argv[] ){
   
   latex.SetTextFont(lumifont);
    latex.SetTextAlign(31); 
-   latex.SetTextSize(cmsSize);    
+   latex.SetTextSize(0.75*cmsSize);    
    latex.DrawLatex(lumix, lumiy,lumiText);
 
    latex.SetTextFont(cmsTextFont);
    latex.SetTextAlign(31); 
-   latex.SetTextSize(cmsSize);
-   latex.DrawLatex(cmsx, cmsy, CMSText);
+   latex.SetTextSize(0.75*cmsSize);
+   //latex.DrawLatex(cmsx, cmsy, CMSText);
+   latex.DrawLatex(cmsx-0.055, cmsy-0.008, CMSText);
    
    latex.SetTextFont(extraTextFont);
    latex.SetTextAlign(31); 
@@ -573,6 +578,7 @@ int main ( int argc, char* argv[] ){
    //latex.DrawLatex(extrax, extray, extraText);
    //tex->Draw(); 
    c->cd();
+   c->RedrawAxis();
    c->SetLogx();
   //c->SetLogy();
    c->Update();

@@ -23,10 +23,10 @@ and using R_lambda = 0.8
 //LOCAL INCLUDES
 #include "PlotLambda.hh"
 
-const double max_y_sd = 1e8;
+const double max_y_sd = 2e6;
 const double min_y_sd = 1e2;
 
-const double max_y_si = 1e8;
+const double max_y_si = 2e6;
 const double min_y_si = 1e2;
 
 void  PlotLambda( )
@@ -73,7 +73,8 @@ void  PlotLambda( )
   grshade->SetLineColor(kOrange);
   grshade->SetTitle("");
   
-  TCanvas *c = new TCanvas("c", "c",2119,33,800,700);
+  //TCanvas *c = new TCanvas("c", "c",2119,33,800,700);
+  TCanvas *c = new TCanvas("c", "c", 0, 0, 800, 700);
   c->SetHighLightColor(2);
   c->Range(-0.6543224,-1290.871,3.177829,8696.391);
   c->SetFillColor(0);
@@ -86,12 +87,15 @@ void  PlotLambda( )
   c->SetBottomMargin(0.12);
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);  
+  c->SetTickx();
+  c->SetTicky();
   
   TMultiGraph *mg0 = new TMultiGraph();
   mg0->Add(grshade);
   
   mg0->Draw("af");
   mg0->GetYaxis()->SetRangeUser( min_y_sd, max_y_sd );
+  mg0->GetXaxis()->SetRangeUser( 0.001, 1000 );
   mg0->GetXaxis()->SetTitle(labelX);
   mg0->GetYaxis()->SetTitle(labelY);
   mg0->GetYaxis()->SetTitleSize( 0.05 );
@@ -159,7 +163,7 @@ void  PlotLambda( )
   mg->Add( PICASSO_SD );
   mg->Draw("L");
   
-  TLegend *leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");
+  TLegend *leg = new TLegend(0.16,0.61,0.5,0.85,NULL,"brNDC");
   leg->AddEntry("NULL", "Razor-0#mu 90% CL limit: AV EFT operator", "h");
   grshade->SetLineColor(kRed-7);
   grshade->SetLineWidth(3);
@@ -175,7 +179,7 @@ void  PlotLambda( )
   leg->SetFillStyle(1001);
   leg->Draw();
 
-  TLegend *leg2 = new TLegend( 0.7, 0.50, 0.95, 0.79, NULL, "brNDC" );
+  TLegend *leg2 = new TLegend( 0.67, 0.61, 0.92, 0.9, NULL, "brNDC" );
   leg2->AddEntry( ICE_CUBE_WW, "IceCube W^{+}W^{-}", "l" );
   leg2->AddEntry( COUPP_2012_SD, "COUPP 2012", "l" );
   leg2->AddEntry( SIMPLE_2012_SD, "SIMPLE 2012", "l" );
@@ -215,13 +219,14 @@ void  PlotLambda( )
   float extraTextSize = extraOverCmsTextSize*cmsSize;
   latex.SetTextFont(lumifont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);    
+  latex.SetTextSize(0.75*cmsSize);    
   latex.DrawLatex(lumix, lumiy,lumiText);
   
   latex.SetTextFont(cmsTextFont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);
-  latex.DrawLatex(cmsx, cmsy, CMSText);
+  latex.SetTextSize(0.75*cmsSize);
+  //latex.DrawLatex(cmsx-0.12, lumiy, CMSText);
+  latex.DrawLatex(cmsx-0.085, cmsy-0.01, CMSText);
   
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
@@ -230,6 +235,7 @@ void  PlotLambda( )
   
   std::cout << "here" << std::endl;
   c->cd();
+  c->RedrawAxis();
   c->SetLogx();
   c->SetLogy();
   c->Update();
@@ -282,6 +288,7 @@ void  PlotLambda( )
   
   mg0->Draw("af");
   mg0->GetYaxis()->SetRangeUser( min_y_si, max_y_si );
+  mg0->GetXaxis()->SetRangeUser( 0.001, 1000 );
   mg0->GetXaxis()->SetTitle(labelX);
   mg0->GetYaxis()->SetTitle(labelY);
   mg0->GetYaxis()->SetTitleSize( 0.05 );
@@ -357,7 +364,7 @@ void  PlotLambda( )
     
   //Legend
   delete leg;
-  leg = new TLegend(0.185,0.5,0.59,0.79,NULL,"brNDC");
+  leg = new TLegend(0.16,0.61,0.5,0.85,NULL,"brNDC");
   leg->AddEntry("NULL", "Razor-0#mu 90% CL limit: V EFT operator", "h");
   grshade->SetLineColor(kRed-7);
   grshade->SetLineWidth(3);
@@ -374,7 +381,7 @@ void  PlotLambda( )
   leg->Draw();
 
   delete leg2;
-  leg2 = new TLegend( 0.7, 0.50, 0.95, 0.79, NULL, "brNDC" );
+  leg2 = new TLegend( 0.67, 0.61, 0.92, 0.9, NULL, "brNDC" );
   leg2->AddEntry( XENON100_SI, "XENON 100", "l" );
   leg2->AddEntry( SIMPLE_2012_SI, "SIMPLE 2012", "l" );
   leg2->AddEntry( COUPP_2012_SI, "COUPP 2012", "l" );
@@ -395,13 +402,14 @@ void  PlotLambda( )
   
   latex.SetTextFont(lumifont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);    
+  latex.SetTextSize(0.75*cmsSize);    
   latex.DrawLatex(lumix, lumiy,lumiText);
   
   latex.SetTextFont(cmsTextFont);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(cmsSize);
-  latex.DrawLatex(cmsx, cmsy, CMSText);
+  latex.SetTextSize(0.75*cmsSize);
+  latex.DrawLatex(cmsx-0.085, cmsy-0.01, CMSText);
+  //latex.DrawLatex(cmsx-0.12, lumiy, CMSText);
   
   latex.SetTextFont(extraTextFont);
   latex.SetTextAlign(31); 
@@ -409,6 +417,7 @@ void  PlotLambda( )
   //latex.DrawLatex(extrax, extray, extraText);
   
   c->cd();
+  c->RedrawAxis();
   c->SetLogx();
   c->SetLogy();
   c->Update();
