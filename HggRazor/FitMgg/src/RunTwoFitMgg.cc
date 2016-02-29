@@ -894,7 +894,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   TString tag1, tag2, tag2p;
   if ( f1 == "doubleExp" )
     {
-      tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+      //tag1 = MakeDoubleExpN1N2( f1 + "_1", mgg, *ws );
+      tag1 = MakeDoubleExp( f1 + "_1", mgg, *ws );
     }
   else if ( f1 == "singleExp" )
     {
@@ -936,8 +937,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //------------------
   if ( f2 == "doubleExp" )
     {
-      tag2  = MakeDoubleExpN1N2( f2 + "_2", mgg, *ws );
-      tag2p = MakeDoubleExpN1N2( f2 + "_prime", mgg, *ws );
+      //tag2  = MakeDoubleExpN1N2( f2 + "_2", mgg, *ws );
+      //tag2p = MakeDoubleExpN1N2( f2 + "_prime", mgg, *ws );
+      tag2  = MakeDoubleExp( f2 + "_2", mgg, *ws );
+      tag2p = MakeDoubleExp( f2 + "_prime", mgg, *ws );
     }
   else if ( f2 == "singleExp" )
     {
@@ -994,7 +997,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //Sideband Fit to data set using parent function
   //----------------------------------------------
   RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  _alpha = ws->var( f1 + "_1_a" )->getVal();
+  //_alpha = ws->var( f1 + "_1_a" )->getVal();
   //FullFit
   //RooFitResult* bres = ws->pdf( tag1 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
 
@@ -1053,8 +1056,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //----------------------------------
   if ( f2 == "doubleExp" )
     {
-      ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
-      ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
+      //ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
+      //ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
+      std::cout << "Setting Npoints" << std::endl;
+      ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
     }
   else if ( f2 == "singleExp" )
     {
@@ -1095,7 +1100,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //----------------------------------------
   //Generate dataset 
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
-  RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   bres2p->SetName("fit_result_f2prime");
   ws->import( *bres2p );
   
@@ -1120,8 +1126,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   double pC, p0, p1, p2, p3, pN;//poly2,pol3;
   if ( f2 == "doubleExp" )
     {
-      dE_N1  = ws->var( f2 + "_prime_Nbkg1" )->getVal();
-      dE_N2  = ws->var( f2 + "_prime_Nbkg2" )->getVal();
+      //dE_N1  = ws->var( f2 + "_prime_Nbkg1" )->getVal();
+      //dE_N2  = ws->var( f2 + "_prime_Nbkg2" )->getVal();
+      dE_N1  = ws->var( f2 + "_prime_Nbkg" )->getVal();
       dE_a1  = ws->var( f2 + "_prime_a1" )->getVal();
       dE_a2  = ws->var( f2 + "_prime_a2" )->getVal();
     }
@@ -1182,6 +1189,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   int _countPass = 0;
   TRandom3* r = new TRandom3(0);
   TRandom3* r2 = new TRandom3(0);
+  std::cout << "ENTERING LOOP" << std::endl;
   for ( int i = 0; i < ntoys; i++ )
     {
       //-----------------------------------------------------------
@@ -1211,10 +1219,16 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //--------------------------------
       //Update f2 (test pdf) paramenters
       //--------------------------------
+      //ws->var( f2 + "_2_Nbkg" )->setRange(0, 1e3);
       if ( f2 == "doubleExp" )
       	{
+	  /*
 	  ws->var( f2 + "_2_Nbkg1")->setVal( dE_N1 );
 	  ws->var( f2 + "_2_Nbkg2")->setVal( dE_N2 );
+	  ws->var( f2 + "_2_a1")->setVal( dE_a1 );
+	  ws->var( f2 + "_2_a2")->setVal( dE_a2 );
+	  */
+	  ws->var( f2 + "_2_Nbkg")->setVal( dE_N1 );
 	  ws->var( f2 + "_2_a1")->setVal( dE_a1 );
 	  ws->var( f2 + "_2_a2")->setVal( dE_a2 );
 	}
@@ -1300,6 +1314,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       RooNLLVar* nll = (RooNLLVar*)sbModel->createNLL( *data_toys, RooFit::Extended(kTRUE), RooFit::Range("Full") );
       //Defininf RooMinimizer Object;
       RooMinimizer m(*nll);
+      m.setStrategy(2);
+      m.setPrintLevel(-1);
       m.minimize("Minuit2", "Migrad");
       //RooMinuit m(*nll) ; 
 
@@ -1331,8 +1347,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //---------------------------
       //Saving paramenters to TTree
       //---------------------------
-      _alpha_hat = ws->var( f2 + "_2_a" )->getVal();
-      _alpha_sigma = ws->var( f2 + "_2_a" )->getError();
+      //_alpha_hat = ws->var( f2 + "_2_a" )->getVal();
+      //_alpha_sigma = ws->var( f2 + "_2_a" )->getError();
       _Nbkg = npointsP;
       _Nbkg_hat = ws->var( f2 + "_2_Nbkg" )->getVal();
       _Nbkg_sigma = ws->var( f2 + "_2_Nbkg" )->getError();
@@ -1424,7 +1440,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   TString tag;
   if ( ffName == "doubleExp" )
     {
-      tag = MakeDoubleExpN1N2( "sideband_fit_doubleExp", mgg, *ws );
+      //tag = MakeDoubleExpN1N2( "sideband_fit_doubleExp", mgg, *ws );
+      tag = MakeDoubleExp( "sideband_fit_doubleExp", mgg, *ws );
       std::cout << "[INFO]: Running double exponential fit" << std::endl; 
     }
   else if ( ffName == "singleExp" )
@@ -1444,8 +1461,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
     }
   else if ( ffName == "doublePow" )
     {
-      //tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
-      tag = MakeDoublePowN1N2( "sideband_fit_doublePow", mgg, *ws );
+      tag = MakeDoublePow( "sideband_fit_doublePow", mgg, *ws );
+      //tag = MakeDoublePowN1N2( "sideband_fit_doublePow", mgg, *ws );
       std::cout << "[INFO]: Running double pow fit" << std::endl; 
     }
   else if ( ffName == "poly2" )
@@ -1473,14 +1490,34 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   std::cout << "====================" << std::endl;
   std::cout << "[INFO]: ENTERING FIT" << std::endl;
   std::cout << "====================" << std::endl;
-  
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
-  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
-  RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
-  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
+  ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n );
+  
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+   RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag )->createNLL( data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+   //Defining RooMinimizer Object;
+   RooMinimizer m(*nll);
+   m.setStrategy(2);
+   //m.setEps(1e-4);
+   //m.setMaxIterations(10000);
+   //m.setMaxFunctionCalls(10000);
+   //m.setPrintLevel(-1);
+   m.minimize("Minuit2", "Migrad");
+
+   //m.migrad(); 
+   RooFitResult* bres = m.save() ; 
+   //_status    = r->status();
+   //_covStatus = r->covQual();
+   
+   m.minimize("Minuit2", "Hesse");
+   RooFitResult* r2 = m.save() ; 
+   //_status2    = r2->status();
+   //_covStatus2 = r2->covQual();
+  
+
+  
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
   std::cout << "===================" << std::endl;
@@ -1491,7 +1528,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //g e t t i n g   n l l 
   //---------------------
   double minNll = bres->minNll();
-  RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
+  //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
   //RooAbsReal* nll = ws->pdf( tag )->createNLL(data, RooFit::Extended(kTRUE), RooFit::Range("Full") );
   std::cout << "nll_nll->" << nll->getVal() << std::endl;
   std::cout << "minNll->" << minNll << std::endl;
@@ -1499,7 +1536,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
   //double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
-  double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
+  
   std::cout << "n -> " << n << std::endl;
   AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
   AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
