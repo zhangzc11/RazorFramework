@@ -275,12 +275,12 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(600,-30, 30)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(200,-30, 30)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
-      tree->Draw("biasNorm>>hbias(600,-30, 30)", "", "goff");
+      tree->Draw("biasNorm>>hbias(200,-30, 30)", "", "goff");
     }
   
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
@@ -306,8 +306,33 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   gaus->SetParameter(2,1.0);
   */
   //TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) ) + [4]*exp( -(x-[5])*(x-[5])/(2*[3]*[3]) )", -1., 1.5);
-  double mu_value = 0.0;
-  double sigma_value = 0.0;
+  double mu_value[3] = {0.0};
+  double sigma_value[3] = {0.0};
+  double alpha_value = 0.0;
+  double n_value = 0.0;
+
+//crystal ball 
+TF1* myF_CB = new TF1("myF_CB", crystalball_function, -6.0, 6.0, 5 );
+//double crystalball_function(double *x, double *par) //(double x, double alpha, double n, double sigma, double mean)
+myF_CB->SetParameter(0, 0.9);	
+myF_CB->SetParameter(1, 1.5);	
+//myF_CB->SetParLimits(1, 1.0001,10.0);	
+myF_CB->SetParameter(2, hbias->GetStdDev());	
+myF_CB->SetParameter(3, hbias->GetMean());	
+myF_CB->SetParameter(4, hbias->GetMaximum());	
+myF_CB->SetLineColor( kBlue );
+myF_CB->SetLineWidth( 3 );
+        
+//single gaussian
+TF1* myF_SG = new TF1("myF_SG", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) )", -1.2, 1.2);
+myF_SG->SetParameter(0, hbias->GetMaximum() );
+myF_SG->SetParameter(1, hbias->GetMean() );
+myF_SG->SetParameter(2, hbias->GetStdDev() );
+myF_SG->SetLineColor( kRed );
+myF_SG->SetLineWidth( 3 );
+
+
+
 
   if( fitFunc == "doubleGaus" )
 	{
@@ -328,32 +353,32 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
 	  
 	  hbias->Fit( myF, "LR");
   	  std::cout << "Double gaussian Peak: " << myF->GetMaximumX(-4,4) << std::endl;
-	  mu_value = myF->GetMaximumX(-4,4);
-	  sigma_value = myF->GetParameter(2); 
+	  mu_value[0] = myF->GetMaximumX(-4,4);
+	  sigma_value[0] = myF->GetParameter(2); 
 	}
   else if (fitFunc == "singleGaus")
 	{
-	  TF1* myF = new TF1("myF", "[0]*exp( -(x-[1])*(x-[1])/(2*[2]*[2]) )", -1.2, 2.0);
-//	  std::cout<<"fit range:  "<<fit_xlow<<"  -  "<<fit_xhigh<<std::endl;
- 	  myF->SetParameter(0, hbias->GetMaximum() );
-	  myF->SetParameter(1, hbias->GetMean() );
-	  myF->SetParameter(2, hbias->GetStdDev() );
-	  
-	 // myF->SetParLimits(2, 0.0, 999);
-	  myF->SetLineColor( kBlue );
-	  myF->SetLineWidth( 3 );
-	  
-	  hbias->Fit( myF, "LR");
-	  mu_value = myF->GetParameter(1);
-	  sigma_value = myF->GetParameter(2); 
-
+	  hbias->Fit( myF_SG, "LR");
+	  mu_value[0] = myF_SG->GetParameter(1);
+	  sigma_value[0] = myF_SG->GetParameter(2); 
 	}
+
    else if (fitFunc == "crystalBall")
   	{
-		
+	hbias->Fit( myF_CB, "LR");
+	hbias->Fit( myF_SG, "LR+");
+	//myF_CB->Draw("same");
+	//myF_SG->Draw("same");
+	mu_value[1] = myF_SG->GetParameter(1);
+        sigma_value[1] = myF_SG->GetParameter(2);
+
+        mu_value[0] = myF_CB->GetParameter(3);
+        sigma_value[0] = myF_CB->GetParameter(2);
+        alpha_value = myF_CB->GetParameter(0);
+        n_value = myF_CB->GetParameter(1);
 	}
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
-  hbias->GetXaxis()->SetRangeUser( -4, 4 );
+  hbias->GetXaxis()->SetRangeUser( -6.0, 6.0 );
   hbias->GetYaxis()->SetRangeUser( 0, 1.2*_max );
   
   hbias->SetMarkerStyle(20);
@@ -381,19 +406,33 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   //lumiText = Form("mean: %.2f", mean_val );
   //lumiText2 = Form("#mu: %.2f #pm %.2f", gaus->GetParameter(1), gaus->GetParError(1) );
   
-  TString _mu    = Form("%.1f", 100.0*mu_value );
-  //TString _mu    = Form("%.1f", 100.0*myF->GetParameter(1) );
-  TString _sigma = Form("%.1f", 100.0*sigma_value );
+  TString _mu    = Form("%.1f", 100.0*mu_value[0] );
+  TString _sigma = Form("%.1f", 100.0*sigma_value[0] );
+  TString _alpha = Form("%.1f", alpha_value );
+  TString _n = Form("%.1f", n_value );
+  
   TLatex tex2;
   tex2.SetNDC();
   tex2.SetTextFont(52);
   tex2.SetTextAlign(31);
   tex2.SetTextSize(0.05);
-  tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
-  if(fitFunc == "singleGaus"  )
+  if(fitFunc == "singleGaus" )
  {
+  tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
   tex2.DrawLatex( 0.90, 0.80, "#sigma = " + _sigma + " %");
- } 
+ }
+ if(fitFunc == "crystalBall" )
+ {
+  TString _mu_2    = Form("%.1f", 100.0*mu_value[1] );
+  TString _sigma_2 = Form("%.1f", 100.0*sigma_value[1] );
+  tex2.DrawLatex( 0.89, 0.88, "#color[4]{#mu_{CB}} = " + _mu + " %");
+  tex2.DrawLatex( 0.89, 0.80, "#color[2]{#mu_{SG}} = " + _mu_2 + " %");
+  tex2.DrawLatex( 0.89, 0.72, "#color[4]{#sigma_{CB}} = " + _sigma + " %");
+  tex2.DrawLatex( 0.89, 0.64, "#color[2]{#sigma_{SG}} = " + _sigma_2 + " %");
+//  tex2.DrawLatex( 0.90, 0.72, "#alpha = " + _alpha+ "     ");
+//  tex2.DrawLatex( 0.90, 0.64, "n = " + _n+ "     ");
+ }
+ 
 
   TLatex latex;
   latex.SetNDC();
@@ -423,35 +462,48 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
  }  
 if (fitFunc == "singleGaus") 
 { 
-  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".pdf" );
-  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".png" );
-  c->SaveAs(outDir+ "/biasFits_" + f1 + "_" + f2 + ".C" );
+  c->SaveAs(outDir+ "/singleGaus_biasFits_" + f1 + "_" + f2 + ".pdf" );
+  c->SaveAs(outDir+ "/singleGaus_biasFits_" + f1 + "_" + f2 + ".png" );
+  c->SaveAs(outDir+ "/singleGaus_biasFits_" + f1 + "_" + f2 + ".C" );
  } 
+if (fitFunc == "crystalBall") 
+{ 
+  c->SaveAs(outDir+ "/crystalBall_biasFits_" + f1 + "_" + f2 + ".pdf" );
+  c->SaveAs(outDir+ "/crystalBall_biasFits_" + f1 + "_" + f2 + ".png" );
+  c->SaveAs(outDir+ "/crystalBall_biasFits_" + f1 + "_" + f2 + ".C" );
+ } 
+
+
 //return myF->GetParameter(1);
-  return mu_value;
+  return mu_value[0];
 };
 
-double crystalball_function(double x, double alpha, double n, double sigma, double mean)
+double crystalball_function(double *x, double *par) //(double x, double alpha, double n, double sigma, double mean)
 {
-          // evaluate the crystal ball function
-          if (sigma < 0.)     return 0.;
-          double z = (x - mean)/sigma; 
-          if (alpha < 0) z = -z; 
-          double abs_alpha = std::abs(alpha);
-         // double C = n/abs_alpha * 1./(n-1.) * std::exp(-alpha*alpha/2.);
-         // double D = std::sqrt(M_PI/2.)*(1.+ROOT::Math::erf(abs_alpha/std::sqrt(2.)));
-         // double N = 1./(sigma*(C+D));
-         if (z  > - abs_alpha)
-            return std::exp(- 0.5 * z * z);
-         else {
-            //double A = std::pow(n/abs_alpha,n) * std::exp(-0.5*abs_alpha*abs_alpha);
-            double nDivAlpha = n/abs_alpha;
-            double AA =  std::exp(-0.5*abs_alpha*abs_alpha);
-            double B = nDivAlpha -abs_alpha;
-            double arg = nDivAlpha/(B-z);
-            return AA * std::pow(arg,n);
-         }
-      }
+        // evaluate the crystal ball function
+	double alpha = par[0];
+	double n = par[1];
+	double sigma = par[2];
+	double mean = par[3];
+	double P_Const = par[4];//constant term
+	if (sigma < 0.)     return 0.;
+	double z = (x[0] - mean)/sigma; 
+	if (alpha < 0) z = -z; 
+	double abs_alpha = std::abs(alpha);
+	double C = n/abs_alpha * 1./(n-1.) * std::exp(-alpha*alpha/2.);
+	double D = std::sqrt(M_PI/2.)*(1.+std::erf(abs_alpha/std::sqrt(2.)));
+	double NN = 1.0;//1./(sigma*(C+D));
+	if (z  > - abs_alpha)
+	return P_Const*NN*std::exp(- 0.5 * z * z);
+	else {
+	double A = std::pow(n/abs_alpha,n) * std::exp(-0.5*abs_alpha*abs_alpha);
+	double nDivAlpha = n/abs_alpha;
+	double AA =  std::exp(-0.5*abs_alpha*abs_alpha);
+	double B = nDivAlpha -abs_alpha;
+	double arg = nDivAlpha/(B-z);
+	return P_Const*NN*AA * std::pow(arg,n);
+	}
+};
 
 
 
