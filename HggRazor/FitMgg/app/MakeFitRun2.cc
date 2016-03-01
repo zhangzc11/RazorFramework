@@ -299,6 +299,7 @@ int main( int argc, char* argv[])
   
   float forceSigma = 1.5;
   bool constrainMu = false;
+  bool sameMu = false;
   float forceMu    = -1;
   //TString mggName  = "mgg";
   TString mggName  = "mGammaGamma";
@@ -418,7 +419,7 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "signalFit" )
     {
-      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

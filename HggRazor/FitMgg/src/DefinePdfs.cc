@@ -68,6 +68,43 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
+TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+ //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  //DGF: Double Gaussian Full
+  RooRealVar* mu1     = new RooRealVar( tag + "_DGF_mu1", "#mu1", 125, "" );
+  RooRealVar* mu2     = new RooRealVar( tag + "_DGF_mu2", "#mu2", 125, "" );
+  RooRealVar* sigma1 = new RooRealVar( tag  + "_DGF_sigma1", "#sigma_{1}", 1.0, "" );
+  RooRealVar* sigma2 = new RooRealVar( tag  + "_DGF_sigma2", "#sigma_{2}", 3.0, "" );
+  mu1->setConstant(kFALSE);
+  mu2->setConstant(kFALSE);
+  sigma1->setConstant(kFALSE);
+  sigma2->setConstant(kFALSE);
+  
+  RooRealVar* frac   = new RooRealVar( tag + "_DGF_frac", "frac", 0.5, .0, 1.0 );
+  
+  RooRealVar* Ns     = new RooRealVar( tag + "_DGF_Ns", "N_{s}", 1e5, "events");
+  Ns->setConstant(kFALSE);
+  //Ns->setRange(0,1e5);
+  //------------------
+  //C r e a t e  p.d.f
+  //------------------
+  RooGaussian* gauss1    = new RooGaussian( tag + "_DGF1", "", mgg, *mu1, *sigma1 );
+  RooGaussian* gauss2    = new RooGaussian( tag + "_DGF2", "", mgg, *mu2, *sigma2 );
+  RooAddPdf* doublegauss = new RooAddPdf( tag   + "_DGF", "", RooArgList( *gauss1, *gauss2 ), *frac );
+
+  //------------------------------------
+  //C r e a t e   E x t e n d e d  p.d.f
+  //------------------------------------
+  TString ex_pdf_name          = tag + "_DGF_ext";
+  RooExtendPdf* ex_doublegauss = new RooExtendPdf( ex_pdf_name, "extDgauss", *doublegauss, *Ns );
+  w.import( *ex_doublegauss );
+  
+  return ex_pdf_name;
+};
+
 TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   //------------------------------

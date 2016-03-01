@@ -44,24 +44,40 @@
 #include "RunTwoFitMgg.hh"
 #include "DefinePdfs.hh"
 
-RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
+RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float forceMu, TString mggName )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(57);
-  mgg.setRange( "signal", 110, 140. );
+  //mgg.setRange( "signal", 110, 140. );
+  mgg.setRange( "signal", 103, 160. );
 
   /*
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 100, 1000, "GeV" );
   mgg.setBins(180);
   mgg.setRange( "signal", 600, 850. );
   */
-  //C r e a t e  doubleGaus
-  TString tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
+  
   //ws->var("dGauss_signal_gauss_Ns")->setVal( 1600 );
   
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
-  ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended( kTRUE ), RooFit::Range("signal") );
+  int npoints = data.numEntries();
+  //-----------------------
+  //C r e a t e  doubleGaus
+  //-----------------------
+  TString tag;
+  if( sameMu )
+    {
+      tag = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
+      ws->var("dGauss_signal_gauss_Ns")->setVal( (double)npoints );
+    }
+  else
+    {
+      tag = MakeFullDoubleGauss( "dGauss_signal", mgg, *ws );
+      ws->var("dGauss_signal_DGF_Ns")->setVal( (double)npoints );
+    }
+  
+  //ws->pdf( tag )->fitTo( data, RooFit::Strategy(0), RooFit::Extended( kTRUE ), RooFit::Range("signal") );
   RooFitResult* sres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
   
   sres->SetName( tag + "_sres" );
