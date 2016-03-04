@@ -80,10 +80,10 @@ int main ( ){
 	      Rmap[aux.mass] = aux;
 	    }
 	  //Filling Map Struct
-	  Rmap[aux.mass].Lambda20 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c1;
-	  Rmap[aux.mass].Lambda40 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c2;
-	  Rmap[aux.mass].Lambda60 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c3;
-	  Rmap[aux.mass].Lambda80 = FindLambda( 0.25, h_qtr_sel, h_qtr_gen )/g_c4;
+	  Rmap[aux.mass].Lambda20 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c1;
+	  Rmap[aux.mass].Lambda40 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c2;
+	  Rmap[aux.mass].Lambda60 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c3;
+	  Rmap[aux.mass].Lambda80 = FindLambda( 0.80, h_qtr_sel, h_qtr_gen )/g_c4;
 	  
 	}
     }//end reading file
@@ -205,6 +205,8 @@ int main ( ){
   c->SetBottomMargin(0.12);
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);
+  c->SetTickx();
+  c->SetTicky();
   
   TMultiGraph* mg0 = new TMultiGraph();
   mg0->Add(grshade);
@@ -274,7 +276,7 @@ int main ( ){
 
   TLegend* leg2 = new TLegend(0.63,0.51,0.758,0.81,NULL,"brNDC");//(xmin, ymin, xmax, ymax)
 
-  leg2->AddEntry("NULL", "R_{#Lambda} = 25%", "h");
+  leg2->AddEntry("NULL", "R_{#Lambda} = 80%", "h");
   //leg2->AddEntry(g_v_r20, "g_{eff} = 1" ,"l");
   leg2->AddEntry(g_v_r40, "g_{eff} = 2#pi" ,"l");
   leg2->AddEntry(g_v_r60, "g_{eff} = 3#pi" ,"l");
@@ -312,13 +314,13 @@ int main ( ){
    float extraTextSize = extraOverCmsTextSize*cmsSize;
    latex.SetTextFont(lumifont);
    latex.SetTextAlign(31); 
-   latex.SetTextSize(cmsSize);    
+   latex.SetTextSize(0.75*cmsSize);    
    latex.DrawLatex(lumix, lumiy,lumiText);
 
    latex.SetTextFont(cmsTextFont);
    latex.SetTextAlign(31); 
-   latex.SetTextSize(cmsSize);
-   latex.DrawLatex(cmsx, cmsy, CMSText);
+   latex.SetTextSize(0.75*cmsSize);
+   latex.DrawLatex(cmsx - 0.057, cmsy-0.008, CMSText);
    
    latex.SetTextFont(extraTextFont);
    latex.SetTextAlign(31); 
@@ -327,6 +329,7 @@ int main ( ){
 
   
   c->cd();
+  c->RedrawAxis();
   c->SetLogx();
   //c->SetLogy();
   c->Update();
@@ -336,8 +339,8 @@ int main ( ){
   c->SaveAs("PLOTS/test_MonoB_Lambda2Pi.C");
   */
   
-  c->SaveAs(outputDir+"/Final_MonoB_R25percent.pdf");
-  c->SaveAs(outputDir+"/Final_MonoB_R25percent.C");
+  c->SaveAs(outputDir+"/Final_MonoB_R80percent.pdf");
+  c->SaveAs(outputDir+"/Final_MonoB_R80percent.C");
   
   
   return 0;
