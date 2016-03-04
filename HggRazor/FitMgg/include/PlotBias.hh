@@ -10,5 +10,6 @@ std::pair<double,double> GetMeanRms(  std::string fname = "", std::string dataSe
 void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TString type );
 double FitBias( TString fname, TString f1, TString f2 , std::string outDir, bool _status, std::string fitFunc);
 double crystalball_function(double *x, double *par);
+double doublecrystalball_function(double *x, double *par);
 
 #endif
