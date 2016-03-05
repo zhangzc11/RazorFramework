@@ -275,15 +275,24 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(200,-30, 30)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
-      tree->Draw("biasNorm>>hbias(200,-30, 30)", "", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "", "goff");
     }
   
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
+  TH1F* hbias_gaus = (TH1F*)gDirectory->Get("hbias_gaus");
+  TH1F* hbias_P = (TH1F*)gDirectory->Get("hbias_P");
+  TH1F* hbias_N = (TH1F*)gDirectory->Get("hbias_N");
   double mean_val = hbias->GetMean();
   
   double _max = hbias->GetBinContent( hbias->GetMaximumBin() );
@@ -292,10 +301,8 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
 
   //double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 2 );
   double _xlow = hbias->GetBinCenter(  hbias->GetMaximumBin() - 4.0 );
-  double fit_xlow = 0.1*(hbias->GetMaximumBin()-300.0) - 1.2 ;
   //double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 3 );
   double _xhigh = hbias->GetBinCenter(  hbias->GetMaximumBin() + 4.0 );
-  double fit_xhigh = 0.1*(hbias->GetMaximumBin()-300.0) + 1.2 ;
   double _xlow2sig = hbias->GetBinCenter( hbias->FindFirstBinAbove( 0.03*_max ) );
   double _xhigh2sig = hbias->GetBinCenter( hbias->GetMaximumBin() ) + ( hbias->GetBinCenter( hbias->GetMaximumBin() ) - _xlow2sig );
   
@@ -315,6 +322,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   double mean2_DCB_value = 0.0;
   double sigma1_DCB_value = 0.0;
   double sigma2_DCB_value = 0.0;
+  double w1_DCB_value = 0.0;
 
 //crystal ball 
 TF1* myF_CB = new TF1("myF_CB", crystalball_function, -6.0, 4.0, 5 );
@@ -339,16 +347,17 @@ TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -6.0, 4.0, 8 );
 //6: w1
 //7: P_const
 
-myF_DCB->SetParameter(0, 1.2);	
-//myF_DCB->SetParLimits(0, 0.0, 999);	
+myF_DCB->SetParameter(0, 0.1+hbias_P->GetStdDev()/hbias_N->GetStdDev());	
+myF_DCB->SetParLimits(0, 0.0, 999);	
 myF_DCB->SetParameter(1, 1.5);	
-myF_DCB->SetParameter(2, hbias->GetStdDev());	
-//myF_DCB->SetParLimits(2, 0.0, 999);	
-myF_DCB->SetParameter(3, hbias->GetMean());
-myF_DCB->SetParameter(4, 3.0*hbias->GetStdDev());	
-//myF_DCB->SetParLimits(4, 0.0, 999);	
-myF_DCB->SetParameter(5, hbias->GetMean());	
-myF_DCB->SetParameter(6, 0.8);	
+myF_DCB->SetParameter(2, 1.0*hbias_gaus->GetStdDev());	
+myF_DCB->SetParLimits(2, 0.3*hbias_gaus->GetStdDev(), 999);	
+myF_DCB->SetParameter(3, hbias->GetMaximumBin()*0.5-6.0+0.05);
+myF_DCB->SetParameter(4, 1.6*hbias_gaus->GetStdDev());	
+myF_DCB->SetParLimits(4, 0.3*hbias_gaus->GetStdDev(), 999);	
+myF_DCB->SetParameter(5, hbias->GetMaximumBin()*0.5-6.0-0.05);	
+myF_DCB->SetParameter(6, 0.6);	
+myF_DCB->SetParLimits(6, 0.0, 1.0);	
 myF_DCB->SetParameter(7, hbias->GetMaximum());	
 myF_DCB->SetLineColor( kBlue );
 myF_DCB->SetLineWidth( 3 );
@@ -425,6 +434,7 @@ myF_SG->SetLineWidth( 3 );
 	sigma2_DCB_value = myF_DCB->GetParameter(4);
 	mean2_DCB_value = myF_DCB->GetParameter(5);
 	alpha_DCB_value = myF_DCB->GetParameter(0);
+	w1_DCB_value = myF_DCB->GetParameter(6);
 	}
 
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
@@ -466,6 +476,7 @@ myF_SG->SetLineWidth( 3 );
   TString _mean1_DCB = Form("%.1f", 100.0*mean1_DCB_value );
   TString _sigma2_DCB = Form("%.1f", 100.0*sigma2_DCB_value );
   TString _mean2_DCB = Form("%.1f", 100.0*mean2_DCB_value );
+  TString _w1_DCB = Form("%.1f", w1_DCB_value );
   
   TLatex tex2;
   tex2.SetNDC();
@@ -501,7 +512,7 @@ myF_SG->SetLineWidth( 3 );
   tex2.DrawLatex( 0.89, 0.64, "#mu_{2} = " + _mean2_DCB + " %");
   tex2.DrawLatex( 0.89, 0.56, "#sigma_{2} = " + _sigma2_DCB + " %");
   tex2.DrawLatex( 0.89, 0.48, "#alpha = " + _alpha_DCB );
-
+  //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
  }
 
   TLatex latex;
@@ -575,8 +586,9 @@ double doublecrystalball_function(double *x, double *par) //(double x, double al
 	double mean1 = par[3];
 	double sigma2 = par[4];
 	double mean2 = par[5];
-	double w1 = par[6];
-	double w2 = 1.0-w1;
+	double w1 = par[6]/sigma1;
+	double w2 = (1.0-par[6])/sigma2;
+	
 	double P_Const = par[7];//constant term
 	if (sigma1 < 0. || sigma2 <0.)     return 0.;
 	double z1 = (x[0] - mean1)/sigma1; 
