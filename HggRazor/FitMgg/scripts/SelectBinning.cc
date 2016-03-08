@@ -15,7 +15,7 @@ struct AnaBin
   double nevents;
 };
 
-void SelectBinning( TString fname, TString categoryMode = "highres" )
+void SelectBinning( TString fname, TString categoryMode = "highres", float _binCount = 18. )
 {
   TFile* f = new TFile( fname, "READ");
   assert( f );
@@ -42,8 +42,9 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
   bool _reachedZero = false;
   int n_stripe_bins = 0;
   std::vector<AnaBin> binVect;
-  for ( int i = 0; i < 300; i++ )
+  for ( int i = 0; i <= 300; i++ )
     {
+      if ( i%100 == 0 ) std::cout << "[INFO]: iteration -> " << i << std::endl;
       if ( MR_i <= 1000 ) MR_step = 50.0;
       
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
@@ -69,13 +70,13 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
 	}
       
       //adapting Rsq binnning to converge faster
-      if( Rsq_i <= 0.5 ) Rsq_step = 0.1;
-      if( Rsq_i <= 0.3 ) Rsq_step = 0.05;
+      if( Rsq_i <= 0.5 ) Rsq_step = 0.05;
+      if( Rsq_i <= 0.3 ) Rsq_step = 0.025;
       
       //very fine binning to find the first bin in the MR stripe
       if( n_stripe_bins == 0 && h->Integral() > 1.0 )  Rsq_step = 0.002;
       
-      if ( h->Integral() < 18. )
+      if ( h->Integral() < _binCount )
 	{
 	  Rsq_i = Rsq_i - Rsq_step;
 	}
