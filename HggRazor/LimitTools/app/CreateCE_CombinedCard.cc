@@ -42,21 +42,55 @@ int main( int argc, char* argv[])
   
   TString process, rfName;
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
+  std::map<TString, TString> pMap;
+  //--------------------
+  //reading inputlist
+  //--------------------
+  if ( ifs.is_open() )
+    {
+      while ( ifs.good() )
+	{
+	  ifs >> process >> rfName;
+	  if ( ifs.eof() ) break;
+	  if ( pMap.find( process ) == pMap.end() ) pMap[process] = rfName;
+	}
+    }
+  else
+    {
+      std::cerr << "[ERROR]: unable to open file -> " << inputFile << std::endl;
+    }
+  ifs.close();
 
+  //----------------------------
+  //Printing process information
+  //----------------------------
+  for ( auto& tmp : pMap )
+    {
+      std::cout << "[INFO]: process-> " << tmp.first << ", file-> " << tmp.second << std::endl;
+    }
+  
   TFile* fout = new TFile("combineHisto.root", "RECREATE");
   //----------------
   //Define ROOT FILE
   //----------------
   TFile* f;
   TTree* tree;
-  TH2F* histo[2];
+ 
   float MRedges[] = {150., 250., 500., 800., 10000.};
 
+  //-------------------
+  //Number of processes
+  //-------------------
+  const int nProcess = pMap.size();
+  TH2F* histoInc[nProcess];//Inclusive mgg histos
+  TH2F* histoSR[nProcess];//mgg Signal Region (SR) histos
+  std::cout << "[INFO]: number of processes is " << nProcess << std::endl;
 
   //--------------------
   //Define category cuts
   //--------------------
-  TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  TString mggInclusiveCut = " && mGammaGamma > 103. && mGammaGamma < 160.";
   TString categoryCutString;
   if (category == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
   else if (category == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
@@ -66,33 +100,24 @@ int main( int argc, char* argv[])
   else if (category == "inclusive") categoryCutString = "";
   
   int nprocess = 0;
-  cut = cut + categoryCutString;
+  cut = cut + mggInclusiveCut + categoryCutString;
   std::cout << "[INFO]: cut applied-> " << cut << std::endl;
-  if ( ifs.is_open() )
+
+  for ( auto& tmp : pMap )
     {
-      while ( ifs.good() )
-	{
-	  ifs >> process >> rfName;
-	  if ( ifs.eof() ) break;
-	  std::cout << process << " -> " << rfName << std::endl;
-	  f = new TFile( rfName, "READ");
-	  assert( f );
-	  tree = (TTree*)f->Get("HggRazor");
-	  TFile* dummy = new TFile( "dummyFile.root", "RECREATE");
-	  histo[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, process ) );
-	  
-	  nprocess++;
-	  delete f;
-	}
-    }
-  else
-    {
-      std::cerr << "[ERROR]: unable to open file -> " << inputFile << std::endl;
+      f = new TFile( tmp.second, "READ");
+      assert( f );
+      tree = (TTree*)f->Get("HggRazor");
+      TFile* dummy = new TFile( "dummyFile.root", "RECREATE");
+      histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first ) );
+      
+      nprocess++;
+      delete f;
     }
   
   fout->cd();
-  histo[0]->Write("p0_razor");
-  histo[1]->Write("p1_razor");
+  histoInc[0]->Write("p0_razor");
+  histoInc[1]->Write("p1_razor");
   fout->Close();
   std::cout << "[INFO]: finishing... " << std::endl;
   return 0;	
