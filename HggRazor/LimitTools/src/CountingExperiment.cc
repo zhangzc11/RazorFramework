@@ -74,7 +74,7 @@ TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pNam
       //std::cout << "edge j = " << j << " , val-> " << RSQedges[j] << std::endl;
     }
   
-  TH2F* _hRazor = new TH2F( "h", "h", 4, MRedges, n_RSQedges-1, RSQedges);
+  TH2F* _hRazor = new TH2F( pName + "_hRazor", pName + "_hRazor", 4, MRedges, n_RSQedges-1, RSQedges);
   //TH2F* _hRazor = new TH2F( "h", "h", 20, 150,5000, 500, 0, 5);
   
   
