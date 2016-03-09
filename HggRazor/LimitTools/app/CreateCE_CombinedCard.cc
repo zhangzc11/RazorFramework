@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <vector>
 #include <utility>
 #include <assert.h>
 //ROOT INCLUDES
@@ -12,6 +13,23 @@
 #include "CountingExperiment.hh"
 #include "CommandLineInput.hh"
 #include "HggAux.hh"
+
+
+
+const float lumi = 2300.;
+const float nonRes_kfactor = 1.37;
+
+//-------------
+//B i n n i n g 
+//-------------
+float MRedges[]   = {150., 187.5, 375., 750., 10000.};
+float RSQedges0[] = {0.0, 0.06, 0.11, 0.16, 10.0};
+float RSQedges1[] = {0.0, 0.07, 0.12, 10.0};
+float RSQedges2[] = {0.0, 0.03, 10.0};
+float RSQedges3[] = {0.0, 10.0};
+
+std::vector<float*> stripesBins;
+//stripesBins.push_back(RSQedges0);
 
 int main( int argc, char* argv[])
 {
@@ -43,9 +61,9 @@ int main( int argc, char* argv[])
   TString process, rfName;
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
   std::map<TString, TString> pMap;
-  //--------------------
+  //-----------------
   //reading inputlist
-  //--------------------
+  //-----------------
   if ( ifs.is_open() )
     {
       while ( ifs.good() )
@@ -75,9 +93,7 @@ int main( int argc, char* argv[])
   //----------------
   TFile* f;
   TTree* tree;
- 
-  float MRedges[] = {150., 250., 500., 800., 10000.};
-
+  
   //-------------------
   //Number of processes
   //-------------------
@@ -91,33 +107,88 @@ int main( int argc, char* argv[])
   //--------------------
   TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString mggInclusiveCut = " && mGammaGamma > 103. && mGammaGamma < 160.";
-  TString categoryCutString;
-  if (category == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
-  else if (category == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
-  else if (category == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
-  else if (category == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
-  else if (category == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
-  else if (category == "inclusive") categoryCutString = "";
+  TString categoryCutString, mggCutSR;
+  
+  if (category == "highpt")
+    {
+      categoryCutString = " && pTGammaGamma >= 110 ";
+      mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+    }
+  else if (category == "hbb")
+    {
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
+      mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.";
+    }
+  else if (category == "zbb")
+    {
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
+      mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.0";
+    }
+  else if (category == "highres")
+    {
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+    }
+  else if (category == "lowres")
+    {
+      categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+      mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+    }
+  else if (category == "inclusive")
+    {
+      categoryCutString = "";
+      mggCutSR = " && mGammaGamma > 103.0 && mGammaGamma < 160.0";
+    }
   
   int nprocess = 0;
   cut = cut + mggInclusiveCut + categoryCutString;
+  TString cutSR = cut + mggCutSR + categoryCutString;
   std::cout << "[INFO]: cut applied-> " << cut << std::endl;
 
+  //-------------------
+  //Filling Rsq binning
+  //-------------------
+  stripesBins.push_back(RSQedges0);
+  stripesBins.push_back(RSQedges1);
+  stripesBins.push_back(RSQedges2);
+  stripesBins.push_back(RSQedges3);
+
+  //processstruct map
+  std::map<TString, ProcessStruct> psMap;
   for ( auto& tmp : pMap )
     {
       f = new TFile( tmp.second, "READ");
       assert( f );
       tree = (TTree*)f->Get("HggRazor");
       TFile* dummy = new TFile( "dummyFile.root", "RECREATE");
-      histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first ) );
-      
+      if ( tmp.first == "NonRes" )
+	{
+	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first, lumi, nonRes_kfactor ) );
+	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), MRedges, 0.01, tmp.first+"_SR", lumi, nonRes_kfactor ) );
+	}
+      else
+	{
+	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first , lumi ) );
+	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), MRedges, 0.01, tmp.first+"_SR", lumi ) );
+	}
+      ProcessStruct myps;
+      myps.h_inc = histoInc[nprocess];
+      myps.h_sr  = histoSR[nprocess];
+      if ( psMap.find( tmp.first ) == psMap.end() ) psMap[tmp.first] = myps;
       nprocess++;
       delete f;
     }
+
+  CreateDataCard( psMap, MRedges, stripesBins, 0.05 );
   
   fout->cd();
   histoInc[0]->Write("p0_razor");
   histoInc[1]->Write("p1_razor");
+
+  histoSR[0]->Write("p0_razor_sr");
+  histoSR[1]->Write("p1_razor_sr");
+  
+  
   fout->Close();
   std::cout << "[INFO]: finishing... " << std::endl;
   return 0;	

@@ -61,7 +61,7 @@ float extraOverCmsTextSize  = 0.76;
 float cmsSize = 0.06;
 
 
-TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pName )
+TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pName, const float lumi, const float kf )
 {
   //-------------------------
   //C r e a t i n g   T H 2 F
@@ -92,15 +92,70 @@ TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pNam
       tree->GetEntry(i);
       if ( i%10000 == 0 )
 	{
-	  
 	  //std::cout << "[INFO]: entry #" << i << std::endl;
 	  //std::cout << "mr: " << mr << " , rsq: " << rsq << std::endl;
 	}
       
-      _hRazor->Fill(mr, rsq, weight);
+      _hRazor->Fill(mr, rsq, lumi*kf*weight);
     }
   std::cout << pName << " " << _hRazor->Integral() << std::endl;
   return _hRazor;
+};
+
+void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize )
+{
+  const int nprocesses = psMap.size();
+  std::ofstream ofs ( "combineCards/CountingExp/test.txt", std::ofstream::out );
+  ofs << "# Simple counting experiment, with one signal and a few background processes\n";
+  ofs << "imax 1 number of channels\n";
+  ofs << "jmax "<< nprocesses-1 << " number of backgrounds\n";
+  ofs << "kmax 1 number of number of nuisance parameters (sources of systematical uncertainties)\n";
+  ofs << "------------\n";
+  ofs << "# we have just one channel, in which we observe xx events\n";
+  ofs << "bin 1\n";
+  ofs << "observation " << psMap["NonRes"].h_sr->Integral() << "\n";
+  ofs << "# now we list the expected events for signal and all backgrounds in that bin\n";
+  ofs << "# the second 'process' line must have a positive number for backgrounds, and 0 for signal\n";
+  ofs << "# then we list the independent sources of uncertainties, and give their effect (syst. error)\n";
+  ofs << "# on each process and bin\n";
+  ofs << "bin";
+  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t1";
+  ofs << "\nprocess\t\tsignal";
+  for ( auto& tmp : psMap ) if ( tmp.first != "signal" ) ofs << "\t\t" << tmp.first;
+  ofs << "\nprocess";
+  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t" << i;
+  ofs << "\nrate\t\t" << psMap["signal"].h_sr->Integral();
+  for ( auto& tmp : psMap ) if ( tmp.first != "signal" ) ofs << "\t\t" << tmp.second.h_sr->Integral();
+  ofs << "\n------------\n";
+  ofs << "lumi\tlnN";
+  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t1.2";
+  ofs.close();
+
+  //std::cout << psMap["signal"].h_sr->FindBin(150,0) << " " << psMap["signal"].h_sr->FindBin(MRedges[3], RSQbinning.at(3)[0])
+  //<< std::endl;
+  float binCount = 0.0;
+  int nb[4] = {5, 4, 3, 2};
+  for ( int i = 0; i < 4; i++ )
+    {
+      int nj = nb[i];
+      std::cout << "nj: " << nj << std::endl;
+      for ( int j = 0; j < nj-1; j++ )
+	{
+	  float rsq_low = RSQbinning.at(i)[j];
+	  int steps = (int)( (RSQbinning.at(i)[j+1] - RSQbinning.at(i)[j])/(float)0.010 );
+	  std::cout << "rsq_low: " << rsq_low << " " << RSQbinning.at(i)[j+1] << " diff: " << RSQbinning.at(i)[j+1] - RSQbinning.at(i)[j] << " steps: " << steps << std::endl;
+	  binCount = 0.0;
+	  for ( int k = 0; k < steps; k++ )
+	    {
+	      float rsq = rsq_low + (float)k*0.01;
+	      float bcontent = psMap["NonRes"].h_inc->GetBinContent( psMap["NonRes"].h_inc->FindBin( MRedges[i], rsq ) );
+	      //if ( bcontent != 0.0 ) std::cout << MRedges[i] << "," << rsq << " --> " << bcontent << std::endl;
+	      binCount += bcontent;
+	    }
+	  std::cout << i << " bin count: " << binCount << std::endl;
+	}
+    }
+  
 };
 
 void PlotSignalModel( std::string fname, std::string outDir )
