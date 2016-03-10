@@ -24,6 +24,7 @@ const float rsqStep = 0.001;
 //-------------
 //B i n n i n g 
 //-------------
+/*
 //MASTER BINNING
 //highpt
 const int n_highptMRedges = 5;
@@ -58,7 +59,7 @@ const int n_lowresRSQedges2 = 3;
 float  lowresRSQedges2[] = {0,0.019,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
-
+*/
 /*
 //min bin count 10
 //HighPt
@@ -95,7 +96,7 @@ float  lowresRSQedges2[] = {0,0.019,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
 */
-/*
+
 //min bin count 18
 //HighPt
 const int n_highptMRedges = 5;
@@ -130,7 +131,6 @@ const int n_lowresRSQedges2 = 3;
 float  lowresRSQedges2[] = {0,0.02,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
-*/
 //hbb
 const int n_hbbMRedges = 2;
 float  hbbMRedges[] = {150,10000};
