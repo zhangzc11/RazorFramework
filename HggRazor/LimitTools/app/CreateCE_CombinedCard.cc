@@ -19,15 +19,183 @@
 const float lumi = 2300.;
 const float nonRes_kfactor = 1.37;
 
+const float rsqStep = 0.001;
+
 //-------------
 //B i n n i n g 
 //-------------
+//MASTER BINNING
+//highpt
+const int n_highptMRedges = 5;
+float  highptMRedges[] = {150,250,500,1000,10000};
+const int n_highptRSQedges0 = 6;
+float  highptRSQedges0[] = {0,0.028,0.053,0.078,0.128,5.0};
+const int n_highptRSQedges1 = 6;
+float  highptRSQedges1[] = {0,0.027,0.052,0.077,0.102,5.0};
+const int n_highptRSQedges2 = 4;
+float  highptRSQedges2[] = {0,0.011,0.036,5.0};
+const int n_highptRSQedges3 = 2;
+float  highptRSQedges3[] = {0,5.0};
+//highres
+const int n_highresMRedges = 5;
+float  highresMRedges[] = {150,225,450,900,10000};
+const int n_highresRSQedges0 = 8;
+float  highresRSQedges0[] = {0,0.036,0.061,0.086,0.111,0.136,0.186,5.0};
+const int n_highresRSQedges1 = 6;
+float  highresRSQedges1[] = {0,0.027,0.052,0.077,0.102,5.0};
+const int n_highresRSQedges2 = 3;
+float  highresRSQedges2[] = {0,0.022,5.0};
+const int n_highresRSQedges3 = 2;
+float  highresRSQedges3[] = {0,5.0};
+//lowres
+const int n_lowresMRedges = 5;
+float  lowresMRedges[] = {150,225,450,900,10000};
+const int n_lowresRSQedges0 = 9;
+float  lowresRSQedges0[] = {0,0.036,0.061,0.086,0.111,0.136,0.161,0.186,5.0};
+const int n_lowresRSQedges1 = 6;
+float  lowresRSQedges1[] = {0,0.022,0.047,0.072,0.097,5.0};
+const int n_lowresRSQedges2 = 3;
+float  lowresRSQedges2[] = {0,0.019,5.0};
+const int n_lowresRSQedges3 = 2;
+float  lowresRSQedges3[] = {0,5.0};
+
+/*
+//min bin count 10
+//HighPt
+const int n_highptMRedges = 5;
+float  highptMRedges[] = {150,250,500,1000,10000};
+const int n_highptRSQedges0 = 4;
+float  highptRSQedges0[] = {0,0.078,0.128,5.0};
+const int n_highptRSQedges1 = 4;
+float  highptRSQedges1[] = {0,0.052,0.102,5.0};
+const int n_highptRSQedges2 = 3;
+float  highptRSQedges2[] = {0,0.036,5.0};
+const int n_highptRSQedges3 = 2;
+float  highptRSQedges3[] = {0,5.0};
+//HighRes
+const int n_highresMRedges = 5;
+float  highresMRedges[] = {150,225,450,900,10000};
+const int n_highresRSQedges0 = 5;
+float  highresRSQedges0[] = {0,0.086,0.136,0.186,5.0};
+const int n_highresRSQedges1 = 4;
+float  highresRSQedges1[] = {0,0.052,0.102,5.0};
+const int n_highresRSQedges2 = 3;
+float  highresRSQedges2[] = {0,0.022,5.0};
+const int n_highresRSQedges3 = 2;
+float  highresRSQedges3[] = {0,5.0};
+//LowRes
+const int n_lowresMRedges = 5;
+float  lowresMRedges[] = {150,225,450,900,10000};
+const int n_lowresRSQedges0 = 5;
+float  lowresRSQedges0[] = {0,0.086,0.136,0.186,5.0};
+const int n_lowresRSQedges1 = 4;
+float  lowresRSQedges1[] = {0,0.047,0.097,5.0};
+const int n_lowresRSQedges2 = 3;
+float  lowresRSQedges2[] = {0,0.019,5.0};
+const int n_lowresRSQedges3 = 2;
+float  lowresRSQedges3[] = {0,5.0};
+*/
+/*
+//min bin count 18
+//HighPt
+const int n_highptMRedges = 5;
+float  highptMRedges[] = {150,250,500,1000,10000};
+const int n_highptRSQedges0 = 4;
+float  highptRSQedges0[] = {0,0.054,0.104,5.0};
+const int n_highptRSQedges1 = 4;
+float  highptRSQedges1[] = {0,0.038,0.088,5.0};
+const int n_highptRSQedges2 = 3;
+float  highptRSQedges2[] = {0,0.03,5.0};
+const int n_highptRSQedges3 = 2;
+float  highptRSQedges3[] = {0,5.0};
+//HighRes
+const int n_highresMRedges = 5;
+float  highresMRedges[] = {150,187.5,375,750,10000};
+const int n_highresRSQedges0 = 5;
+float  highresRSQedges0[] = {0,0.058,0.108,0.158,5.0};
+const int n_highresRSQedges1 = 4;
+float  highresRSQedges1[] = {0,0.071,0.121,5.0};
+const int n_highresRSQedges2 = 3;
+float  highresRSQedges2[] = {0,0.026,5.0};
+const int n_highresRSQedges3 = 2;
+float  highresRSQedges3[] = {0,5.0};
+//LowRes
+const int n_lowresMRedges = 5;
+float  lowresMRedges[] = {150,200,400,800,10000};
+const int n_lowresRSQedges0 = 5;
+float  lowresRSQedges0[] = {0,0.064,0.114,0.164,5.0};
+const int n_lowresRSQedges1 = 4;
+float  lowresRSQedges1[] = {0,0.056,0.106,5.0};
+const int n_lowresRSQedges2 = 3;
+float  lowresRSQedges2[] = {0,0.02,5.0};
+const int n_lowresRSQedges3 = 2;
+float  lowresRSQedges3[] = {0,5.0};
+*/
+//hbb
+const int n_hbbMRedges = 2;
+float  hbbMRedges[] = {150,10000};
+const int n_hbbRSQedges0 = 2;
+float  hbbRSQedges0[] = {0,5.0};
+//zbb
+const int n_zbbMRedges = 2;
+float  zbbMRedges[] = {150,10000};
+const int n_zbbRSQedges0 = 2;
+float  zbbRSQedges0[] = {0,5.0};
+
+
+
+//end binning
 float MRedges[]   = {150., 187.5, 375., 750., 10000.};
 float RSQedges0[] = {0.0, 0.06, 0.11, 0.16, 10.0};
 float RSQedges1[] = {0.0, 0.07, 0.12, 10.0};
 float RSQedges2[] = {0.0, 0.03, 10.0};
 float RSQedges3[] = {0.0, 10.0};
 
+
+
+void FillBinningMap( std::map<float, std::vector<float>>& mymap,
+		     int n_MRedges = 0, float* MRedges = NULL,
+		     int n_RSQ0edges = 0, float* RSQ0edges = NULL,
+		     int n_RSQ1edges = 0, float* RSQ1edges = NULL,
+		     int n_RSQ2edges = 0, float* RSQ2edges = NULL,
+		     int n_RSQ3edges = 0, float* RSQ3edges = NULL,
+		     int n_RSQ4edges = 0, float* RSQ4edges = NULL,
+		     int n_RSQ5edges = 0, float* RSQ5edges = NULL
+		     )
+{
+  for ( int i = 0; i < n_MRedges-1; i++ )
+    {
+      std::vector<float> myvec;
+      if ( mymap.find( MRedges[i] ) == mymap.end() )
+	{
+	  mymap[MRedges[i]] = myvec;
+	  switch (i)
+	    {
+	    case 0:
+	      for ( int j = 0; j < n_RSQ0edges; j++ ) mymap[MRedges[i]].push_back( RSQ0edges[j] );
+	      break;
+	    case 1:
+	      for ( int j = 0; j < n_RSQ1edges; j++ ) mymap[MRedges[i]].push_back( RSQ1edges[j] );
+	      break;
+	    case 2:
+	      for ( int j = 0; j < n_RSQ2edges; j++ ) mymap[MRedges[i]].push_back( RSQ2edges[j] );
+	      break;
+	    case 3:
+	      for ( int j = 0; j < n_RSQ3edges; j++ ) mymap[MRedges[i]].push_back( RSQ3edges[j] );
+	      break;
+	    case 4:
+	      for ( int j = 0; j < n_RSQ4edges; j++ ) mymap[MRedges[i]].push_back( RSQ4edges[j] );
+	      break;
+	    case 5:
+	      for ( int j = 0; j < n_RSQ5edges; j++ ) mymap[MRedges[i]].push_back( RSQ5edges[j] );
+	      break;
+	    default:
+	      std::cerr << "[ERROR] too many MR edges!!!" << std::endl;
+	    }
+	}
+    }
+  return;
+};
 std::vector<float*> stripesBins;
 //stripesBins.push_back(RSQedges0);
 
@@ -108,36 +276,78 @@ int main( int argc, char* argv[])
   TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString mggInclusiveCut = " && mGammaGamma > 103. && mGammaGamma < 160.";
   TString categoryCutString, mggCutSR;
-  
+  //---------------------
+  //B i n n i n g   M a p 
+  //---------------------
+  std::map<float,std::vector<float>> myBinningMap;
   if (category == "highpt")
     {
       categoryCutString = " && pTGammaGamma >= 110 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+      FillBinningMap( myBinningMap,
+		      n_highptMRedges, highptMRedges,
+		      n_highptRSQedges0, highptRSQedges0,
+		      n_highptRSQedges1, highptRSQedges1,
+		      n_highptRSQedges2, highptRSQedges2,
+		      n_highptRSQedges3, highptRSQedges3
+		      );
     }
   else if (category == "hbb")
     {
       categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
       mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.";
+      FillBinningMap( myBinningMap,
+		      n_hbbMRedges, hbbMRedges,
+		      n_hbbRSQedges0, hbbRSQedges0
+		      );
     }
   else if (category == "zbb")
     {
       categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
       mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.0";
+      FillBinningMap( myBinningMap,
+		      n_zbbMRedges, zbbMRedges,
+		      n_zbbRSQedges0, zbbRSQedges0
+		      );
     }
   else if (category == "highres")
     {
       categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+      FillBinningMap( myBinningMap,
+		      n_highresMRedges, highresMRedges,
+		      n_highresRSQedges0, highresRSQedges0,
+		      n_highresRSQedges1, highresRSQedges1,
+		      n_highresRSQedges2, highresRSQedges2,
+		      n_highresRSQedges3, highresRSQedges3
+		      );
     }
   else if (category == "lowres")
     {
       categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
+      FillBinningMap( myBinningMap,
+		      n_lowresMRedges, lowresMRedges,
+		      n_lowresRSQedges0, lowresRSQedges0,
+		      n_lowresRSQedges1, lowresRSQedges1,
+		      n_lowresRSQedges2, lowresRSQedges2,
+		      n_lowresRSQedges3, lowresRSQedges3
+		      );
     }
   else if (category == "inclusive")
     {
       categoryCutString = "";
       mggCutSR = " && mGammaGamma > 103.0 && mGammaGamma < 160.0";
+    }
+
+  //-------------------------
+  //Binning Info
+  //-------------------------
+  for ( auto& tmp : myBinningMap )
+    {
+      std::cout << "MR: " << tmp.first << " --> {";
+      for ( auto& tmp1 : tmp.second ) std::cout << tmp1 << ",";
+      std::cout << "}\n";
     }
   
   int nprocess = 0;
@@ -163,13 +373,13 @@ int main( int argc, char* argv[])
       TFile* dummy = new TFile( "dummyFile.root", "RECREATE");
       if ( tmp.first == "NonRes" )
 	{
-	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first, lumi, nonRes_kfactor ) );
-	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), MRedges, 0.01, tmp.first+"_SR", lumi, nonRes_kfactor ) );
+	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), myBinningMap, rsqStep, tmp.first, lumi, nonRes_kfactor ) );
+	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), myBinningMap, rsqStep, tmp.first+"_SR", lumi, nonRes_kfactor ) );
 	}
       else
 	{
-	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), MRedges, 0.01, tmp.first , lumi ) );
-	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), MRedges, 0.01, tmp.first+"_SR", lumi ) );
+	  histoInc[nprocess] = new TH2F( *Create2DHisto( tree->CopyTree( cut ), myBinningMap, rsqStep, tmp.first , lumi ) );
+	  histoSR[nprocess]  = new TH2F( *Create2DHisto( tree->CopyTree( cutSR ), myBinningMap, rsqStep, tmp.first+"_SR", lumi ) );
 	}
       ProcessStruct myps;
       myps.h_inc = histoInc[nprocess];
@@ -179,7 +389,8 @@ int main( int argc, char* argv[])
       delete f;
     }
 
-  CreateDataCard( psMap, MRedges, stripesBins, 0.05 );
+  //CreateDataCard( psMap, MRedges, stripesBins, rsqStep );
+  CreateDataCard( psMap, myBinningMap, rsqStep, category );
   
   fout->cd();
   histoInc[0]->Write("p0_razor");

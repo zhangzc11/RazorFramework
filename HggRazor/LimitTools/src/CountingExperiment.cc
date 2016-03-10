@@ -61,7 +61,7 @@ float extraOverCmsTextSize  = 0.76;
 float cmsSize = 0.06;
 
 
-TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pName, const float lumi, const float kf )
+TH2F* Create2DHisto( TTree* tree, std::map<float, std::vector<float>> bMap, float RsqBinSize, TString pName, const float lumi, const float kf )
 {
   //-------------------------
   //C r e a t i n g   T H 2 F
@@ -73,8 +73,17 @@ TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pNam
       RSQedges[j] = (float)j*RsqBinSize;
       //std::cout << "edge j = " << j << " , val-> " << RSQedges[j] << std::endl;
     }
-  
-  TH2F* _hRazor = new TH2F( pName + "_hRazor", pName + "_hRazor", 4, MRedges, n_RSQedges-1, RSQedges);
+  const int n_MRedges = bMap.size();
+  float MRedges[n_MRedges+1];
+  int ctr = 0;
+  for ( auto& tmp : bMap )
+    {
+      MRedges[ctr] = tmp.first;
+      //std::cout << MRedges[ctr] << std::endl;
+      ctr++;
+    }
+  MRedges[n_MRedges] = 10000;
+  TH2F* _hRazor = new TH2F( pName + "_hRazor", pName + "_hRazor", n_MRedges, MRedges, n_RSQedges-1, RSQedges);
   //TH2F* _hRazor = new TH2F( "h", "h", 20, 150,5000, 500, 0, 5);
   
   
@@ -102,19 +111,18 @@ TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize, TString pNam
   return _hRazor;
 };
 
-void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize )
+void CreateDataCard( std::map<TString,ProcessStruct> psMap, std::map<float, std::vector<float>> bMap, float rsqBinSize, TString cat )
 {
   const int nprocesses = psMap.size();
-  int nb[4] = {5, 4, 3, 2};
-  for ( int i = 0; i < 4; i++ )
+  for ( auto& tmp : bMap )
     {
-      int nj = nb[i];
+      const int nj = tmp.second.size() - 1;
       std::cout << "nj: " << nj << std::endl;
-      for ( int j = 0; j < nj-1; j++ )
+      for ( int j = 0; j < nj; j++ )
 	{
 	  std::stringstream ss;
-	  ss << "combineCards/CountingExp/SCE_MR_" << MRedges[i] << "_" <<  MRedges[i+1];
-	  ss << "_RSQ_" << RSQbinning.at(i)[j] << "_" << RSQbinning.at(i)[j+1] << ".txt"; 
+	  ss << "combineCards/CountingExp/" << cat << "_SCE_MR_" << tmp.first;
+	  ss << "_RSQ_" << tmp.second[j] << "_" << tmp.second[j+1] << ".txt"; 
 	  std::ofstream ofs ( ss.str().c_str(), std::ofstream::out );
 	  ofs << "# Simple counting experiment, with one signal and a few background processes\n";
 	  ofs << "imax 1 number of channels\n";
@@ -123,7 +131,7 @@ void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std:
 	  ofs << "------------\n";
 	  ofs << "# we have just one channel, in which we observe xx events\n";
 	  ofs << "bin 1\n";
-	  float nonResYield = GetSRYield( psMap["NonRes"].h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], 0.01 );
+	  float nonResYield = GetSRYield( psMap["NonRes"].h_sr, tmp.first, tmp.second[j], tmp.second[j+1], rsqBinSize );
 	  ofs << "observation " << nonResYield << "\n\n";
 	  ofs << "# now we list the expected events for signal and all backgrounds in that bin\n";
 	  ofs << "# the second 'process' line must have a positive number for backgrounds, and 0 for signal\n";
@@ -135,12 +143,62 @@ void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std:
 	  for ( auto& tmp : psMap ) if ( tmp.first != "signal" ) ofs << "\t\t" << tmp.first;
 	  ofs << "\nprocess";
 	  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t" << i;
-	  ofs << "\nrate\t\t" << GetSRYield( psMap["signal"].h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], 0.01 );
+	  ofs << "\nrate\t\t" << GetSRYield( psMap["signal"].h_sr, tmp.first, tmp.second[j], tmp.second[j+1], rsqBinSize );
+	  for ( auto& tmp2 : psMap )
+	    {
+	      if ( tmp2.first != "signal" )
+		{
+		  float yield = GetSRYield( tmp2.second.h_sr, tmp.first, tmp.second[j], tmp.second[j+1], rsqBinSize );
+		  ofs << "\t" << yield;
+		}
+	    }
+	  ofs << "\n------------\n";
+	  ofs << "lumi\tlnN";
+	  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t1.2";
+	  ofs.close();
+	}
+    }
+};
+
+void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize )
+{
+  const int nprocesses = psMap.size();
+  int nb[4] = {5, 4, 3, 2};
+  for ( int i = 0; i < 4; i++ )
+    {
+      int nj = nb[i];
+      std::cout << "nj: " << nj << std::endl;
+      for ( int j = 0; j < nj-1; j++ )
+	{
+	  std::stringstream ss;
+	  ss << "combineCards/CountingExp/HighRes_SCE_MR_" << MRedges[i] << "_" <<  MRedges[i+1];
+	  ss << "_RSQ_" << RSQbinning.at(i)[j] << "_" << RSQbinning.at(i)[j+1] << ".txt"; 
+	  std::ofstream ofs ( ss.str().c_str(), std::ofstream::out );
+	  ofs << "# Simple counting experiment, with one signal and a few background processes\n";
+	  ofs << "imax 1 number of channels\n";
+	  ofs << "jmax "<< nprocesses-1 << " number of backgrounds\n";
+	  ofs << "kmax 1 number of number of nuisance parameters (sources of systematical uncertainties)\n";
+	  ofs << "------------\n";
+	  ofs << "# we have just one channel, in which we observe xx events\n";
+	  ofs << "bin 1\n";
+	  float nonResYield = GetSRYield( psMap["NonRes"].h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], rsqBinSize );
+	  ofs << "observation " << nonResYield << "\n\n";
+	  ofs << "# now we list the expected events for signal and all backgrounds in that bin\n";
+	  ofs << "# the second 'process' line must have a positive number for backgrounds, and 0 for signal\n";
+	  ofs << "# then we list the independent sources of uncertainties, and give their effect (syst. error)\n";
+	  ofs << "# on each process and bin\n\n";
+	  ofs << "bin";
+	  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t1";
+	  ofs << "\nprocess\t\tsignal";
+	  for ( auto& tmp : psMap ) if ( tmp.first != "signal" ) ofs << "\t\t" << tmp.first;
+	  ofs << "\nprocess";
+	  for ( int i = 0; i < nprocesses; i++ ) ofs << "\t\t" << i;
+	  ofs << "\nrate\t\t" << GetSRYield( psMap["signal"].h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], rsqBinSize );
 	  for ( auto& tmp : psMap )
 	    {
 	      if ( tmp.first != "signal" )
 		{
-		  float yield = GetSRYield( tmp.second.h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], 0.01 );
+		  float yield = GetSRYield( tmp.second.h_sr, MRedges[i], RSQbinning.at(i)[j], RSQbinning.at(i)[j+1], rsqBinSize );
 		  ofs << "\t" << yield;
 		}
 	    }
@@ -187,7 +245,7 @@ float GetSRYield( TH2F* h, float mrLow, float rsqLow, float rsqHigh, float rsqBi
   float binCount = 0;
   for ( int k = 0; k < steps; k++ )
     {
-      float rsq = rsqLow + (float)k*0.01;
+      float rsq = rsqLow + (float)k*rsqBinStep;
       float bcontent = h->GetBinContent( h->FindBin( mrLow, rsq ) );
       //if ( bcontent != 0.0 ) std::cout << mrLow << "," << rsq << " --> " << bcontent << std::endl;
       binCount += bcontent;

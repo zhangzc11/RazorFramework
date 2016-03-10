@@ -1,3 +1,7 @@
 NonRes	/Users/cmorgoth/Work/data/HggRazorRun2/mc/NonResonantBkg_TOTAL_1pb_weighted.root
-signal	/Users/cmorgoth/Work/data/HggRazorRun2/mc/GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8Jan23_TOTAL_1pb_weighted.root
+ggH	/Users/cmorgoth/Work/data/HggRazorRun2/mc/GluGluHToGG_M-125_13TeV_powheg_pythia8_CMSSW_7_6_1pb_weighted.root
+vbfH	/Users/cmorgoth/Work/data/HggRazorRun2/mc/VBFHToGG_M-125_13TeV_powheg_pythia8_CMSSW_7_6_1pb_weighted.root
+vH	/Users/cmorgoth/Work/data/HggRazorRun2/mc/VH_HToGG_ZToAll_M125_13TeV_powheg_pythia8_CMSSW_7_6_1pb_weighted.root
+ttH	/Users/cmorgoth/Work/data/HggRazorRun2/mc/ttHToGG_M125_13TeV_powheg_pythia8_CMSSW_7_6_1pb_weighted.root
+signal	/Users/cmorgoth/Work/data/HggRazorRun2/mc/HggRazor_T2bH-Hgg-sbm470-sbw1-chi2m230-chi2w0p1-chi1m100_1pb_weighted.root
 

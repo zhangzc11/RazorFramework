@@ -91,7 +91,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
 	  if( !_ignoreThisBin ) binVect.push_back( thisbin );
 	  _firstBin = true;
 	  Rsq_max = Rsq_i;
-	  Rsq_step = 0.05;
+	  Rsq_step = 0.025;
 	  Rsq_i = Rsq_i - Rsq_step;
 	  n_stripe_bins++;
 	}
@@ -127,11 +127,39 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
     }
 
   std::cout << "VECTOR SIZE: " << binVect.size() << std::endl;
+  std::map<float, std::vector<float>> bMap;
   for ( auto& tmp : binVect )
     {
       std::cout << "( " << tmp.MR_low << "-" << tmp.MR_high << ", " << tmp.Rsq_low << "-" << tmp.Rsq_high 
 		<< " ) --> " << tmp.nevents << std::endl;
+      std::vector<float> myvect;
+      if ( bMap.find( tmp.MR_low ) == bMap.end() ) bMap[tmp.MR_low] = myvect;
     }
 
+  for ( auto& tmp : binVect )
+    {
+      if ( bMap.find( tmp.MR_low ) != bMap.end() ) bMap[tmp.MR_low].push_back(tmp.Rsq_low);
+    }
+
+  std::cout << "const int n_" << categoryMode << "MRedges = " << bMap.size() + 1 << ";" << std::endl;
+  std::cout << "float  " << categoryMode << "MRedges[] = {";
+  for ( auto& tmp : bMap )
+    {
+      std::cout << tmp.first << ",";
+    }
+  std::cout << "10000};\n";
+
+  int ctr = 0;
+  for ( auto& tmp : bMap )
+    {
+      std::cout << "const int n_"<< categoryMode <<"RSQedges" << ctr << " = " << tmp.second.size() + 1 << ";" << std::endl;
+      std::cout << "float  " << categoryMode << "RSQedges" << ctr << "[] = {";
+      ctr++;
+      auto sortFV = [] ( float a, float b ){ return a < b ? true : false; };
+      std::sort( tmp.second.begin(), tmp.second.end(), sortFV );
+      for ( auto& tmp1 : tmp.second ) std::cout << tmp1 << ",";
+      std::cout << "5.0};\n";
+    }
+  
   return;
 };

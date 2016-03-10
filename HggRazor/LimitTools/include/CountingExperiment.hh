@@ -18,11 +18,12 @@ struct ProcessStruct
 };
 
 //Functions
-TH2F* Create2DHisto( TTree* tree, float* MRedges, float RsqBinSize = 0.01, TString pName = "dummy", const float lumi = 2300., const float kf = 1.0 );
-void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize = 0.05 );
+TH2F* Create2DHisto( TTree* tree, std::map<float, std::vector<float>> bMap, float RsqBinSize = 0.01, TString pName = "dummy", const float lumi = 2300., const float kf = 1.0 );
+void CreateDataCard( std::map<TString,ProcessStruct> psMap, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize = 0.001 );
+void CreateDataCard( std::map<TString,ProcessStruct> psMap, std::map<float, std::vector<float>> bMap, float rsqBinSize = 0.001, TString cat = "dummy" );
 
-float GetSRYield( TH2F* h, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize = 0.05 );
-float GetSRYield( TH2F* h, float mrLow, float rsqLow, float rsqHigh, float rsqBinStep = 0.01 );
+float GetSRYield( TH2F* h, float* MRedges, std::vector<float*> RSQbinning, float rsqBinSize = 0.001 );
+float GetSRYield( TH2F* h, float mrLow, float rsqLow, float rsqHigh, float rsqBinStep = 0.001 );
 
 void PlotSignalModel( std::string fname = "", std::string outDir = "bias_plots");
 
