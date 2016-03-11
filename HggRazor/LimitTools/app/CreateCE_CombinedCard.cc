@@ -313,6 +313,7 @@ int main( int argc, char* argv[])
   else if (category == "highres")
     {
       categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && sigmaMoverM < 0.0072";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
       FillBinningMap( myBinningMap,
 		      n_highresMRedges, highresMRedges,
@@ -325,6 +326,7 @@ int main( int argc, char* argv[])
   else if (category == "lowres")
     {
       categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+      //categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && sigmaMoverM > 0.0072 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
       FillBinningMap( myBinningMap,
 		      n_lowresMRedges, lowresMRedges,
