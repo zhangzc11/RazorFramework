@@ -60,8 +60,10 @@ float  lowresRSQedges2[] = {0,0.019,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
 */
-/*
+
 //min bin count 10
+
+/*
 //HighPt
 const int n_highptMRedges = 5;
 float  highptMRedges[] = {150,250,500,1000,10000};
@@ -97,6 +99,7 @@ const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
 */
 
+
 //min bin count 18
 //HighPt
 const int n_highptMRedges = 5;
@@ -131,6 +134,42 @@ const int n_lowresRSQedges2 = 3;
 float  lowresRSQedges2[] = {0,0.02,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
+
+//30 events per bin
+/*
+//HighPt
+const int n_highptMRedges = 5;
+float  highptMRedges[] = {150,225,450,900,10000};
+const int n_highptRSQedges0 = 3;
+float  highptRSQedges0[] = {0,0.069,5.0};
+const int n_highptRSQedges1 = 5;
+float  highptRSQedges1[] = {0,0.037,0.062,0.087,5.0};
+const int n_highptRSQedges2 = 3;
+float  highptRSQedges2[] = {0,0.029,5.0};
+const int n_highptRSQedges3 = 2;
+float  highptRSQedges3[] = {0,5.0};
+//HighRes
+const int n_highresMRedges = 4;
+float  highresMRedges[] = {162.5,325,650,10000};
+const int n_highresRSQedges0 = 7;
+float  highresRSQedges0[] = {0,0.032,0.057,0.082,0.107,0.132,5.0};
+const int n_highresRSQedges1 = 3;
+float  highresRSQedges1[] = {0,0.029,5.0};
+const int n_highresRSQedges2 = 2;
+float  highresRSQedges2[] = {0,5.0};
+//HighPt
+const int n_lowresMRedges = 5;
+float  lowresMRedges[] = {150,175,350,700,10000};
+const int n_lowresRSQedges0 = 6;
+float  lowresRSQedges0[] = {0,0.032,0.057,0.082,0.132,5.0};
+const int n_lowresRSQedges1 = 6;
+float  lowresRSQedges1[] = {0,0.042,0.067,0.092,0.117,5.0};
+const int n_lowresRSQedges2 = 3;
+float  lowresRSQedges2[] = {0,0.023,5.0};
+const int n_lowresRSQedges3 = 2;
+float  lowresRSQedges3[] = {0,5.0};
+*/
+
 //hbb
 const int n_hbbMRedges = 2;
 float  hbbMRedges[] = {150,10000};
@@ -141,8 +180,6 @@ const int n_zbbMRedges = 2;
 float  zbbMRedges[] = {150,10000};
 const int n_zbbRSQedges0 = 2;
 float  zbbRSQedges0[] = {0,5.0};
-
-
 
 //end binning
 float MRedges[]   = {150., 187.5, 375., 750., 10000.};
@@ -312,15 +349,17 @@ int main( int argc, char* argv[])
     }
   else if (category == "highres")
     {
-      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      
       //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && sigmaMoverM < 0.0072";
+      categoryCutString = " && pTGammaGamma < 110 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
       FillBinningMap( myBinningMap,
 		      n_highresMRedges, highresMRedges,
 		      n_highresRSQedges0, highresRSQedges0,
 		      n_highresRSQedges1, highresRSQedges1,
-		      n_highresRSQedges2, highresRSQedges2,
-		      n_highresRSQedges3, highresRSQedges3
+		      n_highresRSQedges2, highresRSQedges2
+		      //n_highresRSQedges3, highresRSQedges3
 		      );
     }
   else if (category == "lowres")
