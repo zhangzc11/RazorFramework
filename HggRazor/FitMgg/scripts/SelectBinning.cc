@@ -48,7 +48,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
       if ( MR_i <= 1000 ) MR_step = 50.0;
       
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
-      TString finalCut = "weight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
+      TString finalCut = "weight*pileupWeight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
       tree->Draw("mGammaGamma>>tmp1(38,103,160)", finalCut, "goff");
       TH1F* h = (TH1F*)gDirectory->Get("tmp1");
         
