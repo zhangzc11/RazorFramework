@@ -32,10 +32,12 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   TString categoryCutString;
   
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
-  else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
-  else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
-  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
-  else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+  else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15.";
+  else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15. && abs(mbbZ-91.) < 15. ";
+  //else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && sigmaMoverM < 0.0085";
+  //else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+  else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
   
   bool _firstBin = false;

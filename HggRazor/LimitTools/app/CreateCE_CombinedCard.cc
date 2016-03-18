@@ -16,7 +16,7 @@
 
 
 
-const float lumi = 2300.;
+const float lumi = 2317.;
 const float nonRes_kfactor = 1.37;
 
 const float rsqStep = 0.001;
@@ -62,44 +62,41 @@ float  lowresRSQedges3[] = {0,5.0};
 */
 
 //min bin count 10
-
-/*
 //HighPt
 const int n_highptMRedges = 5;
 float  highptMRedges[] = {150,250,500,1000,10000};
-const int n_highptRSQedges0 = 4;
-float  highptRSQedges0[] = {0,0.078,0.128,5.0};
-const int n_highptRSQedges1 = 4;
-float  highptRSQedges1[] = {0,0.052,0.102,5.0};
+const int n_highptRSQedges0 = 5;
+float  highptRSQedges0[] = {0,0.046,0.071,0.121,5.0};
+const int n_highptRSQedges1 = 5;
+float  highptRSQedges1[] = {0,0.044,0.069,0.094,5.0};
 const int n_highptRSQedges2 = 3;
-float  highptRSQedges2[] = {0,0.036,5.0};
+float  highptRSQedges2[] = {0,0.034,5.0};
 const int n_highptRSQedges3 = 2;
 float  highptRSQedges3[] = {0,5.0};
 //HighRes
 const int n_highresMRedges = 5;
-float  highresMRedges[] = {150,225,450,900,10000};
-const int n_highresRSQedges0 = 5;
-float  highresRSQedges0[] = {0,0.086,0.136,0.186,5.0};
-const int n_highresRSQedges1 = 4;
-float  highresRSQedges1[] = {0,0.052,0.102,5.0};
+float  highresMRedges[] = {150,237.5,475,950,10000};
+const int n_highresRSQedges0 = 9;
+float  highresRSQedges0[] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,5.0};
+const int n_highresRSQedges1 = 5;
+float  highresRSQedges1[] = {0,0.035,0.06,0.085,5.0};
 const int n_highresRSQedges2 = 3;
-float  highresRSQedges2[] = {0,0.022,5.0};
+float  highresRSQedges2[] = {0,0.018,5.0};
 const int n_highresRSQedges3 = 2;
 float  highresRSQedges3[] = {0,5.0};
 //LowRes
 const int n_lowresMRedges = 5;
-float  lowresMRedges[] = {150,225,450,900,10000};
-const int n_lowresRSQedges0 = 5;
-float  lowresRSQedges0[] = {0,0.086,0.136,0.186,5.0};
-const int n_lowresRSQedges1 = 4;
-float  lowresRSQedges1[] = {0,0.047,0.097,5.0};
+float  lowresMRedges[] = {150,200,400,800,10000};
+const int n_lowresRSQedges0 = 7;
+float  lowresRSQedges0[] = {0,0.049,0.074,0.099,0.124,0.149,5.0};
+const int n_lowresRSQedges1 = 6;
+float  lowresRSQedges1[] = {0,0.023,0.048,0.073,0.098,5.0};
 const int n_lowresRSQedges2 = 3;
-float  lowresRSQedges2[] = {0,0.019,5.0};
+float  lowresRSQedges2[] = {0,0.02,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
-*/
 
-
+/*
 //min bin count 18
 //HighPt
 const int n_highptMRedges = 5;
@@ -134,7 +131,7 @@ const int n_lowresRSQedges2 = 3;
 float  lowresRSQedges2[] = {0,0.02,5.0};
 const int n_lowresRSQedges3 = 2;
 float  lowresRSQedges3[] = {0,5.0};
-
+*/
 //30 events per bin
 /*
 //HighPt
@@ -256,9 +253,10 @@ int main( int argc, char* argv[])
       return -1;
     }
 
-  if ( category != "highpt" && category != "highres" && category != "lowres" && category != "hbb" && category != "zbb" && category != "inclusive" )
+  if ( category != "highpt" && category != "highres" && category != "lowres"
+       && category != "hbb" && category != "zbb" && category != "hzbb" && category != "inclusive" )
     {
-      std::cerr << "[ERROR]: please provide a valid category --category=<highpt/highres/lowres/hbb/zbb/inclusive>" << std::endl;
+      std::cerr << "[ERROR]: please provide a valid category --category=<highpt/highres/lowres/hbb/zbb/hzbb/inclusive>" << std::endl;
       return -1;
     }
 
@@ -329,9 +327,18 @@ int main( int argc, char* argv[])
 		      n_highptRSQedges3, highptRSQedges3
 		      );
     }
+  else if (category == "hzbb")
+    {
+      categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15. || (abs(mbbZ_L-91.) < 15. && abs(mbbH_L-125.) >= 15.) )";
+      mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.";
+      FillBinningMap( myBinningMap,
+		      n_hbbMRedges, hbbMRedges,
+		      n_hbbRSQedges0, hbbRSQedges0
+		      );
+    }
   else if (category == "hbb")
     {
-      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<15";
       mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.";
       FillBinningMap( myBinningMap,
 		      n_hbbMRedges, hbbMRedges,
@@ -340,7 +347,7 @@ int main( int argc, char* argv[])
     }
   else if (category == "zbb")
     {
-      categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.1)<15 && abs(mbbH-125.)>=15";
       mggCutSR = " && mGammaGamma > 121.0 && mGammaGamma < 130.0";
       FillBinningMap( myBinningMap,
 		      n_zbbMRedges, zbbMRedges,
@@ -349,23 +356,23 @@ int main( int argc, char* argv[])
     }
   else if (category == "highres")
     {
-      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
-      
-      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && sigmaMoverM < 0.0072";
-      categoryCutString = " && pTGammaGamma < 110 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91)>=15 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      //categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91)>=15 && sigmaMoverM < 0.0072";
+      //categoryCutString = " && pTGammaGamma < 110 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+      categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91)>=15 && sigmaMoverM < 0.0085 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
       FillBinningMap( myBinningMap,
 		      n_highresMRedges, highresMRedges,
 		      n_highresRSQedges0, highresRSQedges0,
 		      n_highresRSQedges1, highresRSQedges1,
-		      n_highresRSQedges2, highresRSQedges2
-		      //n_highresRSQedges3, highresRSQedges3
+		      n_highresRSQedges2, highresRSQedges2,
+		      n_highresRSQedges3, highresRSQedges3
 		      );
     }
   else if (category == "lowres")
     {
-      categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
-      //categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && sigmaMoverM > 0.0072 ";
+      //categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91)>=15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+      categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91)>=15 && sigmaMoverM >= 0.0085 ";
       mggCutSR = " && mGammaGamma > 122.04 && mGammaGamma < 128.96";
       FillBinningMap( myBinningMap,
 		      n_lowresMRedges, lowresMRedges,

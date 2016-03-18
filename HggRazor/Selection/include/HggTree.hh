@@ -23,6 +23,7 @@ public :
 
    // Declaration of leaf types
    Float_t         weight;
+   Float_t         pileupWeight;
    UInt_t          lumi;
    UInt_t          run;
    UInt_t          event;
@@ -118,6 +119,7 @@ public :
   
    // List of branches
    TBranch        *b_weight;   //!
+   TBranch        *b_pileupWeight;   //!
    TBranch        *b_lumi;   //!
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
@@ -282,6 +284,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetMakeClass(1);
 
    fChain->SetBranchAddress("weight", &weight, &b_weight);
+   fChain->SetBranchAddress("pileupWeight", &pileupWeight, &b_pileupWeight);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("event", &event, &b_event);

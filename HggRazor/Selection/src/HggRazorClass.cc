@@ -449,8 +449,6 @@ void HggRazorClass::Loop()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      // if (Cut(ientry) < 0) continue;
-      //double w = xsecSF*hggBF;
       double w;
       xsecSF = 1.0;
       if ( this->processName == "data" || this->processName == "signal")
@@ -461,7 +459,7 @@ void HggRazorClass::Loop()
 	{ 
 	  //if ( this->processName == "gammaJet" || this->processName == "qcd" ) w = xsecSF*weight*1.3;
 	  //if ( this->processName == "diphoton" ) w = xsecSF*weight*1.12;
-	  w = xsecSF*weight;
+	  w = xsecSF*weight*pileupWeight;
 	}
       total_in += w;
       bool pho1_isFake = false;

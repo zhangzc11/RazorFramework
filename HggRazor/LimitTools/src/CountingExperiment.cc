@@ -87,14 +87,16 @@ TH2F* Create2DHisto( TTree* tree, std::map<float, std::vector<float>> bMap, floa
   //TH2F* _hRazor = new TH2F( "h", "h", 20, 150,5000, 500, 0, 5);
   
   
-  float mr, rsq, weight;
+  float mr, rsq, weight, pileupWeight;
   tree->SetBranchStatus("*", 0);
   tree->SetBranchStatus("MR", 1);
   tree->SetBranchStatus("t1Rsq", 1);
   tree->SetBranchStatus("weight", 1);
+  tree->SetBranchStatus("pileupWeight", 1);
   tree->SetBranchAddress("MR", &mr);
   tree->SetBranchAddress("t1Rsq", &rsq);
   tree->SetBranchAddress("weight", &weight);
+  tree->SetBranchAddress("pileupWeight", &pileupWeight);
   long nentries = tree->GetEntries();
   for ( long i = 0; i < nentries; i++ )
     {
@@ -105,7 +107,15 @@ TH2F* Create2DHisto( TTree* tree, std::map<float, std::vector<float>> bMap, floa
 	  //std::cout << "mr: " << mr << " , rsq: " << rsq << std::endl;
 	}
       
-      _hRazor->Fill(mr, rsq, lumi*kf*weight);
+      if( pName == "data" || pName == "signal" || pName == "signal_SR" )
+	{
+	  //std::cout << "pName: " << pName << std::endl;
+	  _hRazor->Fill(mr, rsq, lumi*kf*weight);
+	}
+      else
+	{
+	  _hRazor->Fill(mr, rsq, lumi*kf*weight*pileupWeight);
+	}
     }
   std::cout << pName << " " << _hRazor->Integral() << std::endl;
   return _hRazor;

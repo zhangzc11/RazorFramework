@@ -207,7 +207,43 @@ std::string GetProcessString( Process process )
     {
       return "data";
     }
-  else
+   else if ( process == Process::dy )
+    {
+      return "dy";
+    }
+   else if ( process == Process::dy )
+    {
+      return "w";
+    }
+   else if ( process == Process::dy )
+    {
+      return "znunu";
+    }
+   else if ( process == Process::dy )
+    {
+      return "tt";
+    }
+   else if ( process == Process::dy )
+    {
+      return "top";
+    }
+  else if ( process == Process::dy )
+    {
+      return "vv";
+    }
+   else if ( process == Process::dy )
+    {
+      return "ww";
+    }
+   else if ( process == Process::dy )
+    {
+      return "zz";
+    }
+   else if ( process == Process::dy )
+    {
+      return "wz";
+    }
+   else
     {
       std::cerr << "[ERROR]: Process not found" << std::endl;
     }
