@@ -30,7 +30,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "1.26 fb^{-1} (13 TeV)";
+TString lumiText = "2.32 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -485,11 +485,11 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
+  ratio->GetYaxis()->SetRangeUser( 0.0, 2.0 );
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
-  //ratio->GetYaxis()->SetNdivisions( 6, false );
+  ratio->GetYaxis()->SetNdivisions( 5, false );
   ratio->SetStats( 0 );
   ratio->Draw("E");
 
@@ -497,10 +497,10 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     {
       std::cout << "entering RSQ" << std::endl;
       s->GetXaxis()->SetRangeUser(0.0, 1.0);
-      ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
+      //ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetTitle("R^{2}");
       s->SetMinimum( 1e-7 );
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       s->GetYaxis()->SetTitle("events / 0.04");
       pad1->SetLogy();
       pad1->Update();
@@ -508,18 +508,18 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     }
   else if ( var == "mr" )
     {
-      s->GetXaxis()->SetRangeUser(0.0, 2000.0);
-      ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      //s->GetXaxis()->SetRangeUser(0.0, 2000.0);
+      //ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
       ratio->GetXaxis()->SetTitle("M_{R} (GeV)");
-      s->GetYaxis()->SetTitle("events / 50 (GeV)");
+      s->GetYaxis()->SetTitle("events / 25 (GeV)");
       s->SetMinimum( 1e-1 );
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       pad1->SetLogy();
       pad1->Update();
     }
   else if ( var == "mgg" )
     {
-      s->GetXaxis()->SetRangeUser( 50., 160. );
+      //s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
       s->SetMinimum( 0 );
@@ -713,8 +713,8 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     }
 
   //ratio->GetXaxis()->SetTitle( label );
-  s->GetYaxis()->SetTitle("events");
-  s->SetMaximum( 2e0*data->GetMaximum() );
+  //s->GetYaxis()->SetTitle("events");
+  //s->SetMaximum( 2e0*data->GetMaximum() );
   s->SetMinimum( 1e-7 );
   //pad1->SetLogy();
   pad1->Update();

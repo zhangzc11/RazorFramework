@@ -15,7 +15,7 @@ struct AnaBin
   double nevents;
 };
 
-void SelectBinning( TString fname, TString categoryMode = "highres" )
+void SelectBinning( TString fname, TString categoryMode = "highres", float _binCount = 18. )
 {
   TFile* f = new TFile( fname, "READ");
   assert( f );
@@ -32,22 +32,25 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
   TString categoryCutString;
   
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
-  else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
-  else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
-  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
-  else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+  else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15.";
+  else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15. && abs(mbbZ-91.) < 15. ";
+  //else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
+  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && sigmaMoverM < 0.0085";
+  //else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+  else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
   
   bool _firstBin = false;
   bool _reachedZero = false;
   int n_stripe_bins = 0;
   std::vector<AnaBin> binVect;
-  for ( int i = 0; i < 300; i++ )
+  for ( int i = 0; i <= 300; i++ )
     {
+      if ( i%100 == 0 ) std::cout << "[INFO]: iteration -> " << i << std::endl;
       if ( MR_i <= 1000 ) MR_step = 50.0;
       
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
-      TString finalCut = "weight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
+      TString finalCut = "weight*pileupWeight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
       tree->Draw("mGammaGamma>>tmp1(38,103,160)", finalCut, "goff");
       TH1F* h = (TH1F*)gDirectory->Get("tmp1");
         
@@ -69,13 +72,13 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
 	}
       
       //adapting Rsq binnning to converge faster
-      if( Rsq_i <= 0.5 ) Rsq_step = 0.1;
-      if( Rsq_i <= 0.3 ) Rsq_step = 0.05;
+      if( Rsq_i <= 0.5 ) Rsq_step = 0.05;
+      if( Rsq_i <= 0.3 ) Rsq_step = 0.025;
       
       //very fine binning to find the first bin in the MR stripe
       if( n_stripe_bins == 0 && h->Integral() > 1.0 )  Rsq_step = 0.002;
       
-      if ( h->Integral() < 18. )
+      if ( h->Integral() < _binCount )
 	{
 	  Rsq_i = Rsq_i - Rsq_step;
 	}
@@ -90,7 +93,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
 	  if( !_ignoreThisBin ) binVect.push_back( thisbin );
 	  _firstBin = true;
 	  Rsq_max = Rsq_i;
-	  Rsq_step = 0.05;
+	  Rsq_step = 0.025;
 	  Rsq_i = Rsq_i - Rsq_step;
 	  n_stripe_bins++;
 	}
@@ -126,11 +129,39 @@ void SelectBinning( TString fname, TString categoryMode = "highres" )
     }
 
   std::cout << "VECTOR SIZE: " << binVect.size() << std::endl;
+  std::map<float, std::vector<float>> bMap;
   for ( auto& tmp : binVect )
     {
       std::cout << "( " << tmp.MR_low << "-" << tmp.MR_high << ", " << tmp.Rsq_low << "-" << tmp.Rsq_high 
 		<< " ) --> " << tmp.nevents << std::endl;
+      std::vector<float> myvect;
+      if ( bMap.find( tmp.MR_low ) == bMap.end() ) bMap[tmp.MR_low] = myvect;
     }
 
+  for ( auto& tmp : binVect )
+    {
+      if ( bMap.find( tmp.MR_low ) != bMap.end() ) bMap[tmp.MR_low].push_back(tmp.Rsq_low);
+    }
+
+  std::cout << "const int n_" << categoryMode << "MRedges = " << bMap.size() + 1 << ";" << std::endl;
+  std::cout << "float  " << categoryMode << "MRedges[] = {";
+  for ( auto& tmp : bMap )
+    {
+      std::cout << tmp.first << ",";
+    }
+  std::cout << "10000};\n";
+
+  int ctr = 0;
+  for ( auto& tmp : bMap )
+    {
+      std::cout << "const int n_"<< categoryMode <<"RSQedges" << ctr << " = " << tmp.second.size() + 1 << ";" << std::endl;
+      std::cout << "float  " << categoryMode << "RSQedges" << ctr << "[] = {";
+      ctr++;
+      auto sortFV = [] ( float a, float b ){ return a < b ? true : false; };
+      std::sort( tmp.second.begin(), tmp.second.end(), sortFV );
+      for ( auto& tmp1 : tmp.second ) std::cout << tmp1 << ",";
+      std::cout << "5.0};\n";
+    }
+  
   return;
 };

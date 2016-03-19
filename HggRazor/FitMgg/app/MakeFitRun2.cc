@@ -259,6 +259,7 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
 
   //****************************************************
   //Category Cut String
@@ -276,10 +277,11 @@ int main( int argc, char* argv[])
   else
     {
       if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
-      else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)<25";
-      else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbZ-91.2)<25 ";
-      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
-      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=25 && abs(mbbZ-91.2)>=25 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
+      else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) < 15";
+      else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbZ_L-91.) < 15 && abs(mbbH_L-125.) >= 15 )";
+      else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15 || ( abs(mbbZ_L-91.) < 15 && abs(mbbH_L-125.) >= 15 ) )";
+      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && sigmaMoverM < 0.0085";
+      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
   //---------------------------------------------
@@ -320,7 +322,7 @@ int main( int argc, char* argv[])
   //-----------------------------------
   //C o n c a t e n a t i n g   C u t s
   //-----------------------------------
-  cut = cut + categoryCutString + BinCutString;
+  cut = cut + categoryCutString + BinCutString + cutMETfilters;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
   //return -1;
   
