@@ -1333,8 +1333,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       m.setStrategy(2);
       m.setPrintLevel(-1);
       m.minimize("Minuit2", "Migrad");
-      //RooMinuit m(*nll) ; 
-
+      
       //m.migrad(); 
       RooFitResult* r = m.save() ; 
       _status    = r->status();
@@ -1552,14 +1551,24 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
   //double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
-  
-  std::cout << "n -> " << n << std::endl;
-  AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
-  AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
-  AIC_3 = 2*minNll;// + 2*K + 2*K*(K+1)/(n-K-1);
-  std::cout << "AIC: " << AIC << std::endl;
-  std::cout << "AIC_2: " << AIC_2 << std::endl;
-  std::cout << "AIC_3: " << AIC_3 << std::endl;
+
+  if ( n-K-1 > 0 )
+    {
+      std::cout << "n -> " << n << std::endl;
+      AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
+      AIC_2 = 2*minNll + 2*K;// + 2*K*(K+1)/(n-K-1);
+      AIC_3 = 2*minNll;// + 2*K + 2*K*(K+1)/(n-K-1);
+      std::cout << "AIC: " << AIC << std::endl;
+      std::cout << "AIC_2: " << AIC_2 << std::endl;
+      std::cout << "AIC_3: " << AIC_3 << std::endl;
+    }
+  else
+    {
+      std::cerr << "[ERROR]: (n-K-1) zero or negative!: " << (n-K-1) << "; setting AIC to 999 " << std::endl;
+      AIC   = 999.;
+      AIC_2 = 999.;
+      AIC_3 = 999.;
+    }
   /*
   RooPlot* fns = ws->var("sideband_fit_doubleExp_a1")->frame( );
   nll->plotOn( fns, RooFit::LineColor(kBlue) );
