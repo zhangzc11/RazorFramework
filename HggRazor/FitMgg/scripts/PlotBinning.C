@@ -101,6 +101,6 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   h2p->Fill(1005, 0.9, 10.);
   
     
-  h2p->Draw("colz");
+  h2p->Draw("colz text");
   return;
 };
