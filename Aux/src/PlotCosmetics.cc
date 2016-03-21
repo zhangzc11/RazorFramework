@@ -496,7 +496,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   if( var == "rsq" )
     {
       std::cout << "entering RSQ" << std::endl;
-      s->GetXaxis()->SetRangeUser(0.0, 1.0);
+      //s->GetXaxis()->SetRangeUser(0.0, 1.0);
       //ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetTitle("R^{2}");
       s->SetMinimum( 1e-7 );
