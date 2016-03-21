@@ -44,11 +44,11 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   bool _reachedZero = false;
   int n_stripe_bins = 0;
   std::vector<AnaBin> binVect;
-  for ( int i = 0; i <= 500; i++ )
+  for ( int i = 0; i <= 1000; i++ )
     {
       if ( i%100 == 0 ) std::cout << "[INFO]: iteration -> " << i << std::endl;
       if ( MR_i <= 2000 ) MR_step = 100.0;
-      if ( MR_i <= 1200 ) MR_step = 50.0;
+      if ( MR_i <= 1500 ) MR_step = 50.0;
       
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
       TString finalCut = "weight*pileupWeight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
@@ -121,6 +121,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
 	  if ( n_stripe_bins > 0 ) MR_max = MR_i;
 	  MR_i = MR_i - MR_step;
 	  if ( MR_i <= 150. ) MR_i = 150.;
+	  if ( MR_i > 150. && MR_i < 199.) MR_i = 150.;
 	  Rsq_step = 0.5;
 	  Rsq_i = Rsq_max - Rsq_step;
 	  n_stripe_bins = 0;

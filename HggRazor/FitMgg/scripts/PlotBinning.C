@@ -38,41 +38,38 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
 
-  //highpt binning
-  const int n_highptMRedges = 5;
-  float  highptMRedges[] = {150,250,500,1000,10000};
-  const int n_highptRSQedges0 = 5;
-  float  highptRSQedges0[] = {0,0.046,0.071,0.121,5.0};
-  const int n_highptRSQedges1 = 5;
-  float  highptRSQedges1[] = {0,0.044,0.069,0.094,5.0};
-  const int n_highptRSQedges2 = 3;
-  float  highptRSQedges2[] = {0,0.034,5.0};
-  const int n_highptRSQedges3 = 2;
- float  highptRSQedges3[] = {0,5.0};
-
   TH2Poly *h2p = new TH2Poly();
   if (categoryMode == "highpt")
     {
-      Double_t x1[] = {150, 150, 250, 250};
-      Double_t y11[] = {0, 0.046, 0.046,0};
-      Double_t y12[] = {0.046, 0.071, 0.071, 0.046};
-      Double_t y13[] = {0.071, 0.121, 0.121, 0.071};
-      Double_t y14[] = {0.121, 1.0, 1.0, 0.121};
-      Double_t x2[] = {250, 250, 500, 500};
-      Double_t y21[] = {0, 0.044, 0.044, 0};
-      Double_t y22[] = {0.044, 0.069, 0.069, 0.044};
-      Double_t y23[] = {0.069, 0.094, 0.094, 0.069};
-      Double_t y24[] = {0.094, 1.0, 1.0, 0.094};
-      Double_t x3[] = {500, 500, 1000, 1000};
-      Double_t y31[] = {0, 0.034, 0.034, 0};
-      Double_t y32[] = {0.034, 1.0, 1.0, 0.034};
-      Double_t x4[] = {1000, 1000, 10000, 10000};
+      float  highptMRedges[] = {156.25,312.5,625,1250,10000};
+      float  highptRSQedges0[] = {0,0.027,0.052,0.077,0.102,0.127,5.0};
+      float  highptRSQedges1[] = {0,0.022,0.047,0.072,5.0};
+      float  highptRSQedges2[] = {0,0.021,5.0};
+      float  highptRSQedges3[] = {0,5.0};
+      Double_t x1[] = {150, 150, 312.5, 312.5};
+      Double_t y11[] = {0, 0.027, 0.027,0};
+      Double_t y12[] = {0.027, 0.052, 0.052, 0.027};
+      Double_t y13[] = {0.052, 0.077, 0.077, 0.052};
+      Double_t y14[] = {0.077, 0.102, 0.102, 0.077};
+      Double_t y15[] = {0.102, 0.127, 0.127, 0.102};
+      Double_t y16[] = {0.127, 1.0, 1.0, 0.127};
+      Double_t x2[] = {312.5, 312.5, 625, 625};
+      Double_t y21[] = {0, 0.022, 0.022, 0};
+      Double_t y22[] = {0.022, 0.047, 0.047, 0.022};
+      Double_t y23[] = {0.047, 0.072, 0.072, 0.047};
+      Double_t y24[] = {0.072, 1.0, 1.0, 0.072};
+      Double_t x3[] = {625, 625, 1250, 1250};
+      Double_t y31[] = {0, 0.021, 0.021, 0};
+      Double_t y32[] = {0.021, 1.0, 1.0, 0.021};
+      Double_t x4[] = {1250, 1250, 10000, 10000};
       Double_t y41[] = {0, 1.0, 1.0, 0.0};
       //add bins
       h2p->AddBin(4, x1, y11);
       h2p->AddBin(4, x1, y12);
       h2p->AddBin(4, x1, y13);
       h2p->AddBin(4, x1, y14);
+      h2p->AddBin(4, x1, y15);
+      h2p->AddBin(4, x1, y16);
       
       h2p->AddBin(4, x2, y21);
       h2p->AddBin(4, x2, y22);
