@@ -1,6 +1,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <map>
+#include <stdlib.h>
 //ROOT INCLUDES
 #include <TString.h>
 #include <THStack.h>
@@ -33,9 +34,9 @@ int HggRazorClass::n_mr = 100;
 float HggRazorClass::mr_l = 130.;
 float HggRazorClass::mr_h = 2630.;
 
-int HggRazorClass::n_rsq = 125;
+int HggRazorClass::n_rsq = 60;
 float HggRazorClass::rsq_l = .0;
-float HggRazorClass::rsq_h = 5.0;
+float HggRazorClass::rsq_h = 3.0;
 
 int HggRazorClass::n_unroll_highPt  = 15;
 int HggRazorClass::n_unroll_highRes = 10;
@@ -75,9 +76,9 @@ int HggRazorClass::n_pho1r9 = 50;
 float HggRazorClass::pho1r9_l = 0.0;
 float HggRazorClass::pho1r9_h = 1.5;
 
-int HggRazorClass::n_pho1HoverE = 50;
+int HggRazorClass::n_pho1HoverE = 25;
 float HggRazorClass::pho1HoverE_l = 0.0;
-float HggRazorClass::pho1HoverE_h = .2;
+float HggRazorClass::pho1HoverE_h = .06;
 
 int HggRazorClass::n_pho1sumChargedHadronPt = 50;
 float HggRazorClass::pho1sumChargedHadronPt_l = 0.0;
@@ -85,7 +86,7 @@ float HggRazorClass::pho1sumChargedHadronPt_h = 30.0;
 
 int HggRazorClass::n_pho1sumNeutralHadronEt = 50;
 float HggRazorClass::pho1sumNeutralHadronEt_l = 0.0;
-float HggRazorClass::pho1sumNeutralHadronEt_h = 30.0;
+float HggRazorClass::pho1sumNeutralHadronEt_h = 5.0;
 
 int HggRazorClass::n_pho1sumPhotonEt = 50;
 float HggRazorClass::pho1sumPhotonEt_l = 0.0;
@@ -116,9 +117,9 @@ int HggRazorClass::n_pho2r9 = 50;
 float HggRazorClass::pho2r9_l = 0.0;
 float HggRazorClass::pho2r9_h = 1.5;
 
-int HggRazorClass::n_pho2HoverE = 50;
+int HggRazorClass::n_pho2HoverE = 25;
 float HggRazorClass::pho2HoverE_l = 0.0;
-float HggRazorClass::pho2HoverE_h = .2;
+float HggRazorClass::pho2HoverE_h = .06;
 
 int HggRazorClass::n_pho2sumChargedHadronPt = 50;
 float HggRazorClass::pho2sumChargedHadronPt_l = 0.0;
@@ -126,7 +127,7 @@ float HggRazorClass::pho2sumChargedHadronPt_h = 30.0;
 
 int HggRazorClass::n_pho2sumNeutralHadronEt = 50;
 float HggRazorClass::pho2sumNeutralHadronEt_l = 0.0;
-float HggRazorClass::pho2sumNeutralHadronEt_h = 30.0;
+float HggRazorClass::pho2sumNeutralHadronEt_h = 5.0;
 
 int HggRazorClass::n_pho2sumPhotonEt = 50;
 float HggRazorClass::pho2sumPhotonEt_l = 0.0;
@@ -197,8 +198,9 @@ TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso ==
 //---------------------
 //T r i g g e r   C u t 
 //---------------------
-//TString triggerCut = "(HLTDecision[63] || HLTDecision[64] || HLTDecision[65] || HLTDecision[66] || HLTDecision[67] || HLTDecision[68] || HLTDecision[69] || HLTDecision[74])";
-TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 )";
+//TString triggerCut = "(HLTDecision[63] || HLTDecision[64] || HLTDecision[65] || HLTDecision[66] || HLTDecision[67] || HLTDecision[68] || HLTDecision[69] || HLTDecision[74]) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+//TString triggerCut = "1";
 //--------------------------------
 //D i p h o t o n  M a s s   C u t 
 //--------------------------------
@@ -234,6 +236,7 @@ int main ( int argc, char* argv[] )
       treeType = "inclusive";
     }
 
+  //provides shape comparison
   std::string shapeOnly = ParseCommandLine( argc, argv, "-shapeOnly=" );
   bool _shapeOnly = false;
   if (  shapeOnly == "yes" )
@@ -241,7 +244,7 @@ int main ( int argc, char* argv[] )
       std::cout << "[INFO]: re-scaling all histograms to unity" << std::endl;
       _shapeOnly = true;
     }
-  
+  //uses k-factors, defined above
   std::string useKF = ParseCommandLine( argc, argv, "-useKF=" );
   bool _useKF = false;
   if (  useKF == "yes" )
@@ -249,7 +252,15 @@ int main ( int argc, char* argv[] )
       std::cout << "[INFO]: Using k-factor(s) hardcoded in main application" << std::endl;
       _useKF = true;
     }
-  
+
+  //plots mc and signal shapes 
+  std::string signalPlot = ParseCommandLine( argc, argv, "-signalPlot=" );
+  bool _signalPlot = false;
+  if (  signalPlot == "yes" )
+    {
+      std::cout << "[INFO]: Will produce MC and signal shape plots" << std::endl;
+      _signalPlot = true;
+    }
   
   std::cout << "=================================" << std::endl;
   std::cout << "===========set parameters========" << std::endl;
@@ -280,6 +291,12 @@ int main ( int argc, char* argv[] )
 
   int map_size = mapList.size();
   const int nprocesses = 2;
+  //check nprocesses and map_size consistency
+  if( map_size != nprocesses )
+    {
+      std::cerr << "[FATAL ERROR]: map size and nprocesses values are inconsistent!!, Please change nprocesses to map size: " << map_size << std::endl;
+      exit( EXIT_FAILURE );
+    }
   const int nplots = 4;
   double k_f = 1.37;//Difference in data/mc normalization
   const double lumi_frac = 1.0; // (5./19.8)
@@ -295,6 +312,8 @@ int main ( int argc, char* argv[] )
 	  std::string processName = GetProcessString( process );
 	  if ( !(process == Process::data || process == Process::dy) ) continue;
 	  /*if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet
+	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
+	  /*if ( !(process == Process::data || process == Process::signal || process == Process::diphoton || process == Process::gammaJet
 	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
 	  std::cout << "[INFO] PROCESS: " << processName << " ,process #: " << ctr << std::endl;
 	  //-----------------------------
@@ -428,7 +447,7 @@ int main ( int argc, char* argv[] )
 	    }
 	  if ( run == "run2" )
 	    {
-	      //MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
+	      if ( _signalPlot ) MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
 	      MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
 	    }
 	}
