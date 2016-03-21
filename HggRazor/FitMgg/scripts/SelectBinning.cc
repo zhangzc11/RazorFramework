@@ -21,7 +21,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   assert( f );
 
   TTree* tree = (TTree*)f->Get("HggRazor");
-  double MR_max   = 2000.;
+  double MR_max   = 10000.;
   double Rsq_max  = 1.000;
   double MR_step  = 1000.;
   double Rsq_step = 0.500;
@@ -44,10 +44,11 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   bool _reachedZero = false;
   int n_stripe_bins = 0;
   std::vector<AnaBin> binVect;
-  for ( int i = 0; i <= 300; i++ )
+  for ( int i = 0; i <= 500; i++ )
     {
       if ( i%100 == 0 ) std::cout << "[INFO]: iteration -> " << i << std::endl;
-      if ( MR_i <= 1000 ) MR_step = 50.0;
+      if ( MR_i <= 2000 ) MR_step = 100.0;
+      if ( MR_i <= 1200 ) MR_step = 50.0;
       
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
       TString finalCut = "weight*pileupWeight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
