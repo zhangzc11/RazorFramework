@@ -201,8 +201,11 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
     {
       cutTree->GetEntry(i);
       //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
-      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );
-      else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );
+      /*if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );
+	else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );*/
+      
+      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, 1.0 );
+      else  h2p->Fill( MR, 0.999, 1.0 );
     } 
 
   
@@ -210,6 +213,7 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   h2p->SetYTitle("R^{2}");
   h2p->SetTitle("");
   h2p->SetStats(0);
+  //h2p->Draw("colz L");
   h2p->Draw("colz text");
   return;
 };

@@ -5,6 +5,7 @@
 #include <TH1F.h>
 #include <TF1.h>
 #include <TDirectory.h>
+#include <stdlib.h>
 
 struct AnaBin
 {
@@ -23,7 +24,7 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   TTree* tree = (TTree*)f->Get("HggRazor");
   double MR_max   = 10000.;
   double Rsq_max  = 1.000;
-  double MR_step  = 1000.;
+  double MR_step  = 8000.;
   double Rsq_step = 0.500;
   double MR_i     = MR_max - MR_step;
   double Rsq_i    = Rsq_max - Rsq_step;
@@ -34,13 +35,17 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
   else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15.";
   else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15. && abs(mbbZ-91.) < 15. ";
-  //else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015 ";
   else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && sigmaMoverM < 0.0085";
-  //else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015) ";
   else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
+  else
+    {
+      std::cerr << "[ERROR]: unrecognized category!, Please provide a valid category: <highpt/hbb/hzz/highres/lowres/inclusive>" << std::endl;
+      exit( EXIT_FAILURE );
+    }
   
   bool _firstBin = false;
+  bool _firstStripe = false;
   bool _reachedZero = false;
   int n_stripe_bins = 0;
   std::vector<AnaBin> binVect;
@@ -49,12 +54,14 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
       if ( i%100 == 0 ) std::cout << "[INFO]: iteration -> " << i << std::endl;
       if ( MR_i <= 2000 ) MR_step = 100.0;
       if ( MR_i <= 1500 ) MR_step = 50.0;
-      
+      if ( MR_max < 10000. ) _firstStripe = true;
       TString razorCut = Form("&& MR > %.1f && MR < %.1f && t1Rsq > %.5f && t1Rsq < %.5f", MR_i, MR_max, Rsq_i, Rsq_max );
       TString finalCut = "weight*pileupWeight*2300.*1.37*(" + cut + categoryCutString + razorCut + ")";
+      //std::cout << "finalCut--> " << finalCut << std::endl;
       tree->Draw("mGammaGamma>>tmp1(38,103,160)", finalCut, "goff");
       TH1F* h = (TH1F*)gDirectory->Get("tmp1");
-        
+      //std::cout << "INT--> " << h->Integral() << std::endl;
+      
       //check if last Rsq bin can be merged
       bool _ignoreThisBin = false;
       if ( _reachedZero ) 
@@ -78,6 +85,8 @@ void SelectBinning( TString fname, TString categoryMode = "highres", float _binC
       
       //very fine binning to find the first bin in the MR stripe
       if( n_stripe_bins == 0 && h->Integral() > 1.0 )  Rsq_step = 0.002;
+
+      if( !_firstStripe ) Rsq_step = 0.5;
       
       if ( h->Integral() < _binCount )
 	{
