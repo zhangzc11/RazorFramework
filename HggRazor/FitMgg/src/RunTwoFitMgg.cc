@@ -274,7 +274,10 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
   RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //RooAddPdf* model2 = new RooAddPdf( "model2", "model2", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //Fixing gaussian parameter for 2nd model
+  npoints = data.numEntries();
+  ws->var("fullsb_fit_singleExp2_Nbkg")->setVal( npoints );
   ws->var("doubleGaussSB_DGF_Ns")->setVal( 0 );
+  ws->var("doubleGaussSB_DGF_Ns")->setMin( 0 );
   ws->var("doubleGaussSB_DGF_frac")->setVal( gausFrac );
   ws->var("doubleGaussSB_DGF_mu1")->setVal( gausMu1 );
   ws->var("doubleGaussSB_DGF_mu2")->setVal( gausMu2 );
