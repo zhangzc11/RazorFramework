@@ -217,7 +217,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
-  mgg.setRange( "signal", 121, 130. );
+  mgg.setRange( "signal", 115, 135. );
   mgg.setRange( "high", 135, 160);
   mgg.setRange( "low", 103, 120);
   //--------------------------------
@@ -245,13 +245,15 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
       ws->var("dGauss_signal_DGF_Ns")->setVal( (double)npoints );
     }
   
-  RooFitResult* sres = ws->pdf( tag )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
     
   //RooAbsPdf* signalPdf = wsignal->pdf("dGauss_signal_doublegauss");
-  double gausFrac   =  ws->var("dGauss_signal_frac")->getVal();
-  double gausMu     =  ws->var("dGauss_signal_gauss_mu")->getVal();
-  double gausSigma1 =  ws->var("dGauss_signal_gauss_sigma1")->getVal();
-  double gausSigma2 =  ws->var("dGauss_signal_gauss_sigma2")->getVal();
+  
+  double gausFrac   =  ws->var("dGauss_signal_DGF_frac")->getVal();
+  double gausMu1    =  ws->var("dGauss_signal_DGF_mu1")->getVal();
+  double gausMu2    =  ws->var("dGauss_signal_DGF_mu2")->getVal();
+  double gausSigma1 =  ws->var("dGauss_signal_DGF_sigma1")->getVal();
+  double gausSigma2 =  ws->var("dGauss_signal_DGF_sigma2")->getVal();
   
   //------------------------------------
   // C r e a t e   b k g  s h a p e
@@ -263,26 +265,27 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
     
   std::cout << "reading model from file" << std::endl;
   //Define arbitrarily a double gaussian
-  //TString tag_signal = MakeDoubleGauss( "doubleGaussSB1", mgg, *ws );
-  TString tag_signal2 = MakeDoubleGauss( "doubleGaussSB", mgg, *ws );
+  TString tag_signal2 = MakeFullDoubleGauss( "doubleGaussSB", mgg, *ws );
 
   std::cout << "creating s+b model" << std::endl;
   //---------------
   //S+B  m  o d e l
   //---------------
-  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg ) ) ) ;
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //RooAddPdf* model2 = new RooAddPdf( "model2", "model2", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //Fixing gaussian parameter for 2nd model
-  ws->var("doubleGaussSB_gauss_Ns")->setVal( 0 );
-  ws->var("doubleGaussSB_frac")->setVal( gausFrac );
-  ws->var("doubleGaussSB_gauss_mu")->setVal( gausMu );
-  ws->var("doubleGaussSB_gauss_sigma1")->setVal( gausSigma1 );
-  ws->var("doubleGaussSB_gauss_sigma2")->setVal( gausSigma2 );
-  ws->var("doubleGaussSB_gauss_Ns")->setConstant(kTRUE);
-  ws->var("doubleGaussSB_frac")->setConstant(kTRUE);
-  ws->var("doubleGaussSB_gauss_mu")->setConstant(kTRUE);
-  ws->var("doubleGaussSB_gauss_sigma1")->setConstant(kTRUE);
-  ws->var("doubleGaussSB_gauss_sigma2")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_Ns")->setVal( 0 );
+  ws->var("doubleGaussSB_DGF_frac")->setVal( gausFrac );
+  ws->var("doubleGaussSB_DGF_mu1")->setVal( gausMu1 );
+  ws->var("doubleGaussSB_DGF_mu2")->setVal( gausMu2 );
+  ws->var("doubleGaussSB_DGF_sigma1")->setVal( gausSigma1 );
+  ws->var("doubleGaussSB_DGF_sigma2")->setVal( gausSigma2 );
+  //ws->var("doubleGaussSB_DGF_Ns")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_frac")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_mu1")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_mu2")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_sigma1")->setConstant(kTRUE);
+  ws->var("doubleGaussSB_DGF_sigma2")->setConstant(kTRUE);
 
   std::cout << "entering constraints" << std::endl;
   //--------------------------------------
@@ -320,7 +323,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
   /*
     profile in Ns to obtain significance.
   */
-  RooArgSet poi   = RooArgSet( *ws->var("doubleGaussSB_gauss_Ns") );
+  RooArgSet poi   = RooArgSet( *ws->var("doubleGaussSB_DGF_Ns") );
   RooAbsReal* nll = model->createNLL(data);
   RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
   RooAbsReal* p2ll = n2ll.createProfile( poi );
@@ -341,6 +344,16 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
   ws->import( *model );
   ws->import( *bres );
   ws->import( *fmgg );
+
+  //-----------------------------
+  //S i g n a l   p l o t t i n g
+  //-----------------------------
+  RooPlot *fmgg2 = mgg.frame();
+  dataSignal.plotOn(fmgg2);
+  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg2->SetName( "signal_fit_frame" );
+  ws->import( *fmgg2 );
   
   //--------------------------------
   // m o d e l   2   p l o t t i n g
@@ -358,7 +371,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TString mggN
   //--------------------------------------
   // l i k e l i h o o d   p l o t t i n g
   //--------------------------------------
-  RooPlot* fns = ws->var("doubleGaussSB_gauss_Ns")->frame( RooFit::Range(0, 20, true) );
+  RooPlot* fns = ws->var("doubleGaussSB_DGF_Ns")->frame( RooFit::Range(0, 100, true) );
   fns->SetMinimum(0);
   fns->SetMaximum(6);
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );

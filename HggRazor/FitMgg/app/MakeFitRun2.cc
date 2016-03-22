@@ -26,7 +26,13 @@ int main( int argc, char* argv[])
     {
       std::cerr << "[INFO]: using a single root file, provide an second input file using --inputFile2=<path_to_file>" << std::endl;
     }
-
+  
+  std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
+  if (  inputFileSignal == "" )
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+    }
+  
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
   if (  treeName == "" )
     {
@@ -157,17 +163,27 @@ int main( int argc, char* argv[])
   //O u t p u t   R O O T   f i l e
   //-------------------------------
   TFile* f;
+  TFile* fs;
   TTree* tree;
+  TTree* treeSignal;
+  bool _getSignal = false;
   if ( dataMode == "data" )
     {
       f = new TFile( inputFile.c_str() , "READ");
-      //f = new TFile( inputFile.c_str() , "UPDATE");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
     {
       f = new TFile( inputFile.c_str() , "READ");
       tree = (TTree*)f->Get( treeName.c_str() );
+    }
+  else if ( dataMode == "data+signal" )
+    {
+      f = new TFile( inputFile.c_str() , "READ");
+      tree = (TTree*)f->Get( treeName.c_str() );
+      fs = new TFile( inputFileSignal.c_str() , "READ");
+      treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      _getSignal = true;
     }
  
   TTree* mc_tree;
@@ -258,7 +274,7 @@ int main( int argc, char* argv[])
   //----------------
   /*CP's Tree Format is default*/
   
-  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   TString cutMETfilters = "";
 
@@ -346,7 +362,15 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "sb" )
     {
-      RooWorkspace* w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      RooWorkspace* w_sb;
+      if ( !_getSignal ) 
+	{
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+	}
+      else
+	{
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), mggName );
+	}
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
