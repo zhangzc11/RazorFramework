@@ -296,16 +296,17 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //---------------
   //S+B  m  o d e l
   //---------------
-  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  //falling background + SM-Higgs + Signal
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgList( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //RooAddPdf* model2 = new RooAddPdf( "model2", "model2", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
   //Fixing gaussian parameter for 2nd model
   npoints = data.numEntries();
   //set Nbkg Initial Value
   ws->var("fullsb_fit_singleExp2_Nbkg")->setVal( npoints );
   //SIGNAL
-  //set intitial value for signal parameters
-  ws->var("DG_Signal_DGF_Ns")->setVal( 0.0 );
-  ws->var("DG_Signal_DGF_Ns")->setMin( 0.0 );
+  //set intitial values for signal parameters
+  ws->var("DG_Signal_DGF_Ns")->setVal( 2.0 );
+  ws->var("DG_Signal_DGF_Ns")->setMin( "", 0.0 );
   ws->var("DG_Signal_DGF_frac")->setVal( gausFrac );
   ws->var("DG_Signal_DGF_mu1")->setVal( gausMu1 );
   ws->var("DG_Signal_DGF_mu2")->setVal( gausMu2 );
@@ -319,8 +320,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("DG_Signal_DGF_sigma2")->setConstant(kTRUE);
   //SM-Higgs
   //set intitial value for SM-Higgs parameters
-  ws->var("DG_SMH_DGF_Ns")->setVal( 0.1 );
-  ws->var("DG_SMH_DGF_Ns")->setMin( 0.0 );
+  ws->var("DG_SMH_DGF_Ns")->setVal( 0.5 );
+  ws->var("DG_SMH_DGF_Ns")->setMin( "", 0.0 );
   ws->var("DG_SMH_DGF_frac")->setVal( gausFrac_SMH );
   ws->var("DG_SMH_DGF_mu1")->setVal( gausMu1_SMH );
   ws->var("DG_SMH_DGF_mu2")->setVal( gausMu2_SMH );
@@ -337,7 +338,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
   //--------------------------------------
-  RooRealVar HiggsYield("HiggsYield","",0.1);
+  RooRealVar HiggsYield("HiggsYield","",0.5);
   RooRealVar HiggsYieldUn("HiggsYieldUn","",0.1);
   //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
   RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), HiggsYield, HiggsYieldUn );

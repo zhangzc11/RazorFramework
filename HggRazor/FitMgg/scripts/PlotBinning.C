@@ -3,6 +3,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TF1.h>
 #include <TDirectory.h>
 #include <TH2Poly.h>
@@ -39,13 +40,49 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   else if (categoryMode == "inclusive") categoryCutString = "";
 
   TH2Poly *h2p = new TH2Poly();
+  const int nMR = 4;
+  int nRsq[nMR];
+  std::map<std::pair<float, float>, std::vector<float>> binningMap;
   if (categoryMode == "highpt")
     {
       float  highptMRedges[] = {156.25,312.5,625,1250,10000};
-      float  highptRSQedges0[] = {0,0.027,0.052,0.077,0.102,0.127,5.0};
-      float  highptRSQedges1[] = {0,0.022,0.047,0.072,5.0};
-      float  highptRSQedges2[] = {0,0.021,5.0};
-      float  highptRSQedges3[] = {0,5.0};
+      nRsq[0] = 7;
+      float  highptRSQedges0[7] = {0,0.027,0.052,0.077,0.102,0.127,5.0};
+      nRsq[1] = 5;
+      float  highptRSQedges1[5] = {0,0.022,0.047,0.072,5.0};
+      nRsq[2] = 3;
+      float  highptRSQedges2[3] = {0,0.021,5.0};
+      nRsq[3] = 2;
+      float  highptRSQedges3[2] = {0,5.0};
+      
+      for ( int i = 0; i < nMR; i++ )
+	{
+	  std::vector<float> vect;
+	  for ( int j = 0; j < nRsq[i]; j++ )
+	    {
+	      switch (i)
+		{
+		case 0:
+		  vect.push_back(highptRSQedges0[j]);
+		  break;
+		case 1:
+		  vect.push_back(highptRSQedges1[j]);
+		  break;
+		case 2:
+		  vect.push_back(highptRSQedges2[j]);
+		  break;
+		case 3:
+		  vect.push_back(highptRSQedges3[j]);
+		  break;
+		default:
+		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
+		  break;
+		}
+	    }
+	  std::pair<float, float> mypair = std::make_pair( highptMRedges[i], highptMRedges[i+1] );
+	  std::cout << mypair.first << " " << mypair.second << std::endl;
+	  binningMap[mypair] = vect;
+	}
       Double_t x1[] = {150, 150, 312.5, 312.5};
       Double_t y11[] = {0, 0.027, 0.027,0};
       Double_t y12[] = {0.027, 0.052, 0.052, 0.027};
@@ -88,10 +125,44 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   else if (categoryMode == "highres")
     {
       float  highresMRedges[] = {150,237.5,475,950,10000};
-      float  highresRSQedges0[] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,5.0};
-      float  highresRSQedges1[] = {0,0.035,0.06,0.085,5.0};
-      float  highresRSQedges2[] = {0,0.018,5.0};
-      float  highresRSQedges3[] = {0,5.0};
+      nRsq[0] = 9;
+      float  highresRSQedges0[9] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,5.0};
+      nRsq[1] = 5;
+      float  highresRSQedges1[5] = {0,0.035,0.06,0.085,5.0};
+      nRsq[2] = 3;
+      float  highresRSQedges2[3] = {0,0.018,5.0};
+      nRsq[3] = 2;
+      float  highresRSQedges3[2] = {0,5.0};
+
+      for ( int i = 0; i < nMR; i++ )
+	{
+	  std::vector<float> vect;
+	  for ( int j = 0; j < nRsq[i]; j++ )
+	    {
+	      switch (i)
+		{
+		case 0:
+		  vect.push_back(highresRSQedges0[j]);
+		  break;
+		case 1:
+		  vect.push_back(highresRSQedges1[j]);
+		  break;
+		case 2:
+		  vect.push_back(highresRSQedges2[j]);
+		  break;
+		case 3:
+		  vect.push_back(highresRSQedges3[j]);
+		  break;
+		default:
+		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
+		  break;
+		}
+	    }
+	  std::pair<float, float> mypair = std::make_pair( highresMRedges[i], highresMRedges[i+1] );
+	  std::cout << mypair.first << " " << mypair.second << std::endl;
+	  binningMap[mypair] = vect;
+	}
+      
       Double_t x1[] = {150, 150, 237.5, 237.5};
       Double_t y11[] = {0, 0.028, 0.028,0};
       Double_t y12[] = {0.028, 0.053, 0.053, 0.028};
@@ -134,10 +205,44 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   else if (categoryMode == "lowres")
     {
       float  lowresMRedges[] = {150,200,400,800,10000};
-      float  lowresRSQedges0[] = {0,0.049,0.074,0.099,0.124,0.149,5.0};
-      float  lowresRSQedges1[] = {0,0.023,0.048,0.073,0.098,5.0};
-      float  lowresRSQedges2[] = {0,0.02,5.0};
-      float  lowresRSQedges3[] = {0,5.0};
+      nRsq[0] = 7;
+      float  lowresRSQedges0[7] = {0,0.049,0.074,0.099,0.124,0.149,5.0};
+      nRsq[1] = 6;
+      float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,5.0};
+      nRsq[2] = 3;
+      float  lowresRSQedges2[3] = {0,0.02,5.0};
+      nRsq[3] = 2;
+      float  lowresRSQedges3[2] = {0,5.0};
+
+      for ( int i = 0; i < nMR; i++ )
+	{
+	  std::vector<float> vect;
+	  for ( int j = 0; j < nRsq[i]; j++ )
+	    {
+	      switch (i)
+		{
+		case 0:
+		  vect.push_back(lowresRSQedges0[j]);
+		  break;
+		case 1:
+		  vect.push_back(lowresRSQedges1[j]);
+		  break;
+		case 2:
+		  vect.push_back(lowresRSQedges2[j]);
+		  break;
+		case 3:
+		  vect.push_back(lowresRSQedges3[j]);
+		  break;
+		default:
+		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
+		  break;
+		}
+	    }
+	  std::pair<float, float> mypair = std::make_pair( lowresMRedges[i], lowresMRedges[i+1] );
+	  std::cout << mypair.first << " " << mypair.second << std::endl;
+	  binningMap[mypair] = vect;
+	}
+      
       Double_t x1[] = {150, 150, 200, 200};
       Double_t y11[] = {0.00, 0.049, 0.049,0.00};
       Double_t y12[] = {0.049, 0.074, 0.074, 0.049};
@@ -196,19 +301,38 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   cutTree->SetBranchAddress("MR", &MR);
   cutTree->SetBranchAddress("t1Rsq", &t1Rsq);
 
+  h2p->Sumw2();
   long nentries = cutTree->GetEntries();
   for ( long i = 0; i < nentries; i++ )
     {
       cutTree->GetEntry(i);
       //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
-      /*if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );
-	else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );*/
+      //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );
+      //else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );
+      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
+      else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
       
-      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, 1.0 );
-      else  h2p->Fill( MR, 0.999, 1.0 );
+      //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, 1.0 );
+      //else  h2p->Fill( MR, 0.999, 1.0 );
     } 
 
+  int nbinsT = h2p->GetNumberOfBins();
+  for( int j = 1; j <= nbinsT; j++ )
+    {
+      //std::cout << "bin: " << j << " --> " << h2p->GetBinContent(j) << " +/- " << h2p->GetBinError(j) << std::endl;
+    }
   
+  std::cout << "#MR_low\tMR_high\tRsq_low\tRsq_high\tSM-Higgs\tSM-HiggsErr" << std::endl;
+  
+  for ( auto& tmp : binningMap )
+    {
+      for ( int i = 0; i < (int)tmp.second.size() - 1; i++ )
+	{
+	  std::cout << tmp.first.first << "\t" << tmp.first.second << "\t" <<  tmp.second.at(i) << "\t" << tmp.second.at(i+1)
+		    << "\t" << h2p->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t"
+		    << h2p->GetBinError( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << std::endl;
+	}
+    }
   h2p->SetXTitle("M_{R} (GeV)");
   h2p->SetYTitle("R^{2}");
   h2p->SetTitle("");
