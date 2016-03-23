@@ -32,6 +32,12 @@ int main( int argc, char* argv[])
     {
       std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
     }
+
+  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
+  if (  inputFileSMH == "" )
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
+    }
   
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
   if (  treeName == "" )
@@ -164,8 +170,10 @@ int main( int argc, char* argv[])
   //-------------------------------
   TFile* f;
   TFile* fs;
+  TFile* fsmh;
   TTree* tree;
   TTree* treeSignal;
+  TTree* treeSMH;
   bool _getSignal = false;
   if ( dataMode == "data" )
     {
@@ -183,6 +191,8 @@ int main( int argc, char* argv[])
       tree = (TTree*)f->Get( treeName.c_str() );
       fs = new TFile( inputFileSignal.c_str() , "READ");
       treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      fsmh = new TFile( inputFileSMH.c_str() , "READ");
+      treeSMH = (TTree*)fsmh->Get( treeName.c_str() );
       _getSignal = true;
     }
  
@@ -369,7 +379,7 @@ int main( int argc, char* argv[])
 	}
       else
 	{
-	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), mggName );
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName );
 	}
       w_sb->Write("w_sb");
     }
