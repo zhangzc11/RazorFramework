@@ -62,7 +62,7 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   //C r e a t e   E x t e n d e d  p.d.f
   //------------------------------------
   TString ex_pdf_name          = tag+"_doublegauss_ext";
-  RooExtendPdf* ex_doublegauss = new RooExtendPdf( ex_pdf_name, "extDgauss", *doublegauss, *Ns );
+  RooAddPdf* ex_doublegauss = new RooAddPdf( ex_pdf_name, "extDgauss", RooArgList(*doublegauss), RooArgList(*Ns) );
   w.import( *ex_doublegauss );
   
   return ex_pdf_name;
@@ -99,7 +99,7 @@ TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   //C r e a t e   E x t e n d e d  p.d.f
   //------------------------------------
   TString ex_pdf_name          = tag + "_DGF_ext";
-  RooExtendPdf* ex_doublegauss = new RooExtendPdf( ex_pdf_name, "extDgauss", *doublegauss, *Ns );
+  RooAddPdf* ex_doublegauss = new RooAddPdf( ex_pdf_name, "extDgauss", RooArgList(*doublegauss), RooArgList(*Ns) );
   w.import( *ex_doublegauss );
   
   return ex_pdf_name;

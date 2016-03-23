@@ -283,7 +283,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   // C r e a t e   b k g  s h a p e
   //------------------------------------
   //TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_bkg", mgg, *ws );
-  TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_doubleExp", mgg, *ws );
+  //TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_doubleExp", mgg, *ws );
   //TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
   TString tag_bkg2 = MakeSingleExp( "fullsb_fit_singleExp2", mgg, *ws );
     
@@ -304,9 +304,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("fullsb_fit_singleExp2_Nbkg")->setVal( npoints );
   //SIGNAL
   //set intitial value for signal parameters
-  
-  //ws->var("DG_Signal_DGF_Ns")->setMin( 0 );
-  ws->var("DG_Signal_DGF_Ns")->setVal( 0 );
+  ws->var("DG_Signal_DGF_Ns")->setVal( 0.0 );
   ws->var("DG_Signal_DGF_Ns")->setMin( 0.0 );
   ws->var("DG_Signal_DGF_frac")->setVal( gausFrac );
   ws->var("DG_Signal_DGF_mu1")->setVal( gausMu1 );
@@ -322,7 +320,6 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //SM-Higgs
   //set intitial value for SM-Higgs parameters
   ws->var("DG_SMH_DGF_Ns")->setVal( 0.1 );
-  //ws->var("DG_SMH_DGF_Ns")->setMin( 0 );
   ws->var("DG_SMH_DGF_Ns")->setMin( 0.0 );
   ws->var("DG_SMH_DGF_frac")->setVal( gausFrac_SMH );
   ws->var("DG_SMH_DGF_mu1")->setVal( gausMu1_SMH );
@@ -340,29 +337,19 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
   //--------------------------------------
-  
   RooRealVar HiggsYield("HiggsYield","",0.1);
-  RooRealVar HiggsYieldUn("HiggsYieldUn","",0.01);
+  RooRealVar HiggsYieldUn("HiggsYieldUn","",0.1);
   //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
   RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), HiggsYield, HiggsYieldUn );
   std::cout << "pass constraints" << std::endl;
-  /*
-  std::cout << "entering forceSigma" << std::endl;
-  if( forceSigma != -1 ) {
-    ws->var("fullsb_fit_signal_gauss_sigma1")->setVal( forceSigma );
-    ws->var("fullsb_fit_signal_gauss_sigma1")->setConstant(true);
-    ws->var("fullsb_fit_signal_frac")->setVal( 1.0 );
-    ws->var("fullsb_fit_signal_frac")->setConstant(true);
-  }
-  */
   std::cout << "pass forceSigma" << std::endl;
 
   //---------------------
   //F i t   t o   D a t a
   //---------------------
-  
-  model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("Full") );
+  //model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
+  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("Full") );
+  //RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE) );
   
   //model2->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres2 = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
@@ -432,13 +419,14 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //--------------------------------------
   // l i k e l i h o o d   p l o t t i n g
   //--------------------------------------
-  RooPlot* fns = ws->var("DG_Signal_DGF_Ns")->frame( RooFit::Range(0, 100, true) );
+  /*RooPlot* fns = ws->var("DG_Signal_DGF_Ns")->frame( RooFit::Range(0, 100, true) );
   fns->SetMinimum(0);
   fns->SetMaximum(6);
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
   p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
   fns->SetName("nll_trick");
   ws->import( *fns );
+  */
   ws->Write("w_sb");
   ftmp->Close();
   return ws;
