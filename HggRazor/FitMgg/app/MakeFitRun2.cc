@@ -383,6 +383,12 @@ int main( int argc, char* argv[])
 	}
       w_sb->Write("w_sb");
     }
+  else if ( fitMode == "datacard" )
+    {
+      RooWorkspace* w_sb;
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName );
+      w_sb->Write("w_sb");
+    }
   else if ( fitMode == "AIC" )
     {
       w_aic[0] = MakeSideBandFitAIC( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], "doubleExp" );

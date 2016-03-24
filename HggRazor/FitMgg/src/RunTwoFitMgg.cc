@@ -1,5 +1,6 @@
 //C++ INCLUDES
 #include <vector>
+#include <fstream>
 //ROOT INCLUDES
 #include <TTree.h>
 #include <TLatex.h>
@@ -432,6 +433,197 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ftmp->Close();
   return ws;
 }
+
+RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName )
+{
+  //------------------------------------------------
+  // C r e a t e   s i g n a l  s h a p e from TTree
+  //------------------------------------------------
+  TFile* ftmp = new TFile("tmp_output_OurID.root", "recreate");
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  mgg.setBins(38);
+  mgg.setRange( "signal", 115, 135. );
+  mgg.setRange( "high", 135, 160);
+  mgg.setRange( "low", 103, 120);
+  //--------------------------------
+  //I m p or t i n g   D a t a
+  //--------------------------------
+
+  //Getting signal shape from signal MC
+  //-----------------------
+  //C r e a t e  doubleGaus
+  //-----------------------
+  bool sameMu = false;
+  TString tagSignal, tagSMH;
+  TString tag;
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*treeData) );
+  RooDataSet dataSignal( "dataSignal", "", RooArgSet(mgg), RooFit::Import(*treeSignal) );
+  RooDataSet dataSMH( "dataSMH", "", RooArgSet(mgg), RooFit::Import(*treeSMH) );
+  //---------------------------------
+  //D e f i n e   s i g n a l   P D F
+  //---------------------------------
+  int npoints = dataSignal.numEntries();
+  if( sameMu )
+    {
+      tagSignal = MakeDoubleGauss( "DG_signal", mgg, *ws );
+      ws->var("DG_signal_gauss_Ns")->setVal( (double)npoints );
+    }
+  else
+    {
+      tagSignal = MakeFullDoubleGauss( "DG_signal", mgg, *ws );
+      ws->var("DG_signal_DGF_Ns")->setVal( (double)npoints );
+    }
+  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+  double gausFrac   =  ws->var("DG_signal_DGF_frac")->getVal();
+  double gausMu1    =  ws->var("DG_signal_DGF_mu1")->getVal();
+  double gausMu2    =  ws->var("DG_signal_DGF_mu2")->getVal();
+  double gausSigma1 =  ws->var("DG_signal_DGF_sigma1")->getVal();
+  double gausSigma2 =  ws->var("DG_signal_DGF_sigma2")->getVal();
+
+  //-------------------------------------
+  //D e f i n e   S M - H i g g s   P D F
+  //-------------------------------------
+  npoints = dataSMH.numEntries();
+  if( sameMu )
+    {
+      tagSMH = MakeDoubleGauss( "DG_SMH", mgg, *ws );
+      ws->var("DG_SMH_gauss_Ns")->setVal( (double)npoints );
+    }
+  else
+    {
+      tagSMH = MakeFullDoubleGauss( "DG_SMH", mgg, *ws );
+      ws->var("DG_SMH_DGF_Ns")->setVal( (double)npoints );
+    }
+  RooFitResult* smhres = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+  double gausFrac_SMH   =  ws->var("DG_SMH_DGF_frac")->getVal();
+  double gausMu1_SMH    =  ws->var("DG_SMH_DGF_mu1")->getVal();
+  double gausMu2_SMH    =  ws->var("DG_SMH_DGF_mu2")->getVal();
+  double gausSigma1_SMH =  ws->var("DG_SMH_DGF_sigma1")->getVal();
+  double gausSigma2_SMH =  ws->var("DG_SMH_DGF_sigma2")->getVal();
+  
+  //------------------------------------
+  // C r e a t e   b k g  s h a p e
+  //------------------------------------
+  TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  //Initializing Nbkg
+  npoints = data.numEntries();
+  //set Nbkg Initial Value
+  ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
+  std::cout << "entering constraints" << std::endl;
+  //--------------------------------------
+  //H i g g s   C o n s t r a i n s
+  //--------------------------------------
+  RooRealVar HiggsYield("HiggsYield","",0.5);
+  RooRealVar HiggsYieldUn("HiggsYieldUn","",0.1);
+  //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
+  RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), HiggsYield, HiggsYieldUn );
+  std::cout << "pass constraints" << std::endl;
+  std::cout << "pass forceSigma" << std::endl;
+
+  //---------------------
+  //F i t   t o   D a t a
+  //---------------------
+  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  float sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
+  float Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
+  //--------------------------------
+  // m o d e l   1   p l o t t i n g
+  //--------------------------------
+  RooPlot *fmgg = mgg.frame();
+  data.plotOn(fmgg);
+  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg->SetName( "fullsb_fit_frame" );
+  //ws->import( *model );
+  ws->import( *bres );
+  ws->import( *fmgg );
+
+  //-----------------------------
+  //S i g n a l   p l o t t i n g
+  //-----------------------------
+  RooPlot *fmgg2 = mgg.frame();
+  dataSignal.plotOn(fmgg2);
+  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg2->SetName( "signal_fit_frame" );
+  ws->import( *fmgg2 );
+
+  //---------------------------------
+  //S M - H i g g s   p l o t t i n g
+  //---------------------------------
+  RooPlot *fmgg3 = mgg.frame();
+  dataSMH.plotOn(fmgg3);
+  ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg3->SetName( "smh_fit_frame" );
+  ws->import( *fmgg3 );
+
+  //-------------------------------------------------------
+  // P r e p a r a t i o n   t o   C o m b i n e  I n p u t
+  //-------------------------------------------------------
+  ws->Write("w_sb");
+  
+  RooWorkspace* combine_ws = new RooWorkspace( "combine_ws", "" );
+  TString combineSMH    = MakeFullDoubleGaussNE( "SMH", mgg, *combine_ws );
+  combine_ws->var( combineSMH+"_frac")->setVal(gausFrac_SMH);
+  combine_ws->var( combineSMH+"_mu1")->setVal(gausMu1_SMH);
+  combine_ws->var( combineSMH+"_mu2")->setVal(gausMu2_SMH);
+  combine_ws->var( combineSMH+"_sigma1")->setVal(gausSigma1_SMH);
+  combine_ws->var( combineSMH+"_sigma2")->setVal(gausSigma2_SMH);
+  combine_ws->var( combineSMH+"_frac")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_mu1")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_mu2")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_sigma1")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_sigma2")->setConstant(kTRUE);
+  RooRealVar SMH_norm( combineSMH+"_norm" ,"", 0.0001);
+  //SMH_norm.setConstant(kFALSE);
+  combine_ws->import( SMH_norm );
+  TString combineSignal = MakeFullDoubleGaussNE( "signal", mgg, *combine_ws );
+  combine_ws->var( combineSignal+"_frac")->setVal(gausFrac);
+  combine_ws->var( combineSignal+"_mu1")->setVal(gausMu1);
+  combine_ws->var( combineSignal+"_mu2")->setVal(gausMu2);
+  combine_ws->var( combineSignal+"_sigma1")->setVal(gausSigma1);
+  combine_ws->var( combineSignal+"_sigma2")->setVal(gausSigma2);
+  combine_ws->var( combineSignal+"_frac")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_mu1")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_mu2")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_sigma1")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_sigma2")->setConstant(kTRUE);
+  RooRealVar Signal_norm( combineSignal + "_norm", "", 5.0 );
+  //Signal_norm.setConstant(kFALSE);
+  combine_ws->import( Signal_norm );
+  TString combineBkg    = MakeSingleExpNE( "Bkg", mgg, *combine_ws );
+  combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
+  RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+  //Bkg_norm.setConstant(kFALSE);
+  combine_ws->import( Bkg_norm );
+  combine_ws->import( data );
+  combine_ws->Write("combineWS");
+  ftmp->cd();
+  ftmp->Close();
+  std::ofstream ofs( "myDatacard.txt", std::ofstream::out );
+  ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
+  ofs << "----------------------------------------------------------------------------------------\n";
+  ofs << "shapes Bkg\t\tcat0\tmyWorkspace.root combineWS:" << combineBkg << "\n";
+  ofs << "shapes SMH\t\tcat0\tmyWorkspace.root combineWS:" << combineSMH << "\n";
+  ofs << "shapes signal\t\tcat0\tmyWorkspace.root combineWS:" << combineSignal << "\n";
+  ofs << "shapes data_obs\t\tcat0\tmyWorkspace.root combineWS:" << "data" << "\n";
+  ofs << "----------------------------------------------------------------------------------------\n";
+  ofs << "bin\t\tcat0\n";
+  ofs << "observation\t-1.0\n";
+  ofs << "----------------------------------------------------------------------------------------\n";
+  ofs << "bin\t\t\t\t\t\tcat0\t\tcat0\t\tcat0\n";
+  ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
+  ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
+  ofs << "rate\t\t\t\t\t\t666\t\t666\t\t666\n";
+  ofs << "----------------------------------------------------------------------------------------\n";
+  ofs << "CMS_Lumi\t\t\tlnN\t\t1.2\t\t1.2\t\t1.2\n";
+  ofs.close();
+  return ws;
+};
+
+
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
 
