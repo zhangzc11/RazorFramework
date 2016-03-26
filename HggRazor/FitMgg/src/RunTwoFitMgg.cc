@@ -350,7 +350,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //F i t   t o   D a t a
   //---------------------
   //model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("Full") );
+  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("low,high") );
   //RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE) );
   
   //model2->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
@@ -524,14 +524,17 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //---------------------
   //F i t   t o   D a t a
   //---------------------
-  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   float sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
   float Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
+  //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints, true );
+  RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, RooFit::ExpectedData() );
+  data_toys->SetName("data");
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
   RooPlot *fmgg = mgg.frame();
-  data.plotOn(fmgg);
+  data_toys->plotOn(fmgg);
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( "fullsb_fit_frame" );
@@ -598,7 +601,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
   //Bkg_norm.setConstant(kFALSE);
   combine_ws->import( Bkg_norm );
-  combine_ws->import( data );
+  combine_ws->import( *data_toys );
   combine_ws->Write("combineWS");
   ftmp->cd();
   ftmp->Close();
@@ -616,9 +619,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ofs << "bin\t\t\t\t\t\tcat0\t\tcat0\t\tcat0\n";
   ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
   ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
-  ofs << "rate\t\t\t\t\t\t666\t\t666\t\t666\n";
+  ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
   ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "CMS_Lumi\t\t\tlnN\t\t1.2\t\t1.2\t\t1.2\n";
+  ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
   ofs.close();
   return ws;
 };
@@ -1854,7 +1857,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 };
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
 {
-  return pdf->generate( x, ntoys );
+  return pdf->generate( x, ntoys);
 };
 
 RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3, TString ffName = "doubleExp" )
