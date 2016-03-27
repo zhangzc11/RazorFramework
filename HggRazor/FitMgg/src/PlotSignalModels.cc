@@ -60,7 +60,7 @@ float extraTextFont = 52;  // default is helvetica-italics
 float extraOverCmsTextSize  = 0.76;
 float cmsSize = 0.06;
 
-void PlotSignalModel( std::string fname = "", std::string outDir = "bias_plots")
+void PlotSignalModel( std::string fname = "", std::string outDir = "SignalFitPlots")
 {
   //-----------------------
   //G e t t i n g   F i l e
@@ -152,11 +152,14 @@ void PlotSignalModel( std::string fname = "", std::string outDir = "bias_plots")
   //S a v i n g   P l o t s
   //-----------------------
   //std::string outName = fname;
-  std::string findName = "biasTest_";
+  std::string findName = "/";
   int begin_s = fname.find( findName ) + findName.size();
+  //int begin_s = 0;
   int end_s   = fname.find( ".root" );
+  std::cout << "outDir: " << outDir << std::endl;
   std::string outName = outDir + "/" +fname.substr( begin_s, end_s - begin_s);
   TString figName = outName;
+  std::cout << "figName: " << figName << std::endl;
   c->SaveAs(figName+".pdf");
   c->SaveAs(figName+".png");
   c->SaveAs(figName+".C");

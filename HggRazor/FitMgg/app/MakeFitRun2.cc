@@ -26,7 +26,7 @@ int main( int argc, char* argv[])
     {
       std::cerr << "[INFO]: using a single root file, provide an second input file using --inputFile2=<path_to_file>" << std::endl;
     }
-
+  
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
   if (  treeName == "" )
     {
@@ -150,6 +150,67 @@ int main( int argc, char* argv[])
   
   if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << _signalFraction << std::endl;
   
+
+  //------------------------
+  //combine datacard related
+  //------------------------
+  std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
+  if (  inputFileSignal == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+    }
+
+  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
+  if (  inputFileSMH == "" && fitMode == "datacard")
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
+    }
+  
+  std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
+  float _SMH_Yield = 1.e-2;
+  if (  SMH_Yield == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input SMH_Yield, --SMH_Yield=<Yield>" << std::endl;
+    }
+  else
+    {
+      _SMH_Yield = atof( SMH_Yield.c_str() );
+    }
+
+  std::string SMH_YieldUn = ParseCommandLine( argc, argv, "-SMH_YieldUn=" );
+  float _SMH_YieldUn = 1.e-2;
+  if (  SMH_YieldUn == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input SMH_YieldUn, --SMH_Yield=<Yield_Uncertainty>" << std::endl;
+    }
+   else
+     {
+       _SMH_YieldUn = atof( SMH_YieldUn.c_str() );
+     }
+  
+  std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
+  float _Signal_Yield = 1.;
+  if (  Signal_Yield == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input Signal_Yield, --Signal_Yield=<Yield>" << std::endl;
+    }
+  else
+    {
+      _Signal_Yield = atof( Signal_Yield.c_str() );
+    }
+
+  std::string binNumber = ParseCommandLine( argc, argv, "-binNumber=" );
+  TString _binNumber = "-666";
+  if (  binNumber == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide a binNumber, --binNumber=<binNumber>" << std::endl;
+    }
+  else
+    {
+      _binNumber = binNumber;
+    }
+  
+
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
 
@@ -157,17 +218,31 @@ int main( int argc, char* argv[])
   //O u t p u t   R O O T   f i l e
   //-------------------------------
   TFile* f;
+  TFile* fs;
+  TFile* fsmh;
   TTree* tree;
+  TTree* treeSignal;
+  TTree* treeSMH;
+  bool _getSignal = false;
   if ( dataMode == "data" )
     {
       f = new TFile( inputFile.c_str() , "READ");
-      //f = new TFile( inputFile.c_str() , "UPDATE");
       tree = (TTree*)f->Get( treeName.c_str() );
     }
   else if ( dataMode == "mc" )
     {
       f = new TFile( inputFile.c_str() , "READ");
       tree = (TTree*)f->Get( treeName.c_str() );
+    }
+  else if ( dataMode == "data+signal" )
+    {
+      f = new TFile( inputFile.c_str() , "READ");
+      tree = (TTree*)f->Get( treeName.c_str() );
+      fs = new TFile( inputFileSignal.c_str() , "READ");
+      treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      fsmh = new TFile( inputFileSMH.c_str() , "READ");
+      treeSMH = (TTree*)fsmh->Get( treeName.c_str() );
+      _getSignal = true;
     }
  
   TTree* mc_tree;
@@ -258,8 +333,9 @@ int main( int argc, char* argv[])
   //----------------
   /*CP's Tree Format is default*/
   
-  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
-  TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+  TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+  TString cutMETfilters = "";
 
   //****************************************************
   //Category Cut String
@@ -280,8 +356,8 @@ int main( int argc, char* argv[])
       else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) < 15";
       else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbZ_L-91.) < 15 && abs(mbbH_L-125.) >= 15 )";
       else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15 || ( abs(mbbZ_L-91.) < 15 && abs(mbbH_L-125.) >= 15 ) )";
-      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && sigmaMoverM < 0.0085";
-      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && sigmaMoverM >= 0.0085";
+      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
+      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
   //---------------------------------------------
@@ -345,7 +421,21 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "sb" )
     {
-      RooWorkspace* w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+      RooWorkspace* w_sb;
+      if ( !_getSignal ) 
+	{
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
+	}
+      else
+	{
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName );
+	}
+      w_sb->Write("w_sb");
+    }
+  else if ( fitMode == "datacard" )
+    {
+      RooWorkspace* w_sb;
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, _SMH_YieldUn, _Signal_Yield, binNumber );
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
