@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <TFile.h>
 #include <TTree.h>
 #include <TH1F.h>
@@ -20,23 +21,38 @@ struct AnaBin
 const float lumi = 2300.;
 const float kf =1.37;
 
-void PlotBinning( TString fname, TString categoryMode = "highres", float _binCount = 18. )
+//-----------------------------------
+//Plots Real MR-Rsq binning
+//If SMH and Signal files are
+//given it will create a configCard
+//with the SMH Yield and signal Yield
+//-----------------------------------
+
+void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "highres", TString signalFile = "", bool _createCF = false )
 {
   TFile* fout = new TFile( "test.root", "RECREATE");
-  
   TFile* f = new TFile( fname, "READ");
   assert( f );
-
   TTree* tree = (TTree*)f->Get("HggRazor");
-    
+  
+  bool _prepareConfigCard = false;
+  TTree* treeSignal;
+  TFile* f2;
+  if ( signalFile != "" && _createCF )
+    {
+      f2 = new TFile( signalFile, "READ");
+      assert( f2 );
+      treeSignal  = (TTree*)f2->Get("HggRazor");
+      _prepareConfigCard = true;
+    }
+  
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString categoryCutString;
   
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
-  else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15.";
-  else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15. && abs(mbbZ-91.) < 15. ";
-  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) >= 15 && abs(mbbZ-91) >= 15 && sigmaMoverM < 0.0085";
-  else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.) >= 15 && abs(mbbZ-91.) >= 15 && sigmaMoverM >= 0.0085 ";
+  else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15. || ( abs(mbbH_L-125.) >= 15. && abs(mbbZ_L-91.) < 15 ) )";
+  else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM < 0.0085";
+  else if (categoryMode == "lowres") categoryCutString  = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
 
   TH2Poly *h2p = new TH2Poly();
@@ -45,7 +61,7 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   std::map<std::pair<float, float>, std::vector<float>> binningMap;
   if (categoryMode == "highpt")
     {
-      float  highptMRedges[] = {156.25,312.5,625,1250,10000};
+      float  highptMRedges[] = {150.0, 312.5, 625, 1250, 10000};
       nRsq[0] = 7;
       float  highptRSQedges0[7] = {0,0.027,0.052,0.077,0.102,0.127,5.0};
       nRsq[1] = 5;
@@ -120,7 +136,17 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
     }
   else if (categoryMode == "hzbb")
     {
-     
+      std::vector<float> vect;
+      vect.push_back( 0.0 );
+      vect.push_back( 5.0 );
+      std::pair<float, float> mypair = std::make_pair( 150., 10000. );
+      std::cout << mypair.first << " " << mypair.second << std::endl;
+      binningMap[mypair] = vect;
+      
+      Double_t x1[] = {150, 150, 10000., 10000.};
+      Double_t y11[] = {0, 1.0, 1.0,0};
+      //add bins
+      h2p->AddBin(4, x1, y11);
     }
   else if (categoryMode == "highres")
     {
@@ -285,7 +311,7 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   
   
  
-
+  
   fout->cd();
   cut = cut + categoryCutString;
   TTree* cutTree = tree->CopyTree( cut );
@@ -300,38 +326,91 @@ void PlotBinning( TString fname, TString categoryMode = "highres", float _binCou
   cutTree->SetBranchAddress("pileupWeight", &pileupWeight);
   cutTree->SetBranchAddress("MR", &MR);
   cutTree->SetBranchAddress("t1Rsq", &t1Rsq);
-
+  
+  //Signal
+  TTree* cutTreeSignal;
+  float MR_s, t1Rsq_s, weight_s, pileupWeight_s;
+  std::cout << "config signal TTree" << std::endl;
+  if ( _prepareConfigCard )
+    {
+      std::cout << "config signal TTree-1" << std::endl;
+      cutTreeSignal = treeSignal->CopyTree( cut );
+      std::cout << "config signal TTree0" << std::endl;
+      cutTreeSignal->SetBranchStatus("*", 0);
+      cutTreeSignal->SetBranchStatus("weight", 1);
+      cutTreeSignal->SetBranchStatus("pileupWeight", 1);
+      cutTreeSignal->SetBranchStatus("MR", 1);
+      cutTreeSignal->SetBranchStatus("t1Rsq", 1);
+      //addresses
+      cutTreeSignal->SetBranchAddress("weight", &weight_s);
+      cutTreeSignal->SetBranchAddress("pileupWeight", &pileupWeight_s);
+      cutTreeSignal->SetBranchAddress("MR", &MR_s);
+      cutTreeSignal->SetBranchAddress("t1Rsq", &t1Rsq_s);
+    }
+  
+  std::cout << "clonning TH2Poly" << std::endl;
+  TH2Poly* h2pSignal = (TH2Poly*)h2p->Clone("h2pSignal"); 
   h2p->Sumw2();
+  h2pSignal->Sumw2();
+  
+  //----------------------------------------------------
+  // For plotting just modify the loop below accordingly
+  //----------------------------------------------------
   long nentries = cutTree->GetEntries();
   for ( long i = 0; i < nentries; i++ )
     {
       cutTree->GetEntry(i);
       //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
-      //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );
-      //else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );
+      //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );//nonRes
+      //else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );//nonRes
+      
       if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
       else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
       
+      //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*lumi );//no pileup
+      //else  h2p->Fill( MR, 0.999, weight*lumi );//no pileup
       //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, 1.0 );
       //else  h2p->Fill( MR, 0.999, 1.0 );
     } 
-
+  
+ if ( _prepareConfigCard )
+   {
+     nentries = cutTreeSignal->GetEntries();
+     for ( long i = 0; i < nentries; i++ )
+       {
+	 cutTreeSignal->GetEntry(i);
+	 //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
+	 if ( t1Rsq < 1.0 ) h2pSignal->Fill( MR_s, t1Rsq_s, weight_s*lumi );//sm-higgs
+	 else  h2pSignal->Fill( MR_s, 0.999, weight_s*lumi );//sm-higgs
+       } 
+   }
+  
+  
   int nbinsT = h2p->GetNumberOfBins();
   for( int j = 1; j <= nbinsT; j++ )
     {
-      //std::cout << "bin: " << j << " --> " << h2p->GetBinContent(j) << " +/- " << h2p->GetBinError(j) << std::endl;
+      //std::cout << "SMH bin: " << j << " --> " << h2p->GetBinContent(j) << " +/- " << h2p->GetBinError(j) << std::endl;
+      //std::cout << "Signal bin: " << j << " --> " << h2pSignal->GetBinContent(j) << " +/- " << h2pSignal->GetBinError(j) << std::endl;
     }
   
-  std::cout << "#MR_low\tMR_high\tRsq_low\tRsq_high\tSM-Higgs\tSM-HiggsErr" << std::endl;
-  
-  for ( auto& tmp : binningMap )
+ 
+  if ( _prepareConfigCard )
     {
-      for ( int i = 0; i < (int)tmp.second.size() - 1; i++ )
+      std::string ofsName = categoryMode + "_configCard.txt";
+      std::ofstream ofs ( ofsName.c_str(), std::ofstream::out );
+      ofs << "#cat\t\tMR_l\t\tMR_h\t\tRsq_l\t\tRsq_h\t\tSMH\t\t\tSMH_Err\t\tSignal\t\tBkg_f" << std::endl;
+      for ( auto& tmp : binningMap )
 	{
-	  std::cout << tmp.first.first << "\t" << tmp.first.second << "\t" <<  tmp.second.at(i) << "\t" << tmp.second.at(i+1)
-		    << "\t" << h2p->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t"
-		    << h2p->GetBinError( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << std::endl;
+	  for ( int i = 0; i < (int)tmp.second.size() - 1; i++ )
+	    {
+	      ofs << categoryMode << "\t\t" <<  tmp.first.first << "\t\t" << tmp.first.second << "\t\t" <<  tmp.second.at(i) << "\t\t" << tmp.second.at(i+1)
+		  << "\t\t" << h2p->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t"
+		  << h2p->GetBinError( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t" 
+		  << h2pSignal->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t"
+		  << "singleExp" << std::endl;
+	    }
 	}
+      ofs.close();
     }
   h2p->SetXTitle("M_{R} (GeV)");
   h2p->SetYTitle("R^{2}");

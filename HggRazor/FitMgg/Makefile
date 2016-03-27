@@ -15,19 +15,19 @@ CPPFLAGS += -g -std=c++11
 TARGET = MakeFit
 TARGET1 = MakeFitRun2
 TARGET2 = PlotAllBiasTest
-TARGET2 = PlotAllSignalModels
+TARGET4 = CreateDataCardCommands
 
 SRC = app/testapp.cc src/makeInvertedANFit_v2.cc $(Aux)/src/CommandLineInput.cc
 SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc
 SRC2 = app/PlotAllBiasTest.cc src/PlotBias.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
-SRC2 = app/PlotAllSignalModels.cc src/PlotSignalModels.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
+SRC4 = app/CreateDataCardCommands.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)
-OBJ3 = $(SRC3:.cc=.o)
+OBJ4 = $(SRC4:.cc=.o)
 
-all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3)
+all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -49,8 +49,8 @@ $(TARGET2) : $(OBJ2)
 	@echo $^
 
 
-$(TARGET3) : $(OBJ3)
-	$(LD) $(CPPFLAGS) -o $(TARGET3) $(OBJ3) $(LDFLAGS)
+$(TARGET4) : $(OBJ4)
+	$(LD) $(CPPFLAGS) -o $(TARGET4) $(OBJ4) $(LDFLAGS)
 	@echo $@
 	@echo $<
 	@echo $^
@@ -59,5 +59,6 @@ $(TARGET3) : $(OBJ3)
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
+
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) *~

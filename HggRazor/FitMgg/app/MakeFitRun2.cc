@@ -27,18 +27,6 @@ int main( int argc, char* argv[])
       std::cerr << "[INFO]: using a single root file, provide an second input file using --inputFile2=<path_to_file>" << std::endl;
     }
   
-  std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
-  if (  inputFileSignal == "" )
-    {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
-    }
-
-  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
-  if (  inputFileSMH == "" )
-    {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
-    }
-  
   std::string treeName = ParseCommandLine( argc, argv, "-treeName=" );
   if (  treeName == "" )
     {
@@ -162,6 +150,67 @@ int main( int argc, char* argv[])
   
   if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << _signalFraction << std::endl;
   
+
+  //------------------------
+  //combine datacard related
+  //------------------------
+  std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
+  if (  inputFileSignal == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+    }
+
+  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
+  if (  inputFileSMH == "" && fitMode == "datacard")
+    {
+      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
+    }
+  
+  std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
+  float _SMH_Yield = 1.e-2;
+  if (  SMH_Yield == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input SMH_Yield, --SMH_Yield=<Yield>" << std::endl;
+    }
+  else
+    {
+      _SMH_Yield = atof( SMH_Yield.c_str() );
+    }
+
+  std::string SMH_YieldUn = ParseCommandLine( argc, argv, "-SMH_YieldUn=" );
+  float _SMH_YieldUn = 1.e-2;
+  if (  SMH_YieldUn == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input SMH_YieldUn, --SMH_Yield=<Yield_Uncertainty>" << std::endl;
+    }
+   else
+     {
+       _SMH_YieldUn = atof( SMH_YieldUn.c_str() );
+     }
+  
+  std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
+  float _Signal_Yield = 1.;
+  if (  Signal_Yield == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide an input Signal_Yield, --Signal_Yield=<Yield>" << std::endl;
+    }
+  else
+    {
+      _Signal_Yield = atof( Signal_Yield.c_str() );
+    }
+
+  std::string binNumber = ParseCommandLine( argc, argv, "-binNumber=" );
+  TString _binNumber = "-666";
+  if (  binNumber == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide a binNumber, --binNumber=<binNumber>" << std::endl;
+    }
+  else
+    {
+      _binNumber = binNumber;
+    }
+  
+
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
 
@@ -386,7 +435,7 @@ int main( int argc, char* argv[])
   else if ( fitMode == "datacard" )
     {
       RooWorkspace* w_sb;
-      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName );
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, _SMH_YieldUn, _Signal_Yield, binNumber );
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
