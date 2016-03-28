@@ -20,6 +20,8 @@ if __name__ == "__main__":
         os.system("mkdir -p "+work_directory+"AIC_output/highres")
         os.system("rm -rf "+work_directory+"AIC_output/lowres")
         os.system("mkdir -p "+work_directory+"AIC_output/lowres")
+        os.system("rm -rf "+work_directory+"AIC_output/hzbb")
+        os.system("mkdir -p "+work_directory+"AIC_output/hzbb")
         os.system("rm -rf "+pwd+"/submit")
         os.system("mkdir -p "+pwd+"/submit")
 	
