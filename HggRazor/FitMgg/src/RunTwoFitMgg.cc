@@ -247,14 +247,14 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   else
     {
       tagSignal = MakeFullDoubleGauss( "dGauss_signal", mgg, *ws );
-      ws->var("dGauss_signal_DGF_Ns")->setVal( (double)npoints );
+      ws->var("dGauss_signal_DG_Ns")->setVal( (double)npoints );
     }
   RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
-  double gausFrac   =  ws->var("dGauss_signal_DGF_frac")->getVal();
-  double gausMu1    =  ws->var("dGauss_signal_DGF_mu1")->getVal();
-  double gausMu2    =  ws->var("dGauss_signal_DGF_mu2")->getVal();
-  double gausSigma1 =  ws->var("dGauss_signal_DGF_sigma1")->getVal();
-  double gausSigma2 =  ws->var("dGauss_signal_DGF_sigma2")->getVal();
+  double gausFrac   =  ws->var("dGauss_signal_DG_frac")->getVal();
+  double gausMu1    =  ws->var("dGauss_signal_DG_mu1")->getVal();
+  double gausMu2    =  ws->var("dGauss_signal_DG_mu2")->getVal();
+  double gausSigma1 =  ws->var("dGauss_signal_DG_sigma1")->getVal();
+  double gausSigma2 =  ws->var("dGauss_signal_DG_sigma2")->getVal();
 
   //-------------------------------------
   //D e f i n e   S M - H i g g s   P D F
@@ -268,72 +268,77 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   else
     {
       tagSMH = MakeFullDoubleGauss( "dGauss_SMH", mgg, *ws );
-      ws->var("dGauss_SMH_DGF_Ns")->setVal( (double)npoints );
+      ws->var("dGauss_SMH_DG_Ns")->setVal( (double)npoints );
     }
   RooFitResult* smhres = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
-  double gausFrac_SMH   =  ws->var("dGauss_SMH_DGF_frac")->getVal();
-  double gausMu1_SMH    =  ws->var("dGauss_SMH_DGF_mu1")->getVal();
-  double gausMu2_SMH    =  ws->var("dGauss_SMH_DGF_mu2")->getVal();
-  double gausSigma1_SMH =  ws->var("dGauss_SMH_DGF_sigma1")->getVal();
-  double gausSigma2_SMH =  ws->var("dGauss_SMH_DGF_sigma2")->getVal();
-  
-
-
+  double gausFrac_SMH   =  ws->var("dGauss_SMH_DG_frac")->getVal();
+  double gausMu1_SMH    =  ws->var("dGauss_SMH_DG_mu1")->getVal();
+  double gausMu2_SMH    =  ws->var("dGauss_SMH_DG_mu2")->getVal();
+  double gausSigma1_SMH =  ws->var("dGauss_SMH_DG_sigma1")->getVal();
+  double gausSigma2_SMH =  ws->var("dGauss_SMH_DG_sigma2")->getVal();
   
   //------------------------------------
   // C r e a t e   b k g  s h a p e
   //------------------------------------
-  //TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_bkg", mgg, *ws );
-  //TString tag_bkg = MakeDoubleExpN1N2( "fullsb_fit_doubleExp", mgg, *ws );
-  //TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
-  TString tag_bkg2 = MakeSingleExp( "fullsb_fit_singleExp2", mgg, *ws );
-    
-  std::cout << "reading model from file" << std::endl;
-  //Define arbitrarily a double gaussian
+  
+  TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  npoints     = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
+  float exp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
+  //creating blinded dataset
+  RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, 10*npoints);
+  data_toys->SetName("data_toys");
+  
+  //---------------------------
+  //bkg_pdf for composite model
+  //---------------------------
+  TString tag_bkg2 = MakeSingleExp( "BkgModel_singleExp", mgg, *ws );
+  ws->var("BkgModel_singleExp_Nbkg")->setVal( npoints );
+  ws->var("BkgModel_singleExp_a")->setVal( exp_a );
+  //-----------------------------------------
+  //Define double gaussian for signal and SMH
+  //-----------------------------------------
   TString tag_signal2 = MakeFullDoubleGauss( "DG_Signal", mgg, *ws );
-  TString tag_SMH2 = MakeFullDoubleGauss( "DG_SMH", mgg, *ws );
+  TString tag_SMH2    = MakeFullDoubleGauss( "DG_SMH", mgg, *ws );
 
   std::cout << "creating s+b model" << std::endl;
   //---------------
   //S+B  m  o d e l
   //---------------
   //falling background + SM-Higgs + Signal
-  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgList( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
-  //RooAddPdf* model2 = new RooAddPdf( "model2", "model2", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
-  //Fixing gaussian parameter for 2nd model
-  npoints = data.numEntries();
-  //set Nbkg Initial Value
-  ws->var("fullsb_fit_singleExp2_Nbkg")->setVal( npoints );
+  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgList( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  
   //SIGNAL
   //set intitial values for signal parameters
-  ws->var("DG_Signal_DGF_Ns")->setVal( 2.0 );
-  ws->var("DG_Signal_DGF_Ns")->setMin( "", 0.0 );
-  ws->var("DG_Signal_DGF_frac")->setVal( gausFrac );
-  ws->var("DG_Signal_DGF_mu1")->setVal( gausMu1 );
-  ws->var("DG_Signal_DGF_mu2")->setVal( gausMu2 );
-  ws->var("DG_Signal_DGF_sigma1")->setVal( gausSigma1 );
-  ws->var("DG_Signal_DGF_sigma2")->setVal( gausSigma2 );
+  ws->var("DG_Signal_DG_Ns")->setVal( 15 );
+  //ws->var("DG_Signal_DG_Ns")->setRange( 1e-10, 1.0e3 );
+  ws->var("DG_Signal_DG_frac")->setVal( gausFrac );
+  ws->var("DG_Signal_DG_mu1")->setVal( gausMu1 );
+  ws->var("DG_Signal_DG_mu2")->setVal( gausMu2 );
+  ws->var("DG_Signal_DG_sigma1")->setVal( gausSigma1 );
+  ws->var("DG_Signal_DG_sigma2")->setVal( gausSigma2 );
   //fix signal shape parameters
-  ws->var("DG_Signal_DGF_frac")->setConstant(kTRUE);
-  ws->var("DG_Signal_DGF_mu1")->setConstant(kTRUE);
-  ws->var("DG_Signal_DGF_mu2")->setConstant(kTRUE);
-  ws->var("DG_Signal_DGF_sigma1")->setConstant(kTRUE);
-  ws->var("DG_Signal_DGF_sigma2")->setConstant(kTRUE);
+  ws->var("DG_Signal_DG_frac")->setConstant(kTRUE);
+  ws->var("DG_Signal_DG_mu1")->setConstant(kTRUE);
+  ws->var("DG_Signal_DG_mu2")->setConstant(kTRUE);
+  ws->var("DG_Signal_DG_sigma1")->setConstant(kTRUE);
+  ws->var("DG_Signal_DG_sigma2")->setConstant(kTRUE);
   //SM-Higgs
   //set intitial value for SM-Higgs parameters
-  ws->var("DG_SMH_DGF_Ns")->setVal( 0.5 );
-  ws->var("DG_SMH_DGF_Ns")->setMin( "", 0.0 );
-  ws->var("DG_SMH_DGF_frac")->setVal( gausFrac_SMH );
-  ws->var("DG_SMH_DGF_mu1")->setVal( gausMu1_SMH );
-  ws->var("DG_SMH_DGF_mu2")->setVal( gausMu2_SMH );
-  ws->var("DG_SMH_DGF_sigma1")->setVal( gausSigma1_SMH );
-  ws->var("DG_SMH_DGF_sigma2")->setVal( gausSigma2_SMH );
+  ws->var("DG_SMH_DG_Ns")->setVal( 0.5 );
+  ws->var("DG_SMH_DG_Ns")->setMin( "", 0.0 );
+  ws->var("DG_SMH_DG_frac")->setVal( gausFrac_SMH );
+  ws->var("DG_SMH_DG_mu1")->setVal( gausMu1_SMH );
+  ws->var("DG_SMH_DG_mu2")->setVal( gausMu2_SMH );
+  ws->var("DG_SMH_DG_sigma1")->setVal( gausSigma1_SMH );
+  ws->var("DG_SMH_DG_sigma2")->setVal( gausSigma2_SMH );
   //fix SM-Higgs shape parameters
-  ws->var("DG_SMH_DGF_frac")->setConstant(kTRUE);
-  ws->var("DG_SMH_DGF_mu1")->setConstant(kTRUE);
-  ws->var("DG_SMH_DGF_mu2")->setConstant(kTRUE);
-  ws->var("DG_SMH_DGF_sigma1")->setConstant(kTRUE);
-  ws->var("DG_SMH_DGF_sigma2")->setConstant(kTRUE);
+  ws->var("DG_SMH_DG_frac")->setConstant(kTRUE);
+  ws->var("DG_SMH_DG_mu1")->setConstant(kTRUE);
+  ws->var("DG_SMH_DG_mu2")->setConstant(kTRUE);
+  ws->var("DG_SMH_DG_sigma1")->setConstant(kTRUE);
+  ws->var("DG_SMH_DG_sigma2")->setConstant(kTRUE);
 
   std::cout << "entering constraints" << std::endl;
   //--------------------------------------
@@ -342,37 +347,22 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   RooRealVar HiggsYield("HiggsYield","",0.5);
   RooRealVar HiggsYieldUn("HiggsYieldUn","",0.1);
   //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
-  RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), HiggsYield, HiggsYieldUn );
+  RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DG_Ns"), HiggsYield, HiggsYieldUn );
   std::cout << "pass constraints" << std::endl;
   std::cout << "pass forceSigma" << std::endl;
 
   //---------------------
   //F i t   t o   D a t a
   //---------------------
-  //model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("low,high") );
-  //RooFitResult* bres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE) );
+  //RooFitResult* sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(SMH_Constraint) ,RooFit::Range("low,high") );
+  //RooFitResult* sbres = model->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  RooFitResult* sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
   
-  //model2->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
-  //RooFitResult* bres2 = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  sbres->SetName("sb_fit_result");
+  ws->import( *sbres );
  
-
-  //-------------------------------------
-  //P r o f i l e d   L i k e l i h o o d 
-  //-------------------------------------
-  /*
-    profile in Ns to obtain significance.
-  */
-  RooArgSet poi   = RooArgSet( *ws->var("DG_Signal_DGF_Ns") );
-  RooAbsReal* nll = model->createNLL(data);
-  RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
-  RooAbsReal* p2ll = n2ll.createProfile( poi );
     
   
-  /*
-  model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
-  RooFitResult* bres = model->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsMassConstraint)) );
-  */
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
@@ -418,17 +408,30 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->import( *bres2 );
   ws->import( *fmgg2 );*/
 
+  //-------------------------------------
+  //P r o f i l e d   L i k e l i h o o d 
+  //-------------------------------------
+  /*
+    profile in Ns to obtain significance.
+  */
+  RooArgSet poi   = RooArgSet( *ws->var("DG_Signal_DG_Ns") );
+  //RooAbsReal* nll = model->createNLL( *data_toys );
+  RooAbsReal* nll = model->createNLL( data );
+  RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
+  RooAbsReal* p2ll = n2ll.createProfile( poi );
   //--------------------------------------
   // l i k e l i h o o d   p l o t t i n g
   //--------------------------------------
-  /*RooPlot* fns = ws->var("DG_Signal_DGF_Ns")->frame( RooFit::Range(0, 100, true) );
+  RooPlot* fns = ws->var("DG_Signal_DG_Ns")->frame( RooFit::Range(0, 10*ws->var("DG_Signal_DG_Ns")->getError(), true) );
   fns->SetMinimum(0);
   fns->SetMaximum(6);
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
-  p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
+  fns->SetMinimum(0);
+  fns->SetMaximum(6);
+  //p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
   fns->SetName("nll_trick");
   ws->import( *fns );
-  */
+  
   ws->Write("w_sb");
   ftmp->Close();
   return ws;
@@ -519,6 +522,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //--------------------------------------
   RooRealVar HiggsYield("HiggsYield","", SMH_Yield);
   RooRealVar HiggsYieldUn("HiggsYieldUn","",SMH_YieldUn);
+  float SMH_NormUn = SMH_YieldUn/SMH_Yield;
   //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
   RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var(tagSMH+"_Ns"), HiggsYield, HiggsYieldUn );
   std::cout << "pass constraints" << std::endl;
@@ -530,8 +534,11 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   float sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
   float Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
-  //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints, true );
-  RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, RooFit::ExpectedData() );
+  float NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
+  float BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+  
+  RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
+  //RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, RooFit::ExpectedData() );
   data_toys->SetName("data_bin"+binNumber);
   //--------------------------------
   // m o d e l   1   p l o t t i n g
@@ -602,7 +609,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   TString combineBkg    = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
   combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
-  //Bkg_norm.setConstant(kFALSE);
+  Bkg_norm.setConstant(kFALSE);
   combine_ws->import( Bkg_norm );
   combine_ws->import( *data_toys );
   combine_ws->Write("combineWS");
@@ -628,6 +635,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
   ofs << "----------------------------------------------------------------------------------------\n";
   ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
+  //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
   ofs.close();
   return ws;
 };
