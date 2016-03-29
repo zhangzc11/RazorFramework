@@ -481,7 +481,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //RooArgSet poi   = RooArgSet( *ws->var("DG_Signal_DG_Ns") );
   //RooArgSet poi   = RooArgSet( *ws->var("Signal_SG_Ns") );
   RooArgSet poi   = RooArgSet( NsModel );
-  RooAbsReal* nll = model->createNLL( *data_toys );
+  RooAbsReal* nll = model->createNLL( *data_toys, RooFit::Extended(kTRUE) );
   //RooAbsReal* nll = model->createNLL( data );
   RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
   RooAbsReal* p2ll = n2ll.createProfile( poi );
@@ -500,7 +500,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   n2ll.plotOn( fns, RooFit::ShiftToZero(), RooFit::LineColor(kBlue) );
   fns->SetMinimum(0);
   fns->SetMaximum(12);
-  //p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
+  p2ll->plotOn( fns, RooFit::LineColor(kBlack) );
   fns->SetName("nll");
   ws->import( *fns );
   
