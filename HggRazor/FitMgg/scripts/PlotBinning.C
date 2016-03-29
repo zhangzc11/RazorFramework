@@ -36,7 +36,7 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   TTree* tree = (TTree*)f->Get("HggRazor");
   
   bool _prepareConfigCard = false;
-  TTree* treeSignal;
+  TTree* treeSignal = NULL;
   TFile* f2;
   if ( signalFile != "" && _createCF )
     {
@@ -328,8 +328,11 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   cutTree->SetBranchAddress("t1Rsq", &t1Rsq);
   
   //Signal
-  TTree* cutTreeSignal;
-  float MR_s, t1Rsq_s, weight_s, pileupWeight_s;
+  TTree* cutTreeSignal = NULL;
+  float MR_s           = 0;
+  float t1Rsq_s        = 0;
+  float weight_s       = 0;
+  float pileupWeight_s = 0;
   std::cout << "config signal TTree" << std::endl;
   if ( _prepareConfigCard )
     {
@@ -373,17 +376,17 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
       //else  h2p->Fill( MR, 0.999, 1.0 );
     } 
   
- if ( _prepareConfigCard )
-   {
-     nentries = cutTreeSignal->GetEntries();
-     for ( long i = 0; i < nentries; i++ )
-       {
-	 cutTreeSignal->GetEntry(i);
-	 //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
-	 if ( t1Rsq < 1.0 ) h2pSignal->Fill( MR_s, t1Rsq_s, weight_s*lumi );//sm-higgs
-	 else  h2pSignal->Fill( MR_s, 0.999, weight_s*lumi );//sm-higgs
-       } 
-   }
+  if ( _prepareConfigCard )
+    {
+      nentries = cutTreeSignal->GetEntries();
+      for ( long i = 0; i < nentries; i++ )
+	{
+	  cutTreeSignal->GetEntry(i);
+	  //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
+	  if ( t1Rsq < 1.0 ) h2pSignal->Fill( MR_s, t1Rsq_s, weight_s*lumi );//sm-higgs
+	  else  h2pSignal->Fill( MR_s, 0.999, weight_s*lumi );//sm-higgs
+	} 
+    }
   
   
   int nbinsT = h2p->GetNumberOfBins();
