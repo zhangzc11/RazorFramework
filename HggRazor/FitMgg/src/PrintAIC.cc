@@ -37,7 +37,12 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	if( num_par.find("poly3") == num_par.end() ) num_par.insert( std::pair<std::string, int>("poly3",4));
 	if( num_par.find("poly4") == num_par.end() ) num_par.insert( std::pair<std::string, int>("poly4",5));
 	if( num_par.find("modExp") == num_par.end() ) num_par.insert( std::pair<std::string, int>("modExp",2));
-
+    //sort the AIC map
+    std::map< double, std::string > sort_func_name;
+        for (auto tmp :delta_aic_map)
+	{
+		sort_func_name.insert(std::pair<double, std::string>(delta_aic_map[tmp.first],tmp.first));
+	}
     //print the table to a file
     	std::string str_table = "AIC_output/FitChoices_Table_"+category+".tex";
         const char * file_Name_table = str_table.c_str();
@@ -73,7 +78,73 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile2,"\\end{center} \n");
 	fprintf(m_outfile2,"\\end{figure} \n \n \n");
-	
+     //print the sorted AIC weight to a file
+	std::string str_table_2 = "AIC_output/FitChoices_Table_"+category+"_sortByWeight.tex";
+        const char * file_Name_table_2 = str_table_2.c_str();
+	FILE* m_outfile_2 = fopen(file_Name_table_2, "a");
+	fprintf(m_outfile_2,"\\begin{table}[H] \n");
+	fprintf(m_outfile_2,"\\begin{center} \n");
+	fprintf(m_outfile_2,"\\begin{tabular}{|c|c|cc|cc|cc|} \n");
+	fprintf(m_outfile_2,"\\hline function & \\#P & $\\Delta A_1$ & $\\omega_1$ & $\\Delta A_2$ & $\\omega_2$ & $\\Delta A_3$ & $\\omega_3$ \\\\ \\hline \n");
+	for ( auto tmp :sort_func_name) 
+      {
+		  fprintf(m_outfile_2,"%s & %2d & %6.2f & %6.2f & %6.2f & %6.2f & %6.2f & %6.2f \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second], delta_aic_map_2[tmp.second], aic_weight_map_2[tmp.second], delta_aic_map_3[tmp.second], aic_weight_map_3[tmp.second]);
+	 }
+	fprintf(m_outfile_2,"\\hline \n");
+	fprintf(m_outfile_2,"\\end{tabular} \n");
+	fprintf(m_outfile_2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_2,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_2,"\\end{center} \n");
+	fprintf(m_outfile_2,"\\end{table} \n \n \n");
+      //print the final AIC to a file
+	std::string str_table_3 = "AIC_output/FitChoices_Table_"+category+"_FinalAIC.tex";
+        const char * file_Name_table_3 = str_table_3.c_str();
+	FILE* m_outfile_3 = fopen(file_Name_table_3, "a");
+	fprintf(m_outfile_3,"\\begin{table}[H] \n");
+	fprintf(m_outfile_3,"\\begin{center} \n");
+	fprintf(m_outfile_3,"\\begin{tabular}{|c|c|cc|} \n");
+	fprintf(m_outfile_3,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$  \\\\ \\hline \n");
+	for ( auto tmp :sort_func_name) 
+      {
+		  fprintf(m_outfile_3,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
+	 }
+	fprintf(m_outfile_3,"\\hline \n");
+	fprintf(m_outfile_3,"\\end{tabular} \n");
+	fprintf(m_outfile_3,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_3,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_3,"\\end{center} \n");
+	fprintf(m_outfile_3,"\\end{table} \n \n \n");
+      //print the AIC that pass the test to a file
+	std::string str_table_4 = "AIC_output/FitChoices_Table_"+category+"_PassAIC.tex";
+        const char * file_Name_table_4 = str_table_4.c_str();
+	FILE* m_outfile_4 = fopen(file_Name_table_4, "a");
+	fprintf(m_outfile_4,"\\begin{table}[H] \n");
+	fprintf(m_outfile_4,"\\begin{center} \n");
+	fprintf(m_outfile_4,"\\begin{tabular}{|c|c|cc|} \n");
+	fprintf(m_outfile_4,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$  \\\\ \\hline \n");
+         double max_AIC_weight = 1.0;
+         bool isMaxAIC = true;
+	for ( auto tmp :sort_func_name) 
+      {
+	if(isMaxAIC)
+	{
+		max_AIC_weight = aic_weight_map[tmp.second];
+		isMaxAIC = false;
+	}
+	if(aic_weight_map[tmp.second] > 0.1*max_AIC_weight)
+	{
+		  fprintf(m_outfile_4,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
+	}	
+ 	}
+	fprintf(m_outfile_4,"\\hline \n");
+	fprintf(m_outfile_4,"\\end{tabular} \n");
+	fprintf(m_outfile_4,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_4,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_4,"\\end{center} \n");
+	fprintf(m_outfile_4,"\\end{table} \n \n \n");
+
+
+
 	
 	//plot the fit
 	double delta_aic_2[8]={delta_aic[0],delta_aic[6],delta_aic[1],delta_aic[7],delta_aic[3],delta_aic[4],delta_aic[5],delta_aic[2]};
@@ -124,7 +195,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	leg[idx]->SetTextColor(kRed);
 	}
 
-	leg[0]->AddEntry(p1,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
+//	leg[0]->AddEntry(p1,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
 	
 	leg[0]->Draw();
 		
@@ -149,7 +220,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	grshade[1]->SetFillStyle(3344);//1001
         grshade[1]->SetFillColor(kRed-9);
         grshade[1]->Draw("f same");
-	leg[1]->AddEntry(p2,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
+//	leg[1]->AddEntry(p2,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
 	leg[1]->Draw();
 	myC->cd(3);
 	RooPlot * p3 = (RooPlot*)w[3]->obj("sideband_fit_doublePow_dpow_ext_frame");
@@ -173,7 +244,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[2]->SetFillColor(kRed-9);
         grshade[2]->Draw("f same");
 	
-	leg[2]->AddEntry(p3,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
+//	leg[2]->AddEntry(p3,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
 	leg[2]->Draw();
 	myC->cd(4);
 	RooPlot * p4 = (RooPlot*)w[2]->obj("sideband_fit_singlePow_spow_ext_frame");
@@ -197,7 +268,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[3]->SetFillColor(kRed-9);
         grshade[3]->Draw("f same");
 	
-	leg[3]->AddEntry(p4,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
+//	leg[3]->AddEntry(p4,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(1)),"");
 	leg[3]->Draw();
 	myC->cd(5);
 	RooPlot * p5 = (RooPlot*)w[4]->obj("sideband_fit_poly2_pol2_ext_frame");
@@ -221,7 +292,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[4]->SetFillColor(kRed-9);
         grshade[4]->Draw("f same");
 	
-	leg[4]->AddEntry(p5,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
+//	leg[4]->AddEntry(p5,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(3)),"");
 	leg[4]->Draw();
 	myC->cd(6);
 	RooPlot * p6 = (RooPlot*)w[5]->obj("sideband_fit_poly3_pol3_ext_frame");
@@ -245,7 +316,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[5]->SetFillColor(kRed-9);
         grshade[5]->Draw("f same");
 	
-	leg[5]->AddEntry(p6,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(4)),"");
+//	leg[5]->AddEntry(p6,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(4)),"");
 	leg[5]->Draw();
 	myC->cd(7);
 	RooPlot * p7 = (RooPlot*)w[7]->obj("sideband_fit_poly4_pol4_ext_frame");
@@ -269,7 +340,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[6]->SetFillColor(kRed-9);
         grshade[6]->Draw("f same");
 	
-	leg[6]->AddEntry(p7,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(5)),"");
+//	leg[6]->AddEntry(p7,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(5)),"");
 	leg[6]->Draw();
 	myC->cd(8);
 	RooPlot * p8 = (RooPlot*)w[6]->obj("sideband_fit_modExp_mexp_ext_frame");
@@ -293,7 +364,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
         grshade[7]->SetFillColor(kRed-9);
         grshade[7]->Draw("f same");
 	
-	leg[7]->AddEntry(p8,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(2)),"");
+//	leg[7]->AddEntry(p8,Form("#chi^{2}/ndf = %5.2f", p1->chiSquare(2)),"");
 	leg[7]->Draw();
 	
 /*	myC->cd(8);
