@@ -34,6 +34,16 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   TFile* f = new TFile( fname, "READ");
   assert( f );
   TTree* tree = (TTree*)f->Get("HggRazor");
+  TH1F* NEvents = (TH1F*)f->Get("NEvents");
+  TH1F* SumScaleWeights = (TH1F*)f->Get("SumScaleWeights");
+
+  float N_events          = NEvents->GetBinContent(1);
+  float N_facScaleUp      = SumScaleWeights->GetBinContent(1);
+  float N_facScaleDown    = SumScaleWeights->GetBinContent(2);
+  float N_renScaleUp      = SumScaleWeights->GetBinContent(3);
+  float N_renScaleDown    = SumScaleWeights->GetBinContent(4);
+  float N_facRenScaleUp   = SumScaleWeights->GetBinContent(5);
+  float N_facRenScaleDown = SumScaleWeights->GetBinContent(6);
   
   bool _prepareConfigCard = false;
   TTree* treeSignal = NULL;
@@ -315,17 +325,21 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   fout->cd();
   cut = cut + categoryCutString;
   TTree* cutTree = tree->CopyTree( cut );
-  float MR, t1Rsq, weight, pileupWeight;
+  float MR, t1Rsq, weight, pileupWeight, sf_facScaleUp, sf_facScaleDown;
   cutTree->SetBranchStatus("*", 0);
   cutTree->SetBranchStatus("weight", 1);
   cutTree->SetBranchStatus("pileupWeight", 1);
   cutTree->SetBranchStatus("MR", 1);
   cutTree->SetBranchStatus("t1Rsq", 1);
+  cutTree->SetBranchStatus("sf_facScaleUp", 1);
+  cutTree->SetBranchStatus("sf_facScaleDown", 1);
   //addresses
   cutTree->SetBranchAddress("weight", &weight);
   cutTree->SetBranchAddress("pileupWeight", &pileupWeight);
   cutTree->SetBranchAddress("MR", &MR);
   cutTree->SetBranchAddress("t1Rsq", &t1Rsq);
+  cutTree->SetBranchAddress("sf_facScaleUp", &sf_facScaleUp);
+  cutTree->SetBranchAddress("sf_facScaleDown", &sf_facScaleDown);
   
   //Signal
   TTree* cutTreeSignal = NULL;
@@ -352,7 +366,9 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
     }
   
   std::cout << "clonning TH2Poly" << std::endl;
-  TH2Poly* h2pSignal = (TH2Poly*)h2p->Clone("h2pSignal"); 
+  TH2Poly* h2pSignal = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_facScaleUp = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_facScaleDown = (TH2Poly*)h2p->Clone("h2pSignal");
   h2p->Sumw2();
   h2pSignal->Sumw2();
   
@@ -367,8 +383,18 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
       //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );//nonRes
       //else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );//nonRes
       
-      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
-      else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
+      if ( t1Rsq < 1.0 )
+	{
+	  h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
+	  h2p_facScaleUp->Fill( MR, t1Rsq, weight*sf_facScaleUp*pileupWeight*lumi*N_events/N_facScaleUp );
+	  h2p_facScaleDown->Fill( MR, t1Rsq, weight*sf_facScaleDown*pileupWeight*lumi*N_events/N_facScaleDown );
+	}
+      else
+	{
+	  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
+	  h2p_facScaleUp->Fill( MR, 0.999, weight*sf_facScaleUp*pileupWeight*lumi*N_events/N_facScaleUp );
+	  h2p_facScaleDown->Fill( MR, 0.999, weight*sf_facScaleDown*pileupWeight*lumi*N_events/N_facScaleDown );
+	}
       
       //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*lumi );//no pileup
       //else  h2p->Fill( MR, 0.999, weight*lumi );//no pileup
@@ -421,5 +447,10 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   h2p->SetStats(0);
   //h2p->Draw("colz L");
   h2p->Draw("colz text");
+  fout->cd();
+  h2p->Write("smh_nominal");
+  h2p_facScaleUp->Write("smh_facScaleUp");
+  h2p_facScaleDown->Write("smh_facScaleDown");
+  fout->Close();
   return;
 };
