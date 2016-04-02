@@ -1821,6 +1821,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	  ws->pdf( tag2 )->fitTo( *data_toys, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("low,high") );
 	}
 
+      delete data_toys;
+      delete signal_toys;
       //------------------------------------
       //G e n e r a t i n g   B K G  t o y s
       //------------------------------------
@@ -1917,8 +1919,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       std::cout << "before filling tree" << std::endl;
       //std::cout << "iteration:" << i << std::endl;
       outTree->Fill();
-      delete data_toys;
-      delete signal_toys;
+      //delete data_toys;
+      //delete signal_toys;
       delete nll;
     }
 
