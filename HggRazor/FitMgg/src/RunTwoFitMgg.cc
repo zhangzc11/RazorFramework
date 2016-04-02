@@ -1951,9 +1951,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //ws->import( *bres_toys );
   ws->import( *f_bias );
   ws->import( *f_Nse );
-  ws->import( Ns );
-  ws->import( Nbkg );
-
+  
   outName = outName + "_Tree.root";
   TFile* _fout = new TFile( outName, "recreate");
   outTree->Write();
