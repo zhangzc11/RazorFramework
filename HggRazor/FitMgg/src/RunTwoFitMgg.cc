@@ -1831,7 +1831,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       signal_toys = GenerateToys( signalPdf, mgg, stoysP );
       //appending signal toys to data_toys (bkg toys)
       data_toys->append( *signal_toys );
-
+      data_toys->SetName("dataToysSignalAndBkg");
       //-------------------------------------------------------------
       //S+B FIT (Ns is the only parameter floated for the signal pdf)
       //-------------------------------------------------------------
@@ -1917,6 +1917,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       std::cout << "before filling tree" << std::endl;
       //std::cout << "iteration:" << i << std::endl;
       outTree->Fill();
+      delete data_toys;
+      delete signal_toys;
       delete nll;
     }
 
