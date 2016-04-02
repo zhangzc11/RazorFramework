@@ -120,6 +120,32 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
+TString MakeDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  RooRealVar* mu     = new RooRealVar( tag+"_DGS_mu", "#mu", 125, "" );
+  RooRealVar* sigma1 = new RooRealVar( tag+"_DGS_sigma1", "#sigma_{1}", 1.0, "" );
+  RooRealVar* sigma2 = new RooRealVar( tag+"_DGS_sigma2", "#sigma_{2}", 3.0, "" );
+  mu->setConstant(kFALSE);
+  sigma1->setConstant(kFALSE);
+  sigma2->setConstant(kFALSE);
+  
+  RooRealVar* frac   = new RooRealVar( tag+"_DGS_frac", "frac", 0.5, .0, 1.0 );
+  
+  //------------------
+  //C r e a t e  p.d.f
+  //------------------
+  RooGaussian* gauss1    = new RooGaussian( tag+"_DGS_G1", "", mgg, *mu, *sigma1 );
+  RooGaussian* gauss2    = new RooGaussian( tag+"_DGS_G2", "", mgg, *mu, *sigma2 );
+  TString pdf_name       = tag+"_DGS";
+  RooAddPdf* doublegauss = new RooAddPdf( pdf_name, "", RooArgList( *gauss1, *gauss2 ), *frac );
+  w.import( *doublegauss );
+  
+  return pdf_name;
+};
+
 TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
  //------------------------------

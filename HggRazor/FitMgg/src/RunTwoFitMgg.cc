@@ -510,7 +510,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
-RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, float SMH_YieldUn, float Signal_Yield, TString binNumber )
+RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield,
+			    TString SMH_facScale, TString SMH_renScale, TString SMH_facRenScale, float Signal_Yield, TString binNumber )
 {
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
@@ -594,10 +595,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //H i g g s   C o n s t r a i n s
   //--------------------------------------
   RooRealVar HiggsYield("HiggsYield","", SMH_Yield);
-  RooRealVar HiggsYieldUn("HiggsYieldUn","",SMH_YieldUn);
-  float SMH_NormUn = SMH_YieldUn/SMH_Yield;
+  //RooRealVar HiggsYieldUn("HiggsYieldUn","",SMH_YieldUn);
+  //float SMH_NormUn = SMH_YieldUn/SMH_Yield;
   //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var("DG_SMH_DGF_Ns"), RooFit::RooConst(0.1), RooFit::RooConst(0.01) );
-  RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var(tagSMH+"_Ns"), HiggsYield, HiggsYieldUn );
+  //RooGaussian SMH_Constraint("SMH_Constraint", "SMH_Constraint", *ws->var(tagSMH+"_Ns"), HiggsYield, HiggsYieldUn );
   std::cout << "pass constraints" << std::endl;
   std::cout << "pass forceSigma" << std::endl;
 
@@ -610,9 +611,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   float NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
   float BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
   
-  RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
-  //RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, RooFit::ExpectedData() );
-  //data_toys->SetName("data_bin"+binNumber);
+  //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
+  RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
+  data_toys->SetName("data_bin"+binNumber);
   data.SetName("data_bin"+binNumber);
   //--------------------------------
   // m o d e l   1   p l o t t i n g
@@ -685,8 +686,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
   Bkg_norm.setConstant(kFALSE);
   combine_ws->import( Bkg_norm );
-  //combine_ws->import( *data_toys );
-  combine_ws->import( data );
+  combine_ws->import( *data_toys );
+  //combine_ws->import( data );
     
   combine_ws->Write("combineWS");
   ftmp->cd();
@@ -711,6 +712,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
   ofs << "----------------------------------------------------------------------------------------\n";
   ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
+  ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << SMH_facScale << "\t\t-\n";
+  ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
+  ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
   //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
   ofs.close();
   return ws;
@@ -1351,6 +1355,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
   //Getting signal shape
+  std::cout << "[INFO]: getting signal model" << std::endl;
   TFile* fsignal = new TFile("data/SM_MC_GluGluH_Fit.root", "read");
   RooWorkspace* wsignal = (RooWorkspace*)fsignal->Get("w_sFit");
   //Getting signal pdf and parementer except Ns
@@ -1404,11 +1409,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //Generate signal toys to check the signal shape in the output file
   //-----------------------------------------------------------------
   RooDataSet* signal_toys = GenerateToys( signalPdf, mgg, 1e4 );
-  signal_toys->SetName("signal_toys");
+  signal_toys->SetName("signal_toys_new");
   RooPlot* s_mgg = mgg.frame();
-  s_mgg->SetName("signal_toys_plot");
+  s_mgg->SetName("signal_toys");
   signal_toys->plotOn( s_mgg );
-  ws->import( *signal_toys );
   ws->import( *signal_toys );
   ws->import( *s_mgg );
 
@@ -1468,7 +1472,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
     }
   else if ( f2 == "singleExp" )
     {
-      tag2  = MakeSingleExp( f2 + "_2", mgg, *ws );
+      tag2  = MakeSingleExpNE( f2 + "_2", mgg, *ws );
       tag2p = MakeSingleExp( f2 + "_prime", mgg, *ws );
     }
   else if ( f2 == "modExp" )
@@ -1550,15 +1554,23 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //npoints = 10*npoints;
   //npoints = 350;//only use this to set the number of toys bkg;
 
-  
+  std::cout << "npoints: " << npoints << std::endl;
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
-  TString gaussTag  = MakeDoubleGauss("doubleGauseSB", mgg, *ws );
-  RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(tag2), *ws->pdf(gaussTag) ) );
+  //  TString gaussTag  = MakeDoubleGauss("doubleGauseSB", mgg, *ws );
+  TString gaussTag = MakeDoubleGaussNE("signal", mgg, *ws );
+  RooRealVar Ns( "sbModel_Ns", "N_{s}", 0, "" );
+  Ns.setConstant(kFALSE);
+  //Ns.setRange(-1,1e4);
+  RooRealVar Nbkg( "sbModel_Nbkg", "N_{bkg}", 0, "" );
+  Nbkg.setVal(npoints);
+  Nbkg.setConstant(kFALSE);
+  
+  RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(tag2), *ws->pdf(gaussTag) ), RooArgList( Nbkg, Ns ) );
   ws->import( *sbModel );
   
-  RooDataSet* data_toys;
+  RooDataSet*   data_toys;
   RooFitResult* bres_toys;
   double n; 
 
@@ -1582,7 +1594,6 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
     {
       //ws->var( f2 + "_prime_Nbkg1" )->setVal(npoints);
       //ws->var( f2 + "_prime_Nbkg2" )->setVal(.0);
-      std::cout << "Setting Npoints" << std::endl;
       ws->var( f2 + "_prime_Nbkg" )->setVal(npoints);
     }
   else if ( f2 == "singleExp" )
@@ -1658,8 +1669,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
     }
   else if ( f2 == "singleExp" )
     {
-      sE_N  = ws->var( f2 + "_prime_Nbkg" )->getVal();
-      sE_a  = ws->var( f2 + "_prime_a" )->getVal();
+      //sE_N  = ws->var( f2 + "_prime_Nbkg" )->getVal();
+      //sE_a  = ws->var( f2 + "_prime_a" )->getVal();
+      sE_N  = ws->var( f1 + "_1_Nbkg" )->getVal();
+      sE_a  = ws->var( f1 + "_1_a" )->getVal();
     }
   else if ( f2 == "modExp" )
     {
@@ -1721,24 +1734,25 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //-----------------------------------------------------------
       int stoys = int(frac*f1Int*npoints);
       double npointsP = r->PoissonD( npoints );
+      Nbkg.setVal(npointsP);
       double stoysP   = r2->PoissonD( stoys );
       std::cout << "[INFO]: it-> " << i << " ======> stoys: " << stoysP << " Nbkg: " << npointsP << " nBkG SR: " << f1Int*npoints << std::endl;
       //-------------------------
       //Set Signal pdf paramaters
       //-------------------------
-      ws->var("doubleGauseSB_gauss_Ns")->setVal( stoys );//Note initial paramenter is the true number of signal events
-      ws->var("doubleGauseSB_frac")->setVal( gausFrac );
-      ws->var("doubleGauseSB_gauss_mu")->setVal( gausMu );
-      ws->var("doubleGauseSB_gauss_sigma1")->setVal( gausSigma1 );
-      ws->var("doubleGauseSB_gauss_sigma2")->setVal( gausSigma2 );
+      Ns.setVal( stoysP );//Note initial paramenter is the true number of signal events
+      ws->var(gaussTag + "_frac")->setVal( gausFrac );
+      ws->var(gaussTag + "_mu")->setVal( gausMu );
+      ws->var(gaussTag + "_sigma1")->setVal( gausSigma1 );
+      ws->var(gaussTag + "_sigma2")->setVal( gausSigma2 );
       
       //-------------------------------------------
       //Fixing Signal pdf paramaters, float only Ns
       //-------------------------------------------
-      ws->var("doubleGauseSB_frac")->setConstant(kTRUE);
-      ws->var("doubleGauseSB_gauss_mu")->setConstant(kTRUE);
-      ws->var("doubleGauseSB_gauss_sigma1")->setConstant(kTRUE);
-      ws->var("doubleGauseSB_gauss_sigma2")->setConstant(kTRUE);
+      ws->var(gaussTag + "_frac")->setConstant(kTRUE);
+      ws->var(gaussTag + "_mu")->setConstant(kTRUE);
+      ws->var(gaussTag + "_sigma1")->setConstant(kTRUE);
+      ws->var(gaussTag + "_sigma2")->setConstant(kTRUE);
 
       //--------------------------------
       //Update f2 (test pdf) paramenters
@@ -1758,8 +1772,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 	}
       else if ( f2 == "singleExp" )
 	{
-	  ws->var( f2 + "_2_Nbkg" )->setVal( sE_N );
-	  ws->var( f2 + "_2_a" )->setVal( sE_a );
+	  ws->var( tag2 + "_a" )->setVal( sE_a );
 	}
       else if ( f2 == "modExp" )
 	{
@@ -1839,16 +1852,17 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //Defininf RooMinimizer Object;
       RooMinimizer m(*nll);
       m.setStrategy(2);
-      m.setPrintLevel(-1);
-      m.minimize("Minuit2", "Migrad");
+      m.setPrintLevel(2);
+      m.setMinimizerType("Minuit2");
+      //m.minimize("Minuit2", "Migrad");
       
-      //m.migrad(); 
+      m.migrad(); 
       RooFitResult* r = m.save(); 
       _status    = r->status();
       _covStatus = r->covQual();
 
-      //m.hesse();
-      m.minimize("Minuit2", "Hesse");
+      m.hesse();
+      //m.minimize("Minuit2", "Hesse");
       RooFitResult* r2 = m.save(); 
       _status2    = r2->status();
       _covStatus2 = r2->covQual();
@@ -1872,22 +1886,22 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //---------------------------
       //_alpha_hat = ws->var( f2 + "_2_a" )->getVal();
       //_alpha_sigma = ws->var( f2 + "_2_a" )->getError();
-      _Nbkg = npointsP;
-      _Nbkg_hat = ws->var( f2 + "_2_Nbkg" )->getVal();
-      _Nbkg_sigma = ws->var( f2 + "_2_Nbkg" )->getError();
-      _Ns = stoysP;
-      _Ns_hat = ws->var("doubleGauseSB_gauss_Ns")->getVal();
-      _Ns_sigma = ws->var("doubleGauseSB_gauss_Ns")->getError();
+      std::cout << "[INFO]: Getting parameters after fit" << std::endl;
+      _Nbkg       = npointsP;
+      _Nbkg_hat   = Nbkg.getVal();
+      _Nbkg_sigma = Nbkg.getError();
+      _Ns         = stoysP;
+      _Ns_hat     = Ns.getVal();
+      _Ns_sigma   = Ns.getError();
       
       //-----------------------
       //G e t t i n g   b i a s
       //-----------------------
-      double Nsignal  = ws->var("doubleGauseSB_gauss_Ns")->getVal();
-      double Ns_Error = ws->var("doubleGauseSB_gauss_Ns")->getError()/Nsignal;
-      //bias =  (Nsignal - double(stoys))/(double)stoys;
-      bias =  (Nsignal - double(stoys))/ws->var("doubleGauseSB_gauss_Ns")->getError();
-      _bias = Nsignal - double(stoys);
-      _statUn = ws->var("doubleGauseSB_gauss_Ns")->getError();//tree variable
+      double Nsignal  = _Ns_hat;
+      double Ns_Error = _Ns_sigma/Nsignal;
+      bias =  (_Ns - _Ns_hat)/_Ns_sigma;
+      _bias = _Ns - _Ns_hat;
+      _statUn = _Ns_sigma;//tree variable
       _biasNorm = bias.getVal();//tree variable
       
       std::cout << "DEBUG DEBUG" << std::endl;
@@ -1935,6 +1949,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //ws->import( *bres_toys );
   ws->import( *f_bias );
   ws->import( *f_Nse );
+  ws->import( Ns );
+  ws->import( Nbkg );
 
   outName = outName + "_Tree.root";
   TFile* _fout = new TFile( outName, "recreate");
@@ -1943,8 +1959,8 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   _fout->Close();
   std::cout << "[INFO]: Bias Tree File Closed " << std::endl;
   return ws;
-  //return;
 };
+
 RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
 {
   return pdf->generate( x, ntoys);

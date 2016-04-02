@@ -177,16 +177,26 @@ int main( int argc, char* argv[])
       _SMH_Yield = atof( SMH_Yield.c_str() );
     }
 
-  std::string SMH_YieldUn = ParseCommandLine( argc, argv, "-SMH_YieldUn=" );
-  float _SMH_YieldUn = 1.e-2;
-  if (  SMH_YieldUn == "" && fitMode == "datacard" )
+  std::string SMH_facScale = ParseCommandLine( argc, argv, "-SMH_facScale=" );
+  if (  SMH_facScale == "" && fitMode == "datacard" )
     {
-      std::cerr << "[WARNING]: please provide an input SMH_YieldUn, --SMH_Yield=<Yield_Uncertainty>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input SMH_facScale, --SMH_facScale=<facScale>" << std::endl;
+      return -1;
     }
-   else
-     {
-       _SMH_YieldUn = atof( SMH_YieldUn.c_str() );
-     }
+
+  std::string SMH_renScale = ParseCommandLine( argc, argv, "-SMH_renScale=" );
+  if (  SMH_renScale == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[ERROR]: please provide an input SMH_renScale, --SMH_renScale=<renScale>" << std::endl;
+      return -1;
+    }
+  
+  std::string SMH_facRenScale = ParseCommandLine( argc, argv, "-SMH_facRenScale=" );
+  if (  SMH_facRenScale == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[ERROR]: please provide an input SMH_facRenScale, --SMH_facRenScale=<facRenScale>" << std::endl;
+      return -1;
+    }
   
   std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
   float _Signal_Yield = 1.;
@@ -440,7 +450,7 @@ int main( int argc, char* argv[])
   else if ( fitMode == "datacard" )
     {
       RooWorkspace* w_sb;
-      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, _SMH_YieldUn, _Signal_Yield, binNumber );
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_facScale, SMH_renScale, SMH_facRenScale, _Signal_Yield, binNumber );
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
