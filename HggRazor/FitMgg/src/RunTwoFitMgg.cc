@@ -1943,7 +1943,6 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   f_Nse->SetName("NsignalError_plot");
   data_Nse.plotOn( f_Nse );
   
-  ws->import( mgg );
   ws->import( bias );
   ws->import( data_bias );
   ws->import( data_Nse );
