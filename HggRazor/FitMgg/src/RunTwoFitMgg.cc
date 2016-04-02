@@ -1566,7 +1566,6 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooRealVar Nbkg( "sbModel_Nbkg", "N_{bkg}", 0, "" );
   Nbkg.setVal(npoints);
   Nbkg.setConstant(kFALSE);
-  
   RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(tag2), *ws->pdf(gaussTag) ), RooArgList( Nbkg, Ns ) );
   ws->import( *sbModel );
   
@@ -1635,6 +1634,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //----------------------------------------
   //Generate dataset 
   data_toys = GenerateToys( ws->pdf( tag1 ), mgg, npoints );
+  data_toys->setName("dataToysBkgOnly")
   RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   bres2p->SetName("fit_result_f2prime");
