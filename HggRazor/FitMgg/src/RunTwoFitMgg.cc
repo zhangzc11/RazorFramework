@@ -1637,7 +1637,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   data_toys->SetName("dataToysBkgOnly");
   RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( *data_toys, RooFit::Save(kTRUE), RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres2p = ws->pdf( tag2p )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  bres2p->SetName("fit_result_f2prime");
+  bres2p->SetName("fit_result_f2_prime");
   ws->import( *bres2p );
   
   RooPlot* pFrame = mgg.frame();
@@ -1669,10 +1669,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
     }
   else if ( f2 == "singleExp" )
     {
-      //sE_N  = ws->var( f2 + "_prime_Nbkg" )->getVal();
-      //sE_a  = ws->var( f2 + "_prime_a" )->getVal();
-      sE_N  = ws->var( f1 + "_1_Nbkg" )->getVal();
-      sE_a  = ws->var( f1 + "_1_a" )->getVal();
+      sE_N  = ws->var( f2 + "_prime_Nbkg" )->getVal();
+      sE_a  = ws->var( f2 + "_prime_a" )->getVal();
+      //sE_N  = ws->var( f1 + "_1_Nbkg" )->getVal();
+      //sE_a  = ws->var( f1 + "_1_a" )->getVal();
     }
   else if ( f2 == "modExp" )
     {
@@ -1854,17 +1854,17 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       //Defininf RooMinimizer Object;
       RooMinimizer m(*nll);
       m.setStrategy(2);
-      m.setPrintLevel(2);
+      m.setPrintLevel(-1);
       m.setMinimizerType("Minuit2");
-      //m.minimize("Minuit2", "Migrad");
       
-      m.migrad(); 
+      m.minimize("Minuit2", "Migrad");
+      //m.migrad(); 
       RooFitResult* r = m.save(); 
       _status    = r->status();
       _covStatus = r->covQual();
 
-      m.hesse();
-      //m.minimize("Minuit2", "Hesse");
+      //m.hesse();
+      m.minimize("Minuit2", "Hesse");
       RooFitResult* r2 = m.save(); 
       _status2    = r2->status();
       _covStatus2 = r2->covQual();
