@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Jun 26 15:10:43 2015 by ROOT version 6.03/03
-// from TTree LowRes/LowRes
-// found on file: DataPhoton_MT2_HT_MggRes_SplitTreeGoodLumi.root
+// Tue Apr  5 08:54:09 2016 by ROOT version 6.04/06
+// from TTree HggTree/Info on selected razor inclusive events
+// found on file: ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root
 //////////////////////////////////////////////////////////
 
 #ifndef HggTree_h
@@ -13,6 +13,7 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
+#include <vector>
 
 class HggTree {
 public :
@@ -24,10 +25,41 @@ public :
    // Declaration of leaf types
    Float_t         weight;
    Float_t         pileupWeight;
-   UInt_t          lumi;
+   Float_t         pileupWeightUp;
+   Float_t         pileupWeightDown;
+   Float_t         ISRSystWeightUp;
+   Float_t         ISRSystWeightDown;
+   Float_t         btagCorrFactor;
+   Float_t         sf_btagUp;
+   Float_t         sf_btagDown;
+   Float_t         sf_bmistagUp;
+   Float_t         sf_bmistagDown;
+   Float_t         sf_facScaleUp;
+   Float_t         sf_facScaleDown;
+   Float_t         sf_renScaleUp;
+   Float_t         sf_renScaleDown;
+   Float_t         sf_facRenScaleUp;
+   Float_t         sf_facRenScaleDown;
+   std::vector<float>   *pdfWeights;
+   Bool_t          Flag_HBHENoiseFilter;
+   Bool_t          Flag_HBHEIsoNoiseFilter;
+   Bool_t          Flag_CSCTightHaloFilter;
+   Bool_t          Flag_hcalLaserEventFilter;
+   Bool_t          Flag_EcalDeadCellTriggerPrimitiveFilter;
+   Bool_t          Flag_goodVertices;
+   Bool_t          Flag_trackingFailureFilter;
+   Bool_t          Flag_eeBadScFilter;
+   Bool_t          Flag_ecalLaserCorrFilter;
+   Bool_t          Flag_trkPOGFilters;
+   Bool_t          Flag_trkPOG_manystripclus53X;
+   Bool_t          Flag_trkPOG_toomanystripclus53X;
+   Bool_t          Flag_trkPOG_logErrorTooManyClusters;
+   Bool_t          Flag_METFilters;
    UInt_t          run;
+   UInt_t          lumi;
    UInt_t          event;
-   Bool_t          trigger;
+   Bool_t          passedDiphotonTrigger;
+   UInt_t          NPU;
    Int_t           nLooseBTaggedJets;
    Int_t           nMediumBTaggedJets;
    Int_t           nLooseMuons;
@@ -35,31 +67,36 @@ public :
    Int_t           nLooseElectrons;
    Int_t           nTightElectrons;
    Int_t           nTightTaus;
-   Float_t         HT;
    Float_t         MR;
-   Float_t         MR_pho;
+   Float_t         MR_JESUp;
+   Float_t         MR_JESDown;
    Float_t         Rsq;
+   Float_t         Rsq_JESUp;
+   Float_t         Rsq_JESDown;
    Float_t         t1Rsq;
-   Float_t         t1Rsq_pho;
+   Float_t         t1Rsq_JESUp;
+   Float_t         t1Rsq_JESDown;
    Float_t         MET;
-   Float_t         phiMET;
+   Float_t         MET_JESUp;
+   Float_t         MET_JESDown;
    Float_t         t1MET;
-   Float_t         phit1MET;
-   Float_t         MT2;
+   Float_t         t1MET_JESUp;
+   Float_t         t1MET_JESDown;
    Int_t           nSelectedPhotons;
    Float_t         mGammaGamma;
-   Float_t         sigmaMoverM;
    Float_t         pTGammaGamma;
-   Float_t         etaGammaGamma;
-   Float_t         phiGammaGamma;
-   Float_t         mGammaGammaCorr;
-   Float_t         pTGammaGammaCorr;
+   Float_t         mGammaGammaSC;
+   Float_t         pTGammaGammaSC;
+   Float_t         sigmaMoverM;
+   Int_t           box;
    Float_t         pho1E;
    Float_t         pho1Pt;
-   Float_t         pho1ECorr;
-   Float_t         pho1PtCorr;
    Float_t         pho1Eta;
    Float_t         pho1Phi;
+   Float_t         pho1SC_E;
+   Float_t         pho1SC_Pt;
+   Float_t         pho1SC_Eta;
+   Float_t         pho1SC_Phi;
    Float_t         pho1SigmaIetaIeta;
    Float_t         pho1R9;
    Float_t         pho1HoverE;
@@ -69,13 +106,15 @@ public :
    Float_t         pho1sigmaEOverE;
    Bool_t          pho1passEleVeto;
    Bool_t          pho1passIso;
-   Int_t           pho1MotherID;   
+   Int_t           pho1MotherID;
    Float_t         pho2E;
    Float_t         pho2Pt;
-   Float_t         pho2ECorr;
-   Float_t         pho2PtCorr;
    Float_t         pho2Eta;
    Float_t         pho2Phi;
+   Float_t         pho2SC_E;
+   Float_t         pho2SC_Pt;
+   Float_t         pho2SC_Eta;
+   Float_t         pho2SC_Phi;
    Float_t         pho2SigmaIetaIeta;
    Float_t         pho2R9;
    Float_t         pho2HoverE;
@@ -88,42 +127,64 @@ public :
    Int_t           pho2MotherID;
    Float_t         mbbZ;
    Float_t         mbbH;
+   Float_t         mbbZ_L;
+   Float_t         mbbH_L;
    Int_t           n_Jets;
-   Float_t         jet_E[8];   //[n_Jets]
-   Float_t         jet_Pt[8];   //[n_Jets]
-   Float_t         jet_Eta[8];   //[n_Jets]
-   Float_t         jet_Phi[8];   //[n_Jets]
-   Float_t         jet_CSV[8];   //[n_Jets]
-   Int_t           jet_HighestCSVindex[8];   //[n_Jets]
-   Float_t         mHJ[8];   //[n_Jets]
-   Int_t           nMT;
-   Float_t         MT[9];   //[nMT]
-   Float_t         Mhb;
-   Float_t         mHem1;
-   Float_t         ptHem1;
-   Float_t         etaHem1;
-   Float_t         phiHem1;
-   Int_t           n_JetsHem1;
-   Int_t           jetIndexHem1[5];   //[n_JetsHem1]
-   Float_t         mHem2;
-   Float_t         ptHem2;
-   Float_t         etaHem2;
-   Float_t         phiHem2;
-   Int_t           n_JetsHem2;
-   Int_t           jetIndexHem2[6];   //[n_JetsHem2]
-   Float_t         evtMass;
-   Float_t         evtMT;
-   Float_t         evtMTEnergy;
-   Float_t         evtDphi;
-   Float_t         xsecSF;
-  
+   Float_t         jet_E[99];   //[n_Jets]
+   Float_t         jet_Pt[99];   //[n_Jets]
+   Float_t         jet_Eta[99];   //[n_Jets]
+   Float_t         jet_Phi[99];   //[n_Jets]
+   Int_t           n_Jets_JESUp;
+   Int_t           n_Jets_JESDown;
+   Bool_t          HLTDecision[300];
+   Int_t           nGenParticle;
+   Int_t           gParticleMotherId[200];   //[nGenParticle]
+   Int_t           gParticleMotherIndex[200];   //[nGenParticle]
+   Int_t           gParticleId[200];   //[nGenParticle]
+   Int_t           gParticleStatus[200];   //[nGenParticle]
+   Float_t         gParticleE[200];   //[nGenParticle]
+   Float_t         gParticlePt[200];   //[nGenParticle]
+   Float_t         gParticlePhi[200];   //[nGenParticle]
+   Float_t         gParticleEta[200];   //[nGenParticle]
+
    // List of branches
    TBranch        *b_weight;   //!
    TBranch        *b_pileupWeight;   //!
-   TBranch        *b_lumi;   //!
+   TBranch        *b_pileupWeightUp;   //!
+   TBranch        *b_pileupWeightDown;   //!
+   TBranch        *b_ISRSystWeightUp;   //!
+   TBranch        *b_ISRSystWeightDown;   //!
+   TBranch        *b_btagCorrFactor;   //!
+   TBranch        *b_sf_btagUp;   //!
+   TBranch        *b_sf_btagDown;   //!
+   TBranch        *b_sf_bmistagUp;   //!
+   TBranch        *b_sf_bmistagDown;   //!
+   TBranch        *b_sf_facScaleUp;   //!
+   TBranch        *b_sf_facScaleDown;   //!
+   TBranch        *b_sf_renScaleUp;   //!
+   TBranch        *b_sf_renScaleDown;   //!
+   TBranch        *b_sf_facRenScaleUp;   //!
+   TBranch        *b_sf_facRenScaleDown;   //!
+   TBranch        *b_pdfWeights;   //!
+   TBranch        *b_Flag_HBHENoiseFilter;   //!
+   TBranch        *b_Flag_HBHEIsoNoiseFilter;   //!
+   TBranch        *b_Flag_CSCTightHaloFilter;   //!
+   TBranch        *b_Flag_hcalLaserEventFilter;   //!
+   TBranch        *b_Flag_EcalDeadCellTriggerPrimitiveFilter;   //!
+   TBranch        *b_Flag_goodVertices;   //!
+   TBranch        *b_Flag_trackingFailureFilter;   //!
+   TBranch        *b_Flag_eeBadScFilter;   //!
+   TBranch        *b_Flag_ecalLaserCorrFilter;   //!
+   TBranch        *b_Flag_trkPOGFilters;   //!
+   TBranch        *b_Flag_trkPOG_manystripclus53X;   //!
+   TBranch        *b_Flag_trkPOG_toomanystripclus53X;   //!
+   TBranch        *b_Flag_trkPOG_logErrorTooManyClusters;   //!
+   TBranch        *b_Flag_METFilters;   //!
    TBranch        *b_run;   //!
+   TBranch        *b_lumi;   //!
    TBranch        *b_event;   //!
-   TBranch        *b_trigger;   //!
+   TBranch        *b_passedDiphotonTrigger;   //!
+   TBranch        *b_npu;   //!
    TBranch        *b_nLooseBTaggedJets;   //!
    TBranch        *b_nMediumBTaggedJets;   //!
    TBranch        *b_nLooseMuons;   //!
@@ -131,31 +192,36 @@ public :
    TBranch        *b_nLooseElectrons;   //!
    TBranch        *b_nTightElectrons;   //!
    TBranch        *b_nTightTaus;   //!
-   TBranch        *b_HT;   //!
    TBranch        *b_MR;   //!
-   TBranch        *b_MR_pho;   //!
+   TBranch        *b_MR_JESUp;   //!
+   TBranch        *b_MR_JESDown;   //!
    TBranch        *b_Rsq;   //!
+   TBranch        *b_Rsq_JESUp;   //!
+   TBranch        *b_Rsq_JESDown;   //!
    TBranch        *b_t1Rsq;   //!
-   TBranch        *b_t1Rsq_pho;   //!
+   TBranch        *b_t1Rsq_JESUp;   //!
+   TBranch        *b_t1Rsq_JESDown;   //!
    TBranch        *b_MET;   //!
-   TBranch        *b_phiMET;   //!
+   TBranch        *b_MET_JESUp;   //!
+   TBranch        *b_MET_JESDown;   //!
    TBranch        *b_t1MET;   //!
-   TBranch        *b_phit1MET;   //!
-   TBranch        *b_MT2;   //!
+   TBranch        *b_t1MET_JESUp;   //!
+   TBranch        *b_t1MET_JESDown;   //!
    TBranch        *b_nSelectedPhotons;   //!
    TBranch        *b_mGammaGamma;   //!
-   TBranch        *b_sigmaMoverM;   //!
    TBranch        *b_pTGammaGamma;   //!
-   TBranch        *b_etaGammaGamma;   //!
-   TBranch        *b_phiGammaGamma;   //!
-   TBranch        *b_mGammaGammaCorr;   //!
-   TBranch        *b_pTGammaGammaCorr;   //!
+   TBranch        *b_mGammaGammaSC;   //!
+   TBranch        *b_pTGammaGammaSC;   //!
+   TBranch        *b_sigmaMoverM;   //!
+   TBranch        *b_box;   //!
    TBranch        *b_pho1E;   //!
    TBranch        *b_pho1Pt;   //!
-   TBranch        *b_pho1ECorr;   //!
-   TBranch        *b_pho1PtCorr;   //!
    TBranch        *b_pho1Eta;   //!
    TBranch        *b_pho1Phi;   //!
+   TBranch        *b_pho1SC_E;   //!
+   TBranch        *b_pho1SC_Pt;   //!
+   TBranch        *b_pho1SC_Eta;   //!
+   TBranch        *b_pho1SC_Phi;   //!
    TBranch        *b_pho1SigmaIetaIeta;   //!
    TBranch        *b_pho1R9;   //!
    TBranch        *b_pho1HoverE;   //!
@@ -165,13 +231,15 @@ public :
    TBranch        *b_pho1sigmaEOverE;   //!
    TBranch        *b_pho1passEleVeto;   //!
    TBranch        *b_pho1passIso;   //!
-  TBranch        *b_pho1MotherID;
+   TBranch        *b_pho1MotherID;   //!
    TBranch        *b_pho2E;   //!
    TBranch        *b_pho2Pt;   //!
-   TBranch        *b_pho2ECorr;   //!
-   TBranch        *b_pho2PtCorr;   //!
    TBranch        *b_pho2Eta;   //!
    TBranch        *b_pho2Phi;   //!
+   TBranch        *b_pho2SC_E;   //!
+   TBranch        *b_pho2SC_Pt;   //!
+   TBranch        *b_pho2SC_Eta;   //!
+   TBranch        *b_pho2SC_Phi;   //!
    TBranch        *b_pho2SigmaIetaIeta;   //!
    TBranch        *b_pho2R9;   //!
    TBranch        *b_pho2HoverE;   //!
@@ -181,38 +249,29 @@ public :
    TBranch        *b_pho2sigmaEOverE;   //!
    TBranch        *b_pho2passEleVeto;   //!
    TBranch        *b_pho2passIso;   //!
-   TBranch        *b_pho2MotherID;
+   TBranch        *b_pho2MotherID;   //!
    TBranch        *b_mbbZ;   //!
    TBranch        *b_mbbH;   //!
+   TBranch        *b_mbbZ_L;   //!
+   TBranch        *b_mbbH_L;   //!
    TBranch        *b_n_Jets;   //!
    TBranch        *b_jet_E;   //!
    TBranch        *b_jet_Pt;   //!
    TBranch        *b_jet_Eta;   //!
    TBranch        *b_jet_Phi;   //!
-   TBranch        *b_jet_CSV;   //!
-   TBranch        *b_jet_HighestCSVindex;   //!
-   TBranch        *b_mHJ;   //!
-   TBranch        *b_nMT;   //!
-   TBranch        *b_MT;   //!
-   TBranch        *b_Mhb;   //!
-   TBranch        *b_mHem1;   //!
-   TBranch        *b_ptHem1;   //!
-   TBranch        *b_etaHem1;   //!
-   TBranch        *b_phiHem1;   //!
-   TBranch        *b_n_JetsHem1;   //!
-   TBranch        *b_jetIndexHem1;   //!
-   TBranch        *b_mHem2;   //!
-   TBranch        *b_ptHem2;   //!
-   TBranch        *b_etaHem2;   //!
-   TBranch        *b_phiHem2;   //!
-   TBranch        *b_n_JetsHem2;   //!
-   TBranch        *b_jetIndexHem2;   //!
-   TBranch        *b_evtMass;   //!
-   TBranch        *b_evtMT;   //!
-   TBranch        *b_evtMTEnergy;   //!
-   TBranch        *b_evtDphi;   //!
-   TBranch        *b_xsecSF;//!
-  
+   TBranch        *b_n_Jets_JESUp;   //!
+   TBranch        *b_n_Jets_JESDown;   //!
+   TBranch        *b_HLTDecision;   //!
+   TBranch        *b_nGenParticle;   //!
+   TBranch        *b_gParticleMotherId;   //!
+   TBranch        *b_gParticleMotherIndex;   //!
+   TBranch        *b_gParticleId;   //!
+   TBranch        *b_gParticleStatus;   //!
+   TBranch        *b_gParticleE;   //!
+   TBranch        *b_gParticlePt;   //!
+   TBranch        *b_gParticlePhi;   //!
+   TBranch        *b_gParticleEta;   //!
+
    HggTree(TTree *tree=0);
    virtual ~HggTree();
    virtual Int_t    Cut(Long64_t entry);
@@ -232,11 +291,11 @@ HggTree::HggTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("DataPhoton_MT2_HT_MggRes_SplitTreeGoodLumi.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("DataPhoton_MT2_HT_MggRes_SplitTreeGoodLumi.root");
+         f = new TFile("ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root");
       }
-      f->GetObject("LowRes",tree);
+      f->GetObject("HggTree",tree);
 
    }
    Init(tree);
@@ -277,6 +336,8 @@ void HggTree::Init(TTree *tree)
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
 
+   // Set object pointer
+   pdfWeights = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -285,10 +346,41 @@ void HggTree::Init(TTree *tree)
 
    fChain->SetBranchAddress("weight", &weight, &b_weight);
    fChain->SetBranchAddress("pileupWeight", &pileupWeight, &b_pileupWeight);
-   fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+   fChain->SetBranchAddress("pileupWeightUp", &pileupWeightUp, &b_pileupWeightUp);
+   fChain->SetBranchAddress("pileupWeightDown", &pileupWeightDown, &b_pileupWeightDown);
+   fChain->SetBranchAddress("ISRSystWeightUp", &ISRSystWeightUp, &b_ISRSystWeightUp);
+   fChain->SetBranchAddress("ISRSystWeightDown", &ISRSystWeightDown, &b_ISRSystWeightDown);
+   fChain->SetBranchAddress("btagCorrFactor", &btagCorrFactor, &b_btagCorrFactor);
+   fChain->SetBranchAddress("sf_btagUp", &sf_btagUp, &b_sf_btagUp);
+   fChain->SetBranchAddress("sf_btagDown", &sf_btagDown, &b_sf_btagDown);
+   fChain->SetBranchAddress("sf_bmistagUp", &sf_bmistagUp, &b_sf_bmistagUp);
+   fChain->SetBranchAddress("sf_bmistagDown", &sf_bmistagDown, &b_sf_bmistagDown);
+   fChain->SetBranchAddress("sf_facScaleUp", &sf_facScaleUp, &b_sf_facScaleUp);
+   fChain->SetBranchAddress("sf_facScaleDown", &sf_facScaleDown, &b_sf_facScaleDown);
+   fChain->SetBranchAddress("sf_renScaleUp", &sf_renScaleUp, &b_sf_renScaleUp);
+   fChain->SetBranchAddress("sf_renScaleDown", &sf_renScaleDown, &b_sf_renScaleDown);
+   fChain->SetBranchAddress("sf_facRenScaleUp", &sf_facRenScaleUp, &b_sf_facRenScaleUp);
+   fChain->SetBranchAddress("sf_facRenScaleDown", &sf_facRenScaleDown, &b_sf_facRenScaleDown);
+   fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
+   fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
+   fChain->SetBranchAddress("Flag_HBHEIsoNoiseFilter", &Flag_HBHEIsoNoiseFilter, &b_Flag_HBHEIsoNoiseFilter);
+   fChain->SetBranchAddress("Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);
+   fChain->SetBranchAddress("Flag_hcalLaserEventFilter", &Flag_hcalLaserEventFilter, &b_Flag_hcalLaserEventFilter);
+   fChain->SetBranchAddress("Flag_EcalDeadCellTriggerPrimitiveFilter", &Flag_EcalDeadCellTriggerPrimitiveFilter, &b_Flag_EcalDeadCellTriggerPrimitiveFilter);
+   fChain->SetBranchAddress("Flag_goodVertices", &Flag_goodVertices, &b_Flag_goodVertices);
+   fChain->SetBranchAddress("Flag_trackingFailureFilter", &Flag_trackingFailureFilter, &b_Flag_trackingFailureFilter);
+   fChain->SetBranchAddress("Flag_eeBadScFilter", &Flag_eeBadScFilter, &b_Flag_eeBadScFilter);
+   fChain->SetBranchAddress("Flag_ecalLaserCorrFilter", &Flag_ecalLaserCorrFilter, &b_Flag_ecalLaserCorrFilter);
+   fChain->SetBranchAddress("Flag_trkPOGFilters", &Flag_trkPOGFilters, &b_Flag_trkPOGFilters);
+   fChain->SetBranchAddress("Flag_trkPOG_manystripclus53X", &Flag_trkPOG_manystripclus53X, &b_Flag_trkPOG_manystripclus53X);
+   fChain->SetBranchAddress("Flag_trkPOG_toomanystripclus53X", &Flag_trkPOG_toomanystripclus53X, &b_Flag_trkPOG_toomanystripclus53X);
+   fChain->SetBranchAddress("Flag_trkPOG_logErrorTooManyClusters", &Flag_trkPOG_logErrorTooManyClusters, &b_Flag_trkPOG_logErrorTooManyClusters);
+   fChain->SetBranchAddress("Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
    fChain->SetBranchAddress("run", &run, &b_run);
+   fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("event", &event, &b_event);
-   fChain->SetBranchAddress("trigger", &trigger, &b_trigger);
+   fChain->SetBranchAddress("passedDiphotonTrigger", &passedDiphotonTrigger, &b_passedDiphotonTrigger);
+   fChain->SetBranchAddress("NPU", &NPU, &b_npu);
    fChain->SetBranchAddress("nLooseBTaggedJets", &nLooseBTaggedJets, &b_nLooseBTaggedJets);
    fChain->SetBranchAddress("nMediumBTaggedJets", &nMediumBTaggedJets, &b_nMediumBTaggedJets);
    fChain->SetBranchAddress("nLooseMuons", &nLooseMuons, &b_nLooseMuons);
@@ -296,31 +388,36 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("nLooseElectrons", &nLooseElectrons, &b_nLooseElectrons);
    fChain->SetBranchAddress("nTightElectrons", &nTightElectrons, &b_nTightElectrons);
    fChain->SetBranchAddress("nTightTaus", &nTightTaus, &b_nTightTaus);
-   fChain->SetBranchAddress("HT", &HT, &b_HT);
    fChain->SetBranchAddress("MR", &MR, &b_MR);
-   fChain->SetBranchAddress("MR_pho", &MR_pho, &b_MR_pho);
+   fChain->SetBranchAddress("MR_JESUp", &MR_JESUp, &b_MR_JESUp);
+   fChain->SetBranchAddress("MR_JESDown", &MR_JESDown, &b_MR_JESDown);
    fChain->SetBranchAddress("Rsq", &Rsq, &b_Rsq);
+   fChain->SetBranchAddress("Rsq_JESUp", &Rsq_JESUp, &b_Rsq_JESUp);
+   fChain->SetBranchAddress("Rsq_JESDown", &Rsq_JESDown, &b_Rsq_JESDown);
    fChain->SetBranchAddress("t1Rsq", &t1Rsq, &b_t1Rsq);
-   fChain->SetBranchAddress("t1Rsq_pho", &t1Rsq_pho, &b_t1Rsq_pho);
+   fChain->SetBranchAddress("t1Rsq_JESUp", &t1Rsq_JESUp, &b_t1Rsq_JESUp);
+   fChain->SetBranchAddress("t1Rsq_JESDown", &t1Rsq_JESDown, &b_t1Rsq_JESDown);
    fChain->SetBranchAddress("MET", &MET, &b_MET);
-   fChain->SetBranchAddress("phiMET", &phiMET, &b_phiMET);
+   fChain->SetBranchAddress("MET_JESUp", &MET_JESUp, &b_MET_JESUp);
+   fChain->SetBranchAddress("MET_JESDown", &MET_JESDown, &b_MET_JESDown);
    fChain->SetBranchAddress("t1MET", &t1MET, &b_t1MET);
-   fChain->SetBranchAddress("phit1MET", &phit1MET, &b_phit1MET);
-   fChain->SetBranchAddress("MT2", &MT2, &b_MT2);
+   fChain->SetBranchAddress("t1MET_JESUp", &t1MET_JESUp, &b_t1MET_JESUp);
+   fChain->SetBranchAddress("t1MET_JESDown", &t1MET_JESDown, &b_t1MET_JESDown);
    fChain->SetBranchAddress("nSelectedPhotons", &nSelectedPhotons, &b_nSelectedPhotons);
    fChain->SetBranchAddress("mGammaGamma", &mGammaGamma, &b_mGammaGamma);
-   fChain->SetBranchAddress("sigmaMoverM", &sigmaMoverM, &b_sigmaMoverM);
    fChain->SetBranchAddress("pTGammaGamma", &pTGammaGamma, &b_pTGammaGamma);
-   fChain->SetBranchAddress("etaGammaGamma", &etaGammaGamma, &b_etaGammaGamma);
-   fChain->SetBranchAddress("phiGammaGamma", &phiGammaGamma, &b_phiGammaGamma);
-   fChain->SetBranchAddress("mGammaGammaCorr", &mGammaGammaCorr, &b_mGammaGammaCorr);
-   fChain->SetBranchAddress("pTGammaGammaCorr", &pTGammaGammaCorr, &b_pTGammaGammaCorr);
+   fChain->SetBranchAddress("mGammaGammaSC", &mGammaGammaSC, &b_mGammaGammaSC);
+   fChain->SetBranchAddress("pTGammaGammaSC", &pTGammaGammaSC, &b_pTGammaGammaSC);
+   fChain->SetBranchAddress("sigmaMoverM", &sigmaMoverM, &b_sigmaMoverM);
+   fChain->SetBranchAddress("box", &box, &b_box);
    fChain->SetBranchAddress("pho1E", &pho1E, &b_pho1E);
    fChain->SetBranchAddress("pho1Pt", &pho1Pt, &b_pho1Pt);
-   fChain->SetBranchAddress("pho1ECorr", &pho1ECorr, &b_pho1ECorr);
-   fChain->SetBranchAddress("pho1PtCorr", &pho1PtCorr, &b_pho1PtCorr);
    fChain->SetBranchAddress("pho1Eta", &pho1Eta, &b_pho1Eta);
    fChain->SetBranchAddress("pho1Phi", &pho1Phi, &b_pho1Phi);
+   fChain->SetBranchAddress("pho1SC_E", &pho1SC_E, &b_pho1SC_E);
+   fChain->SetBranchAddress("pho1SC_Pt", &pho1SC_Pt, &b_pho1SC_Pt);
+   fChain->SetBranchAddress("pho1SC_Eta", &pho1SC_Eta, &b_pho1SC_Eta);
+   fChain->SetBranchAddress("pho1SC_Phi", &pho1SC_Phi, &b_pho1SC_Phi);
    fChain->SetBranchAddress("pho1SigmaIetaIeta", &pho1SigmaIetaIeta, &b_pho1SigmaIetaIeta);
    fChain->SetBranchAddress("pho1R9", &pho1R9, &b_pho1R9);
    fChain->SetBranchAddress("pho1HoverE", &pho1HoverE, &b_pho1HoverE);
@@ -333,10 +430,12 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho1MotherID", &pho1MotherID, &b_pho1MotherID);
    fChain->SetBranchAddress("pho2E", &pho2E, &b_pho2E);
    fChain->SetBranchAddress("pho2Pt", &pho2Pt, &b_pho2Pt);
-   fChain->SetBranchAddress("pho2ECorr", &pho2ECorr, &b_pho2ECorr);
-   fChain->SetBranchAddress("pho2PtCorr", &pho2PtCorr, &b_pho2PtCorr);
    fChain->SetBranchAddress("pho2Eta", &pho2Eta, &b_pho2Eta);
    fChain->SetBranchAddress("pho2Phi", &pho2Phi, &b_pho2Phi);
+   fChain->SetBranchAddress("pho2SC_E", &pho2SC_E, &b_pho2SC_E);
+   fChain->SetBranchAddress("pho2SC_Pt", &pho2SC_Pt, &b_pho2SC_Pt);
+   fChain->SetBranchAddress("pho2SC_Eta", &pho2SC_Eta, &b_pho2SC_Eta);
+   fChain->SetBranchAddress("pho2SC_Phi", &pho2SC_Phi, &b_pho2SC_Phi);
    fChain->SetBranchAddress("pho2SigmaIetaIeta", &pho2SigmaIetaIeta, &b_pho2SigmaIetaIeta);
    fChain->SetBranchAddress("pho2R9", &pho2R9, &b_pho2R9);
    fChain->SetBranchAddress("pho2HoverE", &pho2HoverE, &b_pho2HoverE);
@@ -349,34 +448,25 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pho2MotherID", &pho2MotherID, &b_pho2MotherID);
    fChain->SetBranchAddress("mbbZ", &mbbZ, &b_mbbZ);
    fChain->SetBranchAddress("mbbH", &mbbH, &b_mbbH);
+   fChain->SetBranchAddress("mbbZ_L", &mbbZ_L, &b_mbbZ_L);
+   fChain->SetBranchAddress("mbbH_L", &mbbH_L, &b_mbbH_L);
    fChain->SetBranchAddress("n_Jets", &n_Jets, &b_n_Jets);
    fChain->SetBranchAddress("jet_E", jet_E, &b_jet_E);
    fChain->SetBranchAddress("jet_Pt", jet_Pt, &b_jet_Pt);
    fChain->SetBranchAddress("jet_Eta", jet_Eta, &b_jet_Eta);
    fChain->SetBranchAddress("jet_Phi", jet_Phi, &b_jet_Phi);
-   fChain->SetBranchAddress("jet_CSV", jet_CSV, &b_jet_CSV);
-   fChain->SetBranchAddress("jet_HighestCSVindex", jet_HighestCSVindex, &b_jet_HighestCSVindex);
-   fChain->SetBranchAddress("mHJ", mHJ, &b_mHJ);
-   fChain->SetBranchAddress("nMT", &nMT, &b_nMT);
-   fChain->SetBranchAddress("MT", MT, &b_MT);
-   fChain->SetBranchAddress("Mhb", &Mhb, &b_Mhb);
-   fChain->SetBranchAddress("mHem1", &mHem1, &b_mHem1);
-   fChain->SetBranchAddress("ptHem1", &ptHem1, &b_ptHem1);
-   fChain->SetBranchAddress("etaHem1", &etaHem1, &b_etaHem1);
-   fChain->SetBranchAddress("phiHem1", &phiHem1, &b_phiHem1);
-   fChain->SetBranchAddress("n_JetsHem1", &n_JetsHem1, &b_n_JetsHem1);
-   fChain->SetBranchAddress("jetIndexHem1", jetIndexHem1, &b_jetIndexHem1);
-   fChain->SetBranchAddress("mHem2", &mHem2, &b_mHem2);
-   fChain->SetBranchAddress("ptHem2", &ptHem2, &b_ptHem2);
-   fChain->SetBranchAddress("etaHem2", &etaHem2, &b_etaHem2);
-   fChain->SetBranchAddress("phiHem2", &phiHem2, &b_phiHem2);
-   fChain->SetBranchAddress("n_JetsHem2", &n_JetsHem2, &b_n_JetsHem2);
-   fChain->SetBranchAddress("jetIndexHem2", jetIndexHem2, &b_jetIndexHem2);
-   fChain->SetBranchAddress("evtMass", &evtMass, &b_evtMass);
-   fChain->SetBranchAddress("evtMT", &evtMT, &b_evtMT);
-   fChain->SetBranchAddress("evtMTEnergy", &evtMTEnergy, &b_evtMTEnergy);
-   fChain->SetBranchAddress("evtDphi", &evtDphi, &b_evtDphi);
-   fChain->SetBranchAddress("xsecSF", &xsecSF, &b_xsecSF);
+   fChain->SetBranchAddress("n_Jets_JESUp", &n_Jets_JESUp, &b_n_Jets_JESUp);
+   fChain->SetBranchAddress("n_Jets_JESDown", &n_Jets_JESDown, &b_n_Jets_JESDown);
+   fChain->SetBranchAddress("HLTDecision", HLTDecision, &b_HLTDecision);
+   fChain->SetBranchAddress("nGenParticle", &nGenParticle, &b_nGenParticle);
+   fChain->SetBranchAddress("gParticleMotherId", gParticleMotherId, &b_gParticleMotherId);
+   fChain->SetBranchAddress("gParticleMotherIndex", gParticleMotherIndex, &b_gParticleMotherIndex);
+   fChain->SetBranchAddress("gParticleId", gParticleId, &b_gParticleId);
+   fChain->SetBranchAddress("gParticleStatus", gParticleStatus, &b_gParticleStatus);
+   fChain->SetBranchAddress("gParticleE", gParticleE, &b_gParticleE);
+   fChain->SetBranchAddress("gParticlePt", gParticlePt, &b_gParticlePt);
+   fChain->SetBranchAddress("gParticlePhi", gParticlePhi, &b_gParticlePhi);
+   fChain->SetBranchAddress("gParticleEta", gParticleEta, &b_gParticleEta);
    Notify();
 }
 

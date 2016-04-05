@@ -17,26 +17,26 @@ const int nMR = 4;
 //highpt
 int highpt_nRsq[nMR] = {7,5,3,2};
 float  highptMRedges[] = {150.0, 312.5, 625, 1250, 10000};
-float  highptRSQedges0[7] = {0,0.027,0.052,0.077,0.102,0.127,5.0};
-float  highptRSQedges1[5] = {0,0.022,0.047,0.072,5.0};
-float  highptRSQedges2[3] = {0,0.021,5.0};
-float  highptRSQedges3[2] = {0,5.0};
+float  highptRSQedges0[7] = {0,0.027,0.052,0.077,0.102,0.127,1.0};
+float  highptRSQedges1[5] = {0,0.022,0.047,0.072,1.0};
+float  highptRSQedges2[3] = {0,0.021,1.0};
+float  highptRSQedges3[2] = {0,1.0};
 
 //highres
 int highres_nRsq[nMR] = {9,5,3,2};
 float  highresMRedges[] = {150,237.5,475,950,10000};
-float  highresRSQedges0[9] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,5.0};
-float  highresRSQedges1[5] = {0,0.035,0.06,0.085,5.0};
-float  highresRSQedges2[3] = {0,0.018,5.0};
-float  highresRSQedges3[2] = {0,5.0};
+float  highresRSQedges0[9] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,1.0};
+float  highresRSQedges1[5] = {0,0.035,0.06,0.085,1.0};
+float  highresRSQedges2[3] = {0,0.018,1.0};
+float  highresRSQedges3[2] = {0,1.0};
 
 //lowres
 int lowres_nRsq[nMR] = {7,6,3,2};
 float  lowresMRedges[] = {150,200,400,800,10000};
-float  lowresRSQedges0[7] = {0,0.049,0.074,0.099,0.124,0.149,5.0};
-float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,5.0};
-float  lowresRSQedges2[3] = {0,0.02,5.0};
-float  lowresRSQedges3[2] = {0,5.0};
+float  lowresRSQedges0[7] = {0,0.049,0.074,0.099,0.124,0.149,1.0};
+float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,1.0};
+float  lowresRSQedges2[3] = {0,0.02,1.0};
+float  lowresRSQedges3[2] = {0,1.0};
 
 //----------------
 //Static Variables
@@ -79,6 +79,10 @@ int main( int argc, char* argv[] )
   std::ifstream ifs( inputList, std::ifstream::in );
   assert(ifs);
 
+  std::vector<std::pair<float,float>> facScaleSys;
+  std::vector<std::pair<float,float>> renScaleSys;
+  std::vector<std::pair<float,float>> facRenScaleSys;
+  
   std::string process, rootFileName;
   while ( ifs.good() )
     {
@@ -90,12 +94,19 @@ int main( int argc, char* argv[] )
       std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
       assert( fin );
       std::cout << "[INFO]: file: " << rootFileName << " passed check\n\n"<< std::endl;
+      
+      //------------------------
+      //Getting TTree and Histos
+      //------------------------
       TTree* tree = (TTree*)fin->Get("HggRazor");
       assert( tree );
-      TH1F* SumScaleWeights = (TH1F*)fin->Get("SumScaleWeights");
+      TH1F* NEvents = (TH1F*)fin->Get("NEvents");
+      assert( NEvents );
+      TH1F* SumScaleWeights   = (TH1F*)fin->Get("SumScaleWeights");
       assert( SumScaleWeights );
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       assert( SumPdfWeights );
+      
       TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
@@ -113,9 +124,14 @@ int main( int argc, char* argv[] )
       hggSys->SetBinningMap( binningMap );
       hggSys->PrintBinning();
       hggSys->InitMrRsqTH2Poly();
+      hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->Loop();
+      facScaleSys.push_back( hggSys->GetFacScaleSystematic( 1000, 0 ) );
+      renScaleSys.push_back( hggSys->GetRenScaleSystematic( 1000, 0 ) );
+      facRenScaleSys.push_back( hggSys->GetFacRenScaleSystematic( 1000, 0 ) );
+      
       hggSys->WriteOutput( "histoMR_Rsq" );
       delete hggSys;
       std::cout << "deleted hggSys" << std::endl;
@@ -123,6 +139,15 @@ int main( int argc, char* argv[] )
       std::cout << "deleted tmp File" << std::endl;
     }
 
+  float facScaleTotal[2] = {0,0};
+  for ( auto tmp : facScaleSys )
+    {
+      std::cout << "Up: " << tmp.first << " , Down: " << tmp.second << std::endl;
+      facScaleTotal[0] += tmp.first;
+      facScaleTotal[1] += tmp.second;
+    } 
+  std::cout << "facScaleUp: " << facScaleTotal[0] << " facScaleDown: " << facScaleTotal[1] << std::endl;
+  
   /*
   //-----------------------------
   //Map container for the binning
@@ -180,7 +205,7 @@ void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap
     {
       std::vector<float> vect;
       vect.push_back( 0.0 );
-      vect.push_back( 5.0 );
+      vect.push_back( 1.0 );
       std::pair<float, float> mypair = std::make_pair( 150., 10000. );
       std::cout << mypair.first << " " << mypair.second << std::endl;
       myMap[mypair] = vect;

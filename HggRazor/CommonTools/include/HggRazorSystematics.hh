@@ -29,9 +29,13 @@ public:
 
   float GetHighPtGB( double mr, double r2 );
   float GetHighResGB( double mr, double r2 );
+  std::pair<float, float> GetFacScaleSystematic( float mr, float rsq );
+  std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );
+  std::pair<float, float> GetFacRenScaleSystematic( float mr, float rsq );
   static float GetHggBF( );
 
   bool SetBinningMap( std::map<std::pair<float, float>, std::vector<float>> myMap ){ this->binningMap = myMap; return true;};
+  bool SetNeventsHisto( TH1F* histo );
   bool SetFacScaleWeightsHisto( TH1F* histo );
   bool SetPdfWeightsHisto( TH1F* histo );
 private:
@@ -59,6 +63,7 @@ private:
   TH2Poly *h2p_facRenScaleDown;
 
   //Systematic Histos(user must set these)
+  TH1F* NEvents;
   TH1F* SumScaleWeights;
   TH1F* SumPdfWeights;
   
