@@ -546,7 +546,8 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "signalFit" )
     {
-      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
+      //RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
+      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 //ROOT INCLUDES
+#include <TSYSTEM.h>
 #include <TTree.h>
 #include <TLatex.h>
 #include <TString.h>
@@ -92,6 +93,39 @@ RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float f
   frame->SetName( tag + "_frame" );
   ws->import( *frame );
 
+  return ws;
+};
+
+RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigmaCB )
+{
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  mgg.setBins(57);
+  mgg.setRange( "signal", 103, 160. );
+
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
+  int npoints = data.numEntries();
+
+  //---------------------------------
+  //C r e a t e  Double Crystall Ball
+  //---------------------------------
+  TString tag = MakeDoubleCB( "Signal", mgg, *ws );
+  ws->var( tag + "_Ns" )->setVal( (double)npoints );
+  
+  RooFitResult* sres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  
+  sres->SetName( tag + "_sres" );
+  ws->import( *sres );
+  
+  gSystem->Load("~/Software/git/RazorFramework/HggRazor/FitMgg/CustomPdfs.so");
+  RooPlot* frame = mgg.frame();
+  data.plotOn( frame );
+  ws->pdf( tag )->plotOn( frame, RooFit::LineColor( kBlue ), RooFit::Range("signal"), RooFit::NormRange("signal") );
+  ws->import( mgg );
+  ws->import( data );
+  frame->SetName( tag + "_frame" );
+  ws->import( *frame );
+  
   return ws;
 };
 

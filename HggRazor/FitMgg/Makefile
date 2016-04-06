@@ -19,7 +19,7 @@ TARGET4 = CreateDataCardCommands
 TARGET5 = testCustomPdf
 
 SRC = app/testapp.cc src/makeInvertedANFit_v2.cc $(Aux)/src/CommandLineInput.cc
-SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc
+SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc src/CustomPdfs.cc
 SRC2 = app/PlotAllBiasTest.cc src/PlotBias.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
 SRC4 = app/CreateDataCardCommands.cc $(Aux)/src/CommandLineInput.cc
 SRC5 = app/testCustomPdf.cc src/CustomPdfs.cc

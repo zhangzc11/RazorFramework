@@ -33,7 +33,7 @@
 #include <RooMinuit.h>
 //LOCAL INCLUDES
 #include "DefinePdfs.hh"
-
+#include "CustomPdfs.hh"
 
 TString MakeSingleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
@@ -229,6 +229,20 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   alpha2->setConstant(kFALSE);
   n1->setConstant(kFALSE);
   n2->setConstant(kFALSE);
+  
+  RooRealVar* Ns     = new RooRealVar( tag + "_DCB_Ns", "N_{s}", 1e5, "events");
+  Ns->setConstant(kFALSE);
+  
+  RooDoubleCB* dCB = new RooDoubleCB( tag + "DCB_pdf", "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+  
+  //------------------------------------
+  //C r e a t e   E x t e n d e d  p.d.f
+  //------------------------------------
+  TString ex_pdf_name          = tag + "_DCB";
+  RooAddPdf* ex_dCB = new RooAddPdf( ex_pdf_name, "extDCB", RooArgList(*dCB), RooArgList(*Ns) );
+  w.import( *ex_dCB );
+  
+  return ex_pdf_name;
 };
 
 TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
