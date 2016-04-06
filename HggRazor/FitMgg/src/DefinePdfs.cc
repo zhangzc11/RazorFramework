@@ -182,6 +182,7 @@ TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   
   return ex_pdf_name;
 };
+
 TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
   //------------------------------
@@ -209,7 +210,28 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   
   return pdf_name;
 };
-TString MakeDoubleExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
+
+TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+   //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  //DCB: Double Crystal Ball
+  RooRealVar* mu     = new RooRealVar( tag + "_DCB_muCB", "#mu_{CB}", 125, "" );
+  RooRealVar* sigma  = new RooRealVar( tag + "_DCB_sigmaCB", "#sigma_{CB}", 2, "" );
+  RooRealVar* alpha1   = new RooRealVar( tag  + "_DCB_alpha1", "#alpha_{1}", 1.0, "" );
+  RooRealVar* alpha2   = new RooRealVar( tag  + "_DCB_alpha2", "#alpha_{2}", 1.0, "" );
+  RooRealVar* n1       = new RooRealVar( tag  + "_DCB_n1", "#n_{1}", 1.0, "" );
+  RooRealVar* n2       = new RooRealVar( tag  + "_DCB_n2", "#n_{2}", 1.0, "" );
+  mu->setConstant(kFALSE);
+  sigma->setConstant(kFALSE);
+  alpha1->setConstant(kFALSE);
+  alpha2->setConstant(kFALSE);
+  n1->setConstant(kFALSE);
+  n2->setConstant(kFALSE);
+};
+
+TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
