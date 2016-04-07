@@ -93,21 +93,21 @@ double GetEffSigma( TH1* hist )
 
 double GetBestFitSignalStrength( int n, double* b, double* s, double* obs )
 {
-  int nsteps = 10000;
-  double mu_steps = 0.0001;
+  int nsteps = 2e3;
+  double mu_steps = 1.0e-2;
   double minNll = 9999999;
   double bestMu = -1;
   for( int i = 0; i < nsteps; i++ )
     {
       double mu = mu_steps*i;
       double nll = 0;
-      //std::cout << "mu: " << mu << std::endl;
       for( int j = 0; j < n; j++ ) nll += -( obs[j]*std::log(mu*s[j]+b[j]) -(mu*s[j]+b[j]) );
+      //std::cout << "mu: " << mu << ", nll: " << nll << std::endl;
       if ( nll < minNll )
 	{
 	  minNll = nll;
 	  bestMu = mu;
-	  //std::cout << "minNll: " << minNll << std::endl;
+	  //std::cout << "mu: " << mu << ", minNll: " << minNll << std::endl;
 	}
     }
   return bestMu;
