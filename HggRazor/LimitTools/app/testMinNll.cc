@@ -13,8 +13,8 @@ int main( int argc, char* argv[] )
 {
   gROOT->Reset();
   const int n = 2;
-  double b_nr[n]  = {10, 5};//non-resonant bkg
-  double b_smh[n] = {1, 1};//smh bkg
+  double b_nr[n]  = {100, 50};//non-resonant bkg
+  double b_smh[n] = {10, 10};//smh bkg
   
   
   double b[n];
@@ -23,8 +23,8 @@ int main( int argc, char* argv[] )
 
   TRandom3 r1(0);
   TRandom3 r2(0);
-  TH1F* h_qnot = new TH1F("h_qnot", "h_qnot", 1000, -1000, 1000);
-  for ( int i = 0; i < 100; i ++ )
+  TH1F* h_qnot = new TH1F("h_qnot", "h_qnot", 1000, 0, 10);
+  for ( int i = 0; i < 10000; i ++ )
     {
       for ( int j = 0; j < n; j++ )
 	{
@@ -34,6 +34,7 @@ int main( int argc, char* argv[] )
 	  obs[j] = bNonRes + bSMH;
 	}
       double mu   = GetBestFitSignalStrength( n, b, s, obs );
+      std::cout << "best mu: " << mu << std::endl;
       double qnot = GetQnotTestStatistics( n, b, s, obs, mu );
       h_qnot->Fill( qnot );
     }
