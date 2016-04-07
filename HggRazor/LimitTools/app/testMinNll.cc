@@ -129,13 +129,12 @@ int main( int argc, char* argv[] )
   sSRH->Write("sSRH");
   
 
-  const int n = 2;
-  double b_nr[n]  = {100, 50};//non-resonant bkg
-  double b_smh[n] = {10, 10};//smh bkg
-  double b[n];
-  double s[n] = {3, 2};//signal is fixed
-  double obs[n];
-  double bFull[2];
+  double b_nr[50];//non-resonant bkg
+  double b_smh[50];//smh bkg
+  double b[50];
+  double s[50];//signal is fixed
+  double obs[50];
+  double bFull[50];
 
   //------------------------
   //------------------------
@@ -185,46 +184,54 @@ int main( int argc, char* argv[] )
     {
       float MR  = 175.;
       int mapBin = myMap.size() - k;
+
+      for ( int ifb = 0; ifb < nfbins; ifb++ )
+	{
+	  b[ifb]   = fBinMap[ifb].b_nr + fBinMap[ifb].b_smh;
+	  s[ifb]   = fBinMap[ifb].s;
+	  obs[ifb] = b[ifb] + s[ifb];
+	}
+      
       for ( int i = 0; i <= 27; i++ )
 	{
 	  if ( i >= myMap[mapBin].xl ) 
 	    {
-	      bFull[0] = bkgH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      bFull[1] = bkgH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_nr[0]  = bkgSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_nr[1]  = bkgSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_smh[0] = smhSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_smh[1] = smhSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      s[0]     = sSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      s[1]     = sSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b[0]     = b_nr[0] + b_smh[0];
-	      b[1]     = b_nr[1] + b_smh[1];
-	      obs[0]   = b[0] + s[0];
-	      obs[1]   = b[1] + s[1];
+	      bFull[nfbins+0] = bkgH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
+	      bFull[nfbins+1] = bkgH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
+	      b_nr[nfbins+0]  = bkgSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
+	      b_nr[nfbins+1]  = bkgSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
+	      b_smh[nfbins+0] = smhSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
+	      b_smh[nfbins+1] = smhSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
+	      s[nfbins+0]     = sSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
+	      s[nfbins+1]     = sSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
+	      b[nfbins+0]     = b_nr[nfbins+0] + b_smh[nfbins+0];
+	      b[nfbins+1]     = b_nr[nfbins+1] + b_smh[nfbins+1];
+	      obs[nfbins+0]   = b[nfbins+0] + s[nfbins+0];
+	      obs[nfbins+1]   = b[nfbins+1] + s[nfbins+1];
 	    }
 	  else
 	    {
 	      continue;
 	    }
-	  if ( b[0] == 0  || b[1] == 0 ) continue;//avoid nans
-	  if ( bFull[0] < 10. || bFull[1] <= 10 ) continue;//avoid bins with small counts
-	  double mu   = GetBestFitSignalStrength( n, b, s, obs );
-	  double qnot = GetQnotTestStatistics( n, b, s, obs, mu );
+	  if ( b[nfbins+0] == 0  || b[nfbins+1] == 0 ) continue;//avoid nans
+	  if ( bFull[nfbins+0] < 10. || bFull[nfbins+1] <= 10 ) continue;//avoid bins with small counts
+	  double mu   = GetBestFitSignalStrength( nfbins+2, b, s, obs );
+	  double qnot = GetQnotTestStatistics( nfbins+2, b, s, obs, mu );
 	  std::cout << "==========" << std::endl;
 	  std::cout << "MR: " << MR << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
-		    << " --> b: " << b[0] << ", " << b[1] << "; obs: " << obs[0] << ", " << obs[1] << std::endl;
+		    << " --> b: " << b[nfbins+0] << ", " << b[nfbins+1] << "; obs: " << obs[nfbins+0] << ", " << obs[nfbins+1] << std::endl;
 	  //-----------------------
 	  //filling info histograms
 	  //-----------------------
 	  sigmaMR->SetBinContent(i, sqrt(qnot) );
-	  fbkg0MR->SetBinContent( i, bFull[0] );
-	  fbkg1MR->SetBinContent( i, bFull[1] );
-	  bkg0MR->SetBinContent( i, b_nr[0] );
-	  bkg1MR->SetBinContent( i, b_nr[1] );
-	  smh0MR->SetBinContent( i, b_smh[0] );
-	  smh1MR->SetBinContent( i, b_smh[1] );
-	  s0MR->SetBinContent( i, s[0] );
-	  s1MR->SetBinContent( i, s[1] );
+	  fbkg0MR->SetBinContent( i, bFull[nfbins+0] );
+	  fbkg1MR->SetBinContent( i, bFull[nfbins+1] );
+	  bkg0MR->SetBinContent( i, b_nr[nfbins+0] );
+	  bkg1MR->SetBinContent( i, b_nr[nfbins+1] );
+	  smh0MR->SetBinContent( i, b_smh[nfbins+0] );
+	  smh1MR->SetBinContent( i, b_smh[nfbins+1] );
+	  s0MR->SetBinContent( i, s[nfbins+0] );
+	  s1MR->SetBinContent( i, s[nfbins+1] );
 	  MR += 50.; 
 	}
       double maxMRsignificance         = sigmaMR->GetMaximum();
@@ -235,42 +242,42 @@ int main( int argc, char* argv[] )
 	{
 	  if ( i >= myMap[mapBin].yl ) 
 	    {
-	      bFull[0] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      bFull[1] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b_nr[0]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      b_nr[1]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b_smh[0] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      b_smh[1] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      s[0]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      s[1]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b[0]     = b_nr[0] + b_smh[0];
-	      b[1]     = b_nr[1] + b_smh[1];
-	      obs[0]   = b[0] + s[0];
-	      obs[1]   = b[1] + s[1];
+	      bFull[nfbins+0] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
+	      bFull[nfbins+1] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
+	      b_nr[nfbins+0]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
+	      b_nr[nfbins+1]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
+	      b_smh[nfbins+0] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
+	      b_smh[nfbins+1] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
+	      s[nfbins+0]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
+	      s[nfbins+1]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
+	      b[nfbins+0]     = b_nr[nfbins+0] + b_smh[nfbins+0];
+	      b[nfbins+1]     = b_nr[nfbins+1] + b_smh[nfbins+1];
+	      obs[nfbins+0]   = b[nfbins+0] + s[nfbins+0];
+	      obs[nfbins+1]   = b[nfbins+1] + s[nfbins+1];
 	    }
 	  else
 	    {
 	      continue;
 	    }
-	  if ( b[0] == 0 || b[1] == 0 ) continue;
-	  if ( bFull[0] <= 10. || bFull[1] <= 10 ) continue;//avoid bins with small counts
-	  double mu   = GetBestFitSignalStrength( n, b, s, obs );
-	  double qnot = GetQnotTestStatistics( n, b, s, obs, mu );
+	  if ( b[nfbins+0] == 0 || b[nfbins+1] == 0 ) continue;
+	  if ( bFull[nfbins+0] <= 10. || bFull[nfbins+1] <= 10 ) continue;//avoid bins with small counts
+	  double mu   = GetBestFitSignalStrength( nfbins+2, b, s, obs );
+	  double qnot = GetQnotTestStatistics( nfbins+2, b, s, obs, mu );
 	  std::cout << "==========" << std::endl;
 	  std::cout << " Rsq: " << Rsq << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
-		    << " --> b: " << b[0] << ", " << b[1] << "; obs: " << obs[0] << ", " << obs[1] << std::endl;
+		    << " --> b: " << b[nfbins+0] << ", " << b[nfbins+1] << "; obs: " << obs[nfbins+0] << ", " << obs[nfbins+1] << std::endl;
 	  //-----------------------
 	  //filling info histograms
 	  //-----------------------
 	  sigmaRsq->SetBinContent(i, sqrt(qnot) );
-	  fbkg0Rsq->SetBinContent( i, bFull[0] );
-	  fbkg1Rsq->SetBinContent( i, bFull[1] );
-	  bkg0Rsq->SetBinContent( i, b_nr[0] );
-	  bkg1Rsq->SetBinContent( i, b_nr[1] );
-	  smh0Rsq->SetBinContent( i, b_smh[0] );
-	  smh1Rsq->SetBinContent( i, b_smh[1] );
-	  s0Rsq->SetBinContent( i, s[0] );
-	  s1Rsq->SetBinContent( i, s[1] );
+	  fbkg0Rsq->SetBinContent( i, bFull[nfbins+0] );
+	  fbkg1Rsq->SetBinContent( i, bFull[nfbins+1] );
+	  bkg0Rsq->SetBinContent( i, b_nr[nfbins+0] );
+	  bkg1Rsq->SetBinContent( i, b_nr[nfbins+1] );
+	  smh0Rsq->SetBinContent( i, b_smh[nfbins+0] );
+	  smh1Rsq->SetBinContent( i, b_smh[nfbins+1] );
+	  s0Rsq->SetBinContent( i, s[nfbins+0] );
+	  s1Rsq->SetBinContent( i, s[nfbins+1] );
 	  Rsq += 0.005; 
 	}
       double maxRSQsignificance         = sigmaRsq->GetMaximum();
@@ -375,14 +382,14 @@ int main( int argc, char* argv[] )
       h_qnot->Fill( qnot );
     }
   */
-  b[0] = b_nr[0] + b_smh[0];
-  b[1] = b_nr[1] + b_smh[1];
-  obs[0] = b_nr[0] + 50;
-  obs[1] = b_nr[1] + 30;
-  double mu   = GetBestFitSignalStrength( n, b, s, obs );
-  double qnot = GetQnotTestStatistics( n, b, s, obs, mu );
-  std::cout << "best fit mu: " << mu << " ==> qnot = " << qnot 
-	    << " --> b: " << b[0] << ", " << b[1] << "; obs: " << obs[0] << ", " << obs[1] << std::endl;
+
+  for ( auto tmp : fBinMap )
+    {
+      std::cout << "BIN #" << tmp.first << "--> xl: " << tmp.second.xl << ", xh: " << tmp.second.xh
+		<< ", yl: " << tmp.second.yl << ", yh: " << tmp.second.yh
+		<< "; b_nr: " << tmp.second.b_nr << ", b_smh: " << tmp.second.b_smh 
+		<< ", s: " << tmp.second.s << std::endl;
+    }
   
    //h_qnot->Write();
   sigmaMR->Write();
