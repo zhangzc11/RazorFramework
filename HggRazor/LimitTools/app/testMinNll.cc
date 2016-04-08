@@ -78,7 +78,7 @@ int main( int argc, char* argv[] )
   TTree* smhTree = (TTree*)fsmh->Get("HggRazor");
   assert(smhTree);
 
-  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
+  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm470-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
   assert(fs);
   TTree* sTree = (TTree*)fs->Get("HggRazor");
   assert(sTree);
@@ -180,7 +180,7 @@ int main( int argc, char* argv[] )
   std::map<int, finalBin> myMap;
   int nfbins = 0;
   myMap[nfbins] = bE;
- 
+  float maxSignificance = -99;
   for ( int k = 0; k < 60; k++ )//loop to create bins
     {
       std::cout << "[INFO]: iteration: " << k << std::endl;
@@ -206,7 +206,6 @@ int main( int argc, char* argv[] )
       s1Rsq    = new TH1F("s1Rsq", "s1-Rsq", 200, 0, 1);//sr signal bin1
       
       int partitionType = -1;//MR = 0, Rsq = 1
-      float maxSignificance = -99;
       int maxIbin = -1;
       int maxBin = -1;
       std::cout << "==========" << std::endl;
@@ -291,7 +290,7 @@ int main( int argc, char* argv[] )
 	      MR += 50.; 
 	    }
 
-	  if ( sigmaMR->GetMaximum() > maxSignificance && sigmaMR->GetMaximum() > 0)
+	  if ( sigmaMR->GetMaximum() > 1.001*maxSignificance && sigmaMR->GetMaximum() > 0 )
 	    {
 	      maxSignificance = sigmaMR->GetMaximum();
 	      maxBin = sigmaMR->GetMaximumBin();
@@ -353,8 +352,8 @@ int main( int argc, char* argv[] )
 	      Rsq += 0.005; 
 	    }
 
-	   if ( sigmaRsq->GetMaximum() > maxSignificance )
-	     {
+	  if ( sigmaRsq->GetMaximum() > 1.001*maxSignificance && sigmaRsq->GetMaximum() > 0)
+	    {
 	      maxSignificance = sigmaRsq->GetMaximum();
 	      maxBin = sigmaRsq->GetMaximumBin();
 	      partitionType = 2;
@@ -475,6 +474,12 @@ int main( int argc, char* argv[] )
 	      tmpMap[itmp]._final = true;
 	    }
 	  myMap = tmpMap;
+	}
+      else
+	{
+	  std::cout << "[INFO]: Significance has not been improved by more than 1%, best significance is: " << maxSignificance << std::endl;
+	  std::cout << "[INFO]: Binning process has terminated" << std::endl;
+	  break;
 	}
 
       sigmaMR->Write();
