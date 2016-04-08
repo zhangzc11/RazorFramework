@@ -28,6 +28,7 @@ struct finalBin
   float b_nr;
   float b_smh;
   float s;
+  bool _final;
 };
 
 int main( int argc, char* argv[] )
@@ -170,194 +171,217 @@ int main( int argc, char* argv[] )
   int nMRbins  = 197;
   int nRSQbins = 10000;
 
-  int nPlaneBins = 1;
-  binEdges bE;
+  finalBin bE;
   bE.xl = 1;
   bE.xh = nMRbins;
   bE.yl = 1;
   bE.yh = nRSQbins;
-  std::map<int, binEdges> myMap;
+  std::map<int, finalBin> myMap;
   std::map<int, finalBin> fBinMap;
-  myMap[nPlaneBins] = bE;
   int nfbins = 0;
-  for ( int k = 0; k < 1; k++ )
+  myMap[nfbins] = bE;
+ 
+  for ( int k = 0; k < 1; k++ )//loop to create bins
     {
-      float MR  = 175.;
-      int mapBin = myMap.size() - k;
+      int partitionType = -1;//MR = 0, Rsq = 1
+      float maxSignificance = -99;
+      int maxIbin = -1;
+      int maxBin = -1;
+      for( int ibin = 0; ibin <= k; ibin++ )//loop around already created bins
+	{
+	  for ( int ifb = 0; ifb <= k; ifb++ )//add bins that are not going to be partitioned
+	    {
+	      if ( ifb != ibin )//exclude bin being partitioned
+		{
+		  b[ifb]   = fBinMap[ifb].b_nr + fBinMap[ifb].b_smh;
+		  s[ifb]   = fBinMap[ifb].s;
+		  obs[ifb] = b[ifb] + s[ifb];
+		}
+	    }
+	  
+	  float MR  = 175.;
+	  for ( int i = 0; i <= 27; i++ )//sum over MR bin ins histogram
+	    {
+	      if ( i >= myMap[ibin].xl ) //checks that i (MR bin) is above the boundary of the current ibin
+		{
+		  bFull[k+0] = bkgH->Integral( myMap[ibin].xl, i, myMap[ibin].yl, myMap[ibin].yh );
+		  bFull[k+1] = bkgH->Integral( i+1, myMap[ibin].xh, myMap[ibin].yl, myMap[ibin].yh );
+		  b_nr[k+0]  = bkgSRH->Integral( myMap[ibin].xl, i, myMap[ibin].yl, myMap[ibin].yh );
+		  b_nr[k+1]  = bkgSRH->Integral( i+1, myMap[ibin].xh, myMap[ibin].yl, myMap[ibin].yh );
+		  b_smh[k+0] = smhSRH->Integral( myMap[ibin].xl, i, myMap[ibin].yl, myMap[ibin].yh );
+		  b_smh[k+1] = smhSRH->Integral( i+1, myMap[ibin].xh, myMap[ibin].yl, myMap[ibin].yh );
+		  s[k+0]     = sSRH->Integral( myMap[ibin].xl, i, myMap[ibin].yl, myMap[ibin].yh );
+		  s[k+1]     = sSRH->Integral( i+1, myMap[ibin].xh, myMap[ibin].yl, myMap[ibin].yh );
+		  b[k+0]     = b_nr[k+0] + b_smh[k+0];
+		  b[k+1]     = b_nr[k+1] + b_smh[k+1];
+		  obs[k+0]   = b[k+0] + s[k+0];
+		  obs[k+1]   = b[k+1] + s[k+1];
+		}
+	      else
+		{
+		  continue;
+		}
+	      if ( b[k+0] == 0  || b[k+1] == 0 ) continue;//avoid nans
+	      if ( bFull[k+0] < 10. || bFull[k+1] <= 10 ) continue;//avoid bins with small counts
+	      double mu   = GetBestFitSignalStrength( k+2, b, s, obs );
+	      double qnot = GetQnotTestStatistics( k+2, b, s, obs, mu );
+	      std::cout << "==========" << std::endl;
+	      std::cout << "MR: " << MR << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
+			<< " --> b: " << b[k+0] << ", " << b[k+1] << "; obs: " << obs[k+0] << ", " << obs[k+1] << std::endl;
+	      //-----------------------
+	      //filling info histograms
+	      //-----------------------
+	      sigmaMR->SetBinContent(i, sqrt(qnot) );
+	      fbkg0MR->SetBinContent( i, bFull[k+0] );
+	      fbkg1MR->SetBinContent( i, bFull[k+1] );
+	      bkg0MR->SetBinContent( i, b_nr[k+0] );
+	      bkg1MR->SetBinContent( i, b_nr[k+1] );
+	      smh0MR->SetBinContent( i, b_smh[k+0] );
+	      smh1MR->SetBinContent( i, b_smh[k+1] );
+	      s0MR->SetBinContent( i, s[k+0] );
+	      s1MR->SetBinContent( i, s[k+1] );
+	      MR += 50.; 
+	    }
 
-      for ( int ifb = 0; ifb < nfbins; ifb++ )
-	{
-	  b[ifb]   = fBinMap[ifb].b_nr + fBinMap[ifb].b_smh;
-	  s[ifb]   = fBinMap[ifb].s;
-	  obs[ifb] = b[ifb] + s[ifb];
+	  if ( sigmaMR->GetMaximum() > maxSignificance )
+	    {
+	      maxSignificance = sigmaMR->GetMaximum();
+	      maxBin = sigmaMR->GetMaximumBin();
+	      partitionType = 1;
+	      maxIbin = ibin;
+	    }
+	  
+	  float Rsq  = 0.0025;
+	  for ( int i = 0; i <= 200; i++ )
+	    {
+	      if ( i >= myMap[ibin].yl ) 
+		{
+		  bFull[k+0] = bkgH->Integral( myMap[ibin].xl, myMap[ibin].xh, myMap[ibin].yl, i );
+		  bFull[k+1] = bkgH->Integral( myMap[ibin].xl, myMap[ibin].xh, i+1, myMap[ibin].yh );
+		  b_nr[k+0]  = bkgSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, myMap[ibin].yl, i );
+		  b_nr[k+1]  = bkgSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, i+1, myMap[ibin].yh );
+		  b_smh[k+0] = smhSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, myMap[ibin].yl, i );
+		  b_smh[k+1] = smhSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, i+1, myMap[ibin].yh );
+		  s[k+0]     = sSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, myMap[ibin].yl, i );
+		  s[k+1]     = sSRH->Integral( myMap[ibin].xl, myMap[ibin].xh, i+1, myMap[ibin].yh );
+		  b[k+0]     = b_nr[k+0] + b_smh[k+0];
+		  b[k+1]     = b_nr[k+1] + b_smh[k+1];
+		  obs[k+0]   = b[k+0] + s[k+0];
+		  obs[k+1]   = b[k+1] + s[k+1];
+		}
+	      else
+		{
+		  continue;
+		}
+	      if ( b[k+0] == 0 || b[k+1] == 0 ) continue;
+	      if ( bFull[k+0] <= 10. || bFull[k+1] <= 10 ) continue;//avoid bins with small counts
+	      double mu   = GetBestFitSignalStrength( k+2, b, s, obs );
+	      double qnot = GetQnotTestStatistics( k+2, b, s, obs, mu );
+	      std::cout << "==========" << std::endl;
+	      std::cout << " Rsq: " << Rsq << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
+			<< " --> b: " << b[k+0] << ", " << b[k+1] << "; obs: " << obs[k+0] << ", " << obs[k+1] << std::endl;
+	      //-----------------------
+	      //filling info histograms
+	      //-----------------------
+	      sigmaRsq->SetBinContent(i, sqrt(qnot) );
+	      fbkg0Rsq->SetBinContent( i, bFull[k+0] );
+	      fbkg1Rsq->SetBinContent( i, bFull[k+1] );
+	      bkg0Rsq->SetBinContent( i, b_nr[k+0] );
+	      bkg1Rsq->SetBinContent( i, b_nr[k+1] );
+	      smh0Rsq->SetBinContent( i, b_smh[k+0] );
+	      smh1Rsq->SetBinContent( i, b_smh[k+1] );
+	      s0Rsq->SetBinContent( i, s[k+0] );
+	      s1Rsq->SetBinContent( i, s[k+1] );
+	      Rsq += 0.005; 
+	    }
+
+	   if ( sigmaRsq->GetMaximum() > maxSignificance )
+	     {
+	      maxSignificance = sigmaRsq->GetMaximum();
+	      maxBin = sigmaRsq->GetMaximumBin();
+	      partitionType = 2;
+	      maxIbin = ibin;
+	    }
 	}
       
-      for ( int i = 0; i <= 27; i++ )
+      if ( partitionType == 1 )
 	{
-	  if ( i >= myMap[mapBin].xl ) 
-	    {
-	      bFull[nfbins+0] = bkgH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      bFull[nfbins+1] = bkgH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_nr[nfbins+0]  = bkgSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_nr[nfbins+1]  = bkgSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_smh[nfbins+0] = smhSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b_smh[nfbins+1] = smhSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      s[nfbins+0]     = sSRH->Integral( myMap[mapBin].xl, i, myMap[mapBin].yl, myMap[mapBin].yh );
-	      s[nfbins+1]     = sSRH->Integral( i+1, myMap[mapBin].xh, myMap[mapBin].yl, myMap[mapBin].yh );
-	      b[nfbins+0]     = b_nr[nfbins+0] + b_smh[nfbins+0];
-	      b[nfbins+1]     = b_nr[nfbins+1] + b_smh[nfbins+1];
-	      obs[nfbins+0]   = b[nfbins+0] + s[nfbins+0];
-	      obs[nfbins+1]   = b[nfbins+1] + s[nfbins+1];
-	    }
-	  else
-	    {
-	      continue;
-	    }
-	  if ( b[nfbins+0] == 0  || b[nfbins+1] == 0 ) continue;//avoid nans
-	  if ( bFull[nfbins+0] < 10. || bFull[nfbins+1] <= 10 ) continue;//avoid bins with small counts
-	  double mu   = GetBestFitSignalStrength( nfbins+2, b, s, obs );
-	  double qnot = GetQnotTestStatistics( nfbins+2, b, s, obs, mu );
-	  std::cout << "==========" << std::endl;
-	  std::cout << "MR: " << MR << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
-		    << " --> b: " << b[nfbins+0] << ", " << b[nfbins+1] << "; obs: " << obs[nfbins+0] << ", " << obs[nfbins+1] << std::endl;
-	  //-----------------------
-	  //filling info histograms
-	  //-----------------------
-	  sigmaMR->SetBinContent(i, sqrt(qnot) );
-	  fbkg0MR->SetBinContent( i, bFull[nfbins+0] );
-	  fbkg1MR->SetBinContent( i, bFull[nfbins+1] );
-	  bkg0MR->SetBinContent( i, b_nr[nfbins+0] );
-	  bkg1MR->SetBinContent( i, b_nr[nfbins+1] );
-	  smh0MR->SetBinContent( i, b_smh[nfbins+0] );
-	  smh1MR->SetBinContent( i, b_smh[nfbins+1] );
-	  s0MR->SetBinContent( i, s[nfbins+0] );
-	  s1MR->SetBinContent( i, s[nfbins+1] );
-	  MR += 50.; 
-	}
-      double maxMRsignificance         = sigmaMR->GetMaximum();
-      double maxMRsignificanceLocation = sigmaMR->GetBinLowEdge( sigmaMR->GetMaximumBin() );
-            
-      float Rsq  = 0.0025;
-      for ( int i = 0; i <= 200; i++ )
-	{
-	  if ( i >= myMap[mapBin].yl ) 
-	    {
-	      bFull[nfbins+0] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      bFull[nfbins+1] = bkgH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b_nr[nfbins+0]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      b_nr[nfbins+1]  = bkgSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b_smh[nfbins+0] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      b_smh[nfbins+1] = smhSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      s[nfbins+0]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, myMap[mapBin].yl, i );
-	      s[nfbins+1]     = sSRH->Integral( myMap[mapBin].xl, myMap[mapBin].xh, i+1, myMap[mapBin].yh );
-	      b[nfbins+0]     = b_nr[nfbins+0] + b_smh[nfbins+0];
-	      b[nfbins+1]     = b_nr[nfbins+1] + b_smh[nfbins+1];
-	      obs[nfbins+0]   = b[nfbins+0] + s[nfbins+0];
-	      obs[nfbins+1]   = b[nfbins+1] + s[nfbins+1];
-	    }
-	  else
-	    {
-	      continue;
-	    }
-	  if ( b[nfbins+0] == 0 || b[nfbins+1] == 0 ) continue;
-	  if ( bFull[nfbins+0] <= 10. || bFull[nfbins+1] <= 10 ) continue;//avoid bins with small counts
-	  double mu   = GetBestFitSignalStrength( nfbins+2, b, s, obs );
-	  double qnot = GetQnotTestStatistics( nfbins+2, b, s, obs, mu );
-	  std::cout << "==========" << std::endl;
-	  std::cout << " Rsq: " << Rsq << " best fit mu: " << mu << " ==> nsigma = " << sqrt( qnot )
-		    << " --> b: " << b[nfbins+0] << ", " << b[nfbins+1] << "; obs: " << obs[nfbins+0] << ", " << obs[nfbins+1] << std::endl;
-	  //-----------------------
-	  //filling info histograms
-	  //-----------------------
-	  sigmaRsq->SetBinContent(i, sqrt(qnot) );
-	  fbkg0Rsq->SetBinContent( i, bFull[nfbins+0] );
-	  fbkg1Rsq->SetBinContent( i, bFull[nfbins+1] );
-	  bkg0Rsq->SetBinContent( i, b_nr[nfbins+0] );
-	  bkg1Rsq->SetBinContent( i, b_nr[nfbins+1] );
-	  smh0Rsq->SetBinContent( i, b_smh[nfbins+0] );
-	  smh1Rsq->SetBinContent( i, b_smh[nfbins+1] );
-	  s0Rsq->SetBinContent( i, s[nfbins+0] );
-	  s1Rsq->SetBinContent( i, s[nfbins+1] );
-	  Rsq += 0.005; 
-	}
-      double maxRSQsignificance         = sigmaRsq->GetMaximum();
-      double maxRSQsignificanceLocation = sigmaRsq->GetBinLowEdge( sigmaRsq->GetMaximumBin() );
-      
-      if ( maxMRsignificance > maxRSQsignificance )
-	{
-	  std::cout << "splitting in MR @ " << maxMRsignificanceLocation << ", significance = " << maxMRsignificance << " nsigmas" << std::endl;
+	  std::cout << "splitting in MR @ " << maxBin << ", significance = " << maxSignificance << " nsigmas" << std::endl;
 	  int maxBin  = sigmaMR->GetMaximumBin();
 	  float Nbkg0 = fbkg0MR->GetBinContent( maxBin );
 	  float Nbkg1 = fbkg1MR->GetBinContent( maxBin );
-	  std::cout << "splitting in MR @ " << maxRSQsignificanceLocation << ", significance = " << maxRSQsignificance << " nsigmas" << std::endl;
+	  std::cout << "splitting in MR @ " << maxBin << ", significance = " << maxSignificance << " nsigmas" << std::endl;
 	  std::cout << "Rsq @ " << maxBin << " NBkg0: " << Nbkg0
 		    << " NBkg1: " << Nbkg1 << std::endl;
+	  finalBin fb;
+	  //filling low bin
+	  fb.xl    = myMap[maxIbin].xl;
+	  fb.xh    = maxBin;
+	  fb.yl    = myMap[maxIbin].yl;
+	  fb.yh    = myMap[maxIbin].yh;
+	  fb.b_nr  = bkg1MR->GetBinContent( maxBin );
+	  fb.b_smh = smh1MR->GetBinContent( maxBin );
+	  fb.s     = s1MR->GetBinContent( maxBin );
+	  fBinMap[nfbins] = fb;
 	  if ( (Nbkg0 - 10.) < 10.0 )
 	    {
 	      std::cout << "First Partition is at minimum bkg events: " << Nbkg0 << std::endl;
-	      finalBin fb;
-	      fb.xl    = myMap[mapBin].xl;
-	      fb.xh    = maxBin;
-	      fb.yl    = myMap[mapBin].yl;
-	      fb.yh    = myMap[mapBin].yh;
-	      fb.b_nr  = bkg1MR->GetBinContent( maxBin );
-	      fb.b_smh = smh1MR->GetBinContent( maxBin );
-	      fb.s     = s1MR->GetBinContent( maxBin );
-	      fBinMap[nfbins] = fb;
-	      nfbins++;
+	      fBinMap[nfbins]._final = true;
 	    }
+	  nfbins++;
+	  //filling high bin
+	  fb.xl    = maxBin;
+	  fb.xh    = myMap[maxIbin].xh;
+	  fb.yl    = myMap[maxIbin].yl;
+	  fb.yh    = myMap[maxIbin].yh;
+	  fb.b_nr  = bkg1MR->GetBinContent( maxBin );
+	  fb.b_smh = smh1MR->GetBinContent( maxBin );
+	  fb.s     = s1MR->GetBinContent( maxBin );
+	  fBinMap[nfbins] = fb;
 	  if ( (Nbkg1 - 10.) < 10.0 )
 	    {
-	      std::cout << "Second Partition is at minimum bkg events: " << Nbkg1 << std::endl;
-	      finalBin fb;
-	      fb.xl    = maxBin;
-	      fb.xh    = myMap[mapBin].xh;
-	      fb.yl    = myMap[mapBin].yl;
-	      fb.yh    = myMap[mapBin].yh;
-	      fb.b_nr  = bkg1MR->GetBinContent( maxBin );
-	      fb.b_smh = smh1MR->GetBinContent( maxBin );
-	      fb.s     = s1MR->GetBinContent( maxBin );
-	      fBinMap[nfbins] = fb;
-	      nfbins++;
+	      fBinMap[nfbins]._final = true;
 	    }
-	  
+	  nfbins++;
 	}
-      else
+      else if ( partitionType == 2 )
 	{
-	  int maxBin  = sigmaRsq->GetMaximumBin();
 	  float Nbkg0 = fbkg0Rsq->GetBinContent( maxBin );
 	  float Nbkg1 = fbkg1Rsq->GetBinContent( maxBin );
-	  std::cout << "splitting in Rsq @ " << maxRSQsignificanceLocation << ", significance = " << maxRSQsignificance << " nsigmas" << std::endl;
+	  std::cout << "splitting in Rsq @ " << maxBin << ", significance = " << maxSignificance << " nsigmas" << std::endl;
 	  std::cout << "Rsq @ " << maxBin << " NBkg0: " << Nbkg0
 		    << " NBkg1: " << Nbkg1 << std::endl;
-	  
+	  finalBin fb;
+	  //fill low bin
+	  fb.xl    = myMap[maxIbin].xl;
+	  fb.xh    = myMap[maxIbin].xh;
+	  fb.yl    = myMap[maxIbin].yl;
+	  fb.yh    = maxBin;
+	  fb.b_nr  = bkg1Rsq->GetBinContent( maxBin );
+	  fb.b_smh = smh1Rsq->GetBinContent( maxBin );
+	  fb.s     = s1Rsq->GetBinContent( maxBin );
+	  fBinMap[nfbins] = fb;
+	  nfbins++;
 	  if ( (Nbkg0 - 10.) < 10.0 )
 	    {
 	      std::cout << "First Partition is at minimum bkg events: " << Nbkg0 << std::endl;
-	      finalBin fb;
-	      fb.xl    = myMap[mapBin].xl;
-	      fb.xh    = myMap[mapBin].xh;
-	      fb.yl    = myMap[mapBin].yl;
-	      fb.yh    = maxBin;
-	      fb.b_nr  = bkg1Rsq->GetBinContent( maxBin );
-	      fb.b_smh = smh1Rsq->GetBinContent( maxBin );
-	      fb.s     = s1Rsq->GetBinContent( maxBin );
-	      fBinMap[nfbins] = fb;
-	      nfbins++;
+	      fBinMap[nfbins]._final = true;
 	    }
+	  
+	  //filling high bin
+	  fb.xl    = myMap[maxIbin].xl;
+	  fb.xh    = myMap[maxIbin].xh;
+	  fb.yl    = maxBin;
+	  fb.yh    = myMap[maxIbin].yh;
+	  fb.b_nr  = bkg1Rsq->GetBinContent( maxBin );
+	  fb.b_smh = smh1Rsq->GetBinContent( maxBin );
+	  fb.s     = s1Rsq->GetBinContent( maxBin );
+	  fBinMap[nfbins] = fb;
+	  nfbins++;
 	  if ( (Nbkg1 - 10.) < 10.0 )
 	    {
 	      std::cout << "Second Partition is at minimum bkg events: " << Nbkg1 << std::endl;
-	      finalBin fb;
-	      fb.xl    = myMap[mapBin].xl;
-	      fb.xh    = myMap[mapBin].xh;
-	      fb.yl    = maxBin;
-	      fb.yh    = myMap[mapBin].yh;
-	      fb.b_nr  = bkg1Rsq->GetBinContent( maxBin );
-	      fb.b_smh = smh1Rsq->GetBinContent( maxBin );
-	      fb.s     = s1Rsq->GetBinContent( maxBin );
-	      fBinMap[nfbins] = fb;
-	      nfbins++;
+	      fBinMap[nfbins]._final = true;
 	    }
 	  
 	}
