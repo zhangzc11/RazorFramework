@@ -7,6 +7,7 @@
 #include <TDirectory.h>
 #include <TROOT.h>
 #include <TRandom3.h>
+#include <TH2Poly.h>
 //LOCAL INCLUDES
 #include "AssortedFunctions.hh"
 #include "CommandLineInput.hh"
@@ -34,7 +35,26 @@ struct finalBin
 int main( int argc, char* argv[] )
 {
   gROOT->Reset();
-  TString categoryMode = "highres";
+
+  //-----------------
+  //Selection TString
+  //-----------------
+  std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
+  if (  categoryMode == "" )
+    {
+      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,hzbb,highres,lowres>" << std::endl;
+      return -1;
+    }
+
+  //-----------------
+  //Selection TString
+  //-----------------
+  std::string lumi = ParseCommandLine( argc, argv, "-lumi=" );
+  if (  lumi == "" )
+    {
+      std::cerr << "[ERROR]: please provide the integrated luminosity. Use --lumi=<lumi(pb-1)>" << std::endl;
+      return -1;
+    }
   
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25. && MR > 150. && t1Rsq > 0.0";
   TString categoryCutString;
@@ -84,7 +104,6 @@ int main( int argc, char* argv[] )
   assert(sTree);
   
  
-
   //------------------------------
   //------------------------------
   //Non-resonant bkg histograms
@@ -94,13 +113,13 @@ int main( int argc, char* argv[] )
   //---------------
   //full mgg region
   //---------------
-  TString bkgCut = "1.37*weight*pileupWeight*2300.*(" + cut + ")";
+  TString bkgCut = "1.37*weight*pileupWeight*"+lumi+"*(" + cut + ")";
   bkgTree->Draw("t1Rsq:MR>>bkgH(197,150,10000, 2000,0, 10)", bkgCut, "goff");
   TH2F* bkgH = (TH2F*)gDirectory->Get("bkgH");
   //-----------------
   //mgg signal region
   //-----------------
-  TString bkgCutSR = "1.37*weight*pileupWeight*2300.*(" + massWindowCut + ")";
+  TString bkgCutSR = "1.37*weight*pileupWeight*"+lumi+"*(" + massWindowCut + ")";
   bkgTree->Draw("t1Rsq:MR>>bkgSRH(197,150,10000, 2000,0, 10)", bkgCutSR, "goff");
   TH2F* bkgSRH = (TH2F*)gDirectory->Get("bkgSRH");
   
@@ -109,7 +128,7 @@ int main( int argc, char* argv[] )
   //SM higgs bkg histograms
   //------------------------------
   //------------------------------
-  TString smhCutSR = "weight*pileupWeight*2300.*(" + massWindowCut + ")";
+  TString smhCutSR = "weight*pileupWeight*"+lumi+"*(" + massWindowCut + ")";
   smhTree->Draw("t1Rsq:MR>>smhSRH(197,150,10000, 2000,0, 10)", smhCutSR, "goff");
   TH2F* smhSRH = (TH2F*)gDirectory->Get("smhSRH");
 
@@ -118,7 +137,7 @@ int main( int argc, char* argv[] )
   //signal model histogram
   //------------------------------
   //------------------------------
-  TString sCutSR = "weight*2300.*(" + massWindowCut + ")";//SR:Signal Region
+  TString sCutSR = "weight*"+lumi+"*(" + massWindowCut + ")";//SR:Signal Region
   sTree->Draw("t1Rsq:MR>>sSRH(197,150, 10000, 2000, 0, 10)", sCutSR, "goff");
   TH2F* sSRH = (TH2F*)gDirectory->Get("sSRH");
   
@@ -168,8 +187,12 @@ int main( int argc, char* argv[] )
   int binMRsplit  = 1;
   int binRSQsplit = 1;
   int nsplits = 2;
+  float MR_L = 150.;
+  float MR_H = 10000.;
+  float Rsq_L = .0;
+  float Rsq_H = 10.;
   int nMRbins  = 197;
-  int nRSQbins = 10000;
+  int nRSQbins = 2000;
 
   finalBin bE;
   bE.xl = 1;
@@ -297,6 +320,8 @@ int main( int argc, char* argv[] )
 	      partitionType = 1;
 	      maxIbin = ibin;
 	      std::cout << "MR: Improved significance: " << maxSignificance << " " << maxBin << " maxIbin " << maxIbin << std::endl;
+	      std::cout << "new bins: " << myMap[ibin].xl << "," << maxBin << " - " << maxBin << "," <<  myMap[ibin].xh << std::endl;
+	      //std::cout << " analyzing bin " << ibin << " :"<< myMap[ibin].xl << "-" << myMap[ibin].xh << "," << myMap[ibin].yl << "-" << myMap[ibin].yh << std::endl;
 	      //for (int bb = 0; bb < k+2; bb++ ) std::cout << "b[" << bb << "] = " << b[bb] << std::endl;
 	    }
 	  
@@ -359,6 +384,7 @@ int main( int argc, char* argv[] )
 	      partitionType = 2;
 	      maxIbin = ibin;
 	      std::cout << "Rsq: Improved significance: " << maxSignificance << " " << maxBin << " maxIbin " << maxIbin << std::endl;
+	      std::cout << "new bins: " << myMap[ibin].yl << "," << maxBin << " - " << maxBin << ","<<  myMap[ibin].yh << std::endl;
 	      //for (int bb = 0; bb < k+2; bb++ ) std::cout << "b[" << bb << "] = " << b[bb] << std::endl;
 	    }
 	}
@@ -380,10 +406,8 @@ int main( int argc, char* argv[] )
 		}
 	    }
 	  std::cout << "splitting in MR @ " << maxBin << ", significance = " << maxSignificance << " nsigmas" << std::endl;
-	  int maxBin  = sigmaMR->GetMaximumBin();
 	  float Nbkg0 = fbkg0MR->GetBinContent( maxBin );
 	  float Nbkg1 = fbkg1MR->GetBinContent( maxBin );
-	  
 	  std::cout << "splitting in MR @ " << maxBin << ", significance = " << maxSignificance << " nsigmas" << std::endl;
 	  std::cout << "MR @ " << maxBin << " NBkg0: " << Nbkg0
 		    << " NBkg1: " << Nbkg1 << std::endl;
@@ -541,16 +565,37 @@ int main( int argc, char* argv[] )
     }
   */
 
+  TH2Poly* h2p = new TH2Poly();
   for ( auto tmp : myMap )
     {
       std::cout << "BIN #" << tmp.first << "--> xl: " << tmp.second.xl << ", xh: " << tmp.second.xh
 		<< ", yl: " << tmp.second.yl << ", yh: " << tmp.second.yh
 		<< "; b: " << tmp.second.b_nr + tmp.second.b_smh 
 		<< ", s: " << tmp.second.s << std::endl;
+      
+      double MR_bw  = (MR_H-MR_L)/nMRbins;
+      double Rsq_bw = (Rsq_H-Rsq_L)/nRSQbins;
+      
+      double MR_low   = 150 + MR_bw*(tmp.second.xl - 1);
+      double MR_high  = 150 + MR_bw*(tmp.second.xh - 1);
+      double Rsq_low  = Rsq_bw*(tmp.second.yl - 1);
+      double Rsq_high = Rsq_bw*(tmp.second.yh - 1);
+      if ( Rsq_high > 1.0 ) Rsq_high  = 1.0;
+      if ( MR_high > 9000.0 ) MR_high = 10000.0;
+
+      std::cout << "BIN #" << tmp.first << "--> xl: " << MR_low << ", xh: " << MR_high
+		<< ", yl: " << Rsq_low << ", yh: " << Rsq_high
+		<< "; b: " << tmp.second.b_nr + tmp.second.b_smh 
+		<< ", s: " << tmp.second.s << std::endl;
+      
+      h2p->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
+      int bin = h2p->FindBin( MR_low+0.5*MR_bw, Rsq_low+0.5*Rsq_bw );
+      std::cout << "TH2Poly bin: " << bin << std::endl;
+      h2p->SetBinContent( bin, tmp.second.s);
     }
   
    //h_qnot->Write();
-    
+  h2p->Write("h2p");
   fout->Close();
   
   return 0;
