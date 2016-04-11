@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
   TTree* smhTree = (TTree*)fsmh->Get("HggRazor");
   assert(smhTree);
 
-  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm470-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
+  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
   assert(fs);
   TTree* sTree = (TTree*)fs->Get("HggRazor");
   assert(sTree);
@@ -605,13 +605,19 @@ int main( int argc, char* argv[] )
   */
 
   TH2Poly* h2p = new TH2Poly();
+  TH2Poly* h2p_nr = new TH2Poly();
+  TH2Poly* h2p_smh = new TH2Poly();
+  TH2Poly* h2p_s = new TH2Poly();
+  TH2Poly* h2p_SoverSqrtB = new TH2Poly();
+  std::cout << "std::vector<float*> SetBinning()\n{\n";
+  int ctr = 0;
   for ( auto tmp : myMap )
     {
-      std::cout << "BIN #" << tmp.first << "--> xl: " << tmp.second.xl << ", xh: " << tmp.second.xh
+      /*std::cout << "BIN #" << tmp.first << "--> xl: " << tmp.second.xl << ", xh: " << tmp.second.xh
 		<< ", yl: " << tmp.second.yl << ", yh: " << tmp.second.yh
 		<< "; b: " << tmp.second.b_nr + tmp.second.b_smh 
 		<< ", s: " << tmp.second.s << std::endl;
-      
+      */
       double MR_bw  = (MR_H-MR_L)/nMRbins;
       double Rsq_bw = (Rsq_H-Rsq_L)/nRSQbins;
       
@@ -622,19 +628,37 @@ int main( int argc, char* argv[] )
       if ( Rsq_high > 1.0 ) Rsq_high  = 1.0;
       if ( MR_high > 9000.0 ) MR_high = 10000.0;
 
-      std::cout << "BIN #" << tmp.first << "--> xl: " << MR_low << ", xh: " << MR_high
+      /*std::cout << "BIN #" << tmp.first << "--> xl: " << MR_low << ", xh: " << MR_high
 		<< ", yl: " << Rsq_low << ", yh: " << Rsq_high
 		<< "; b: " << tmp.second.b_nr + tmp.second.b_smh 
 		<< ", s: " << tmp.second.s << std::endl;
+      */
+
+     
+      std::cout << "float bin" << ctr << "[4] = {" << MR_low<< "," << Rsq_low << "," <<  MR_high << "," <<  Rsq_high << "};\n";
+      std::cout << "myVec.push_back(bin" << ctr << ");\n";
+      ctr++;
       
       h2p->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
+      h2p_nr->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
+      h2p_smh->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
+      h2p_s->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
+      h2p_SoverSqrtB->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
       int bin = h2p->FindBin( MR_low+0.5*MR_bw, Rsq_low+0.5*Rsq_bw );
-      std::cout << "TH2Poly bin: " << bin << std::endl;
       h2p->SetBinContent( bin, tmp.second.b_full);
+      h2p_nr->SetBinContent( bin, tmp.second.b_nr);
+      h2p_smh->SetBinContent( bin, tmp.second.b_smh);
+      h2p_s->SetBinContent( bin, tmp.second.s);
+      h2p_SoverSqrtB->SetBinContent( bin, tmp.second.s/sqrt(tmp.second.b_nr+tmp.second.s) );
     }
-  
+
+  std::cout << "}\n";
    //h_qnot->Write();
-  h2p->Write("h2p");
+  h2p->Write("h2p_bFull");
+  h2p_nr->Write("h2pSR_bNR");
+  h2p_smh->Write("h2pSR_bSMH");
+  h2p_s->Write("h2pSR_Signal");
+  h2p_SoverSqrtB->Write("h2pSR_SoverSqrtB");
   fout->Close();
   
   return 0;
