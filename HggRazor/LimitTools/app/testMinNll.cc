@@ -654,7 +654,7 @@ int main( int argc, char* argv[] )
   std::cout << "std::vector<float*> SetBinning()\n{\n";
   for( int i = 0; i < myMap.size(); i++ )
     {
-      std::cout << "myVec.push_back(bin" << ctr << ");\n";
+      std::cout << "myVec.push_back(bin" << i << ");\n";
     }
   std::cout << "}\n";
 
