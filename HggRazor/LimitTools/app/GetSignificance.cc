@@ -38,6 +38,14 @@ float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,1.0};
 float  lowresRSQedges2[3] = {0,0.02,1.0};
 float  lowresRSQedges3[2] = {0,1.0};
 
+//----------------
+//Static Variables
+//----------------
+float HggRazorSystematics::Lumi  = 2300.0;
+float HggRazorSystematics::NR_kf = 1.37;
+
+void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
+/*
 //--------------------------
 float bin0[4] = {150,0.165,10000,1};
 float bin1[4] = {150,0.105,200,0.165};
@@ -55,16 +63,6 @@ float bin12[4] = {450,0.01,550,0.02};
 float bin13[4] = {550,0.01,950,0.02};
 float bin14[4] = {250,0.025,350,0.045};
 float bin15[4] = {350,0.025,450,0.045};
-
-
-//----------------
-//Static Variables
-//----------------
-float HggRazorSystematics::Lumi  = 2300.0;
-float HggRazorSystematics::NR_kf = 1.37;
-
-void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
-
 std::vector<float*> SetBinning()
 {
   std::vector<float*> myVec;
@@ -88,6 +86,27 @@ std::vector<float*> SetBinning()
     {
       std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
     }
+  return myVec;
+};
+*/
+
+float bin0[4] = {600,0.01,10000,1};
+float bin1[4] = {150,0.175,600,1};
+float bin2[4] = {150,0,400,0.175};
+float bin3[4] = {400,0,600,0.025};
+float bin4[4] = {400,0.025,600,0.175};
+float bin5[4] = {600,0,950,0.01};
+float bin6[4] = {950,0,10000,0.01};
+std::vector<float*> SetBinning()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin0);
+  myVec.push_back(bin1);
+  myVec.push_back(bin2);
+  myVec.push_back(bin3);
+  myVec.push_back(bin4);
+  myVec.push_back(bin5);
+  myVec.push_back(bin6);
   return myVec;
 };
 

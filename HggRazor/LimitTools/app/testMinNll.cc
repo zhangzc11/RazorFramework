@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
   TTree* smhTree = (TTree*)fsmh->Get("HggRazor");
   assert(smhTree);
 
-  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm470-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
+  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
   assert(fs);
   TTree* sTree = (TTree*)fs->Get("HggRazor");
   assert(sTree);
