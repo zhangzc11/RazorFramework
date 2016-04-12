@@ -15,16 +15,19 @@ CPPFLAGS += -g -std=c++11
 TARGET  = CreateCE_CombinedCards
 TARGET1 = GetEffectiveSigma 
 TARGET2 = testMinNll
+TARGET3 = GetSignificance
 
 SRC  = app/CreateCE_CombinedCard.cc src/CountingExperiment.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
 SRC1 = app/GetEffectiveSigma.cc src/AssortedFunctions.cc $(Aux)/src/CommandLineInput.cc
 SRC2 = app/testMinNll.cc src/AssortedFunctions.cc $(Aux)/src/CommandLineInput.cc
+SRC3 = app/GetSignificance.cc src/AssortedFunctions.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc
 
 OBJ  = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)
+OBJ3 = $(SRC3:.cc=.o)
 
-all : $(TARGET) $(TARGET1) $(TARGET2)
+all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -44,9 +47,15 @@ $(TARGET2) : $(OBJ2)
 	@echo $<
 	@echo $^
 
+$(TARGET3) : $(OBJ3)
+	$(LD) $(CPPFLAGS) -o $(TARGET3) $(OBJ3) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) *~

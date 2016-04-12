@@ -20,8 +20,9 @@ public:
   HggRazorSystematics( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
   ~HggRazorSystematics( );
 
-  bool InitMrRsqTH2Poly( );
+  bool InitMrRsqTH2Poly( int mode = 0 );
   void Loop();
+  void LoopNominal();
   void PrintBinning();
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h, double& err );
@@ -29,12 +30,16 @@ public:
 
   float GetHighPtGB( double mr, double r2 );
   float GetHighResGB( double mr, double r2 );
+  int GetSizeMap( ){return this->binningMap.size(); };
+  int GetSizeVector(){return this->binningVect.size(); };
+  TH2Poly* GetNominalTH2Poly( ){ return this->h2p; };
   std::pair<float, float> GetFacScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetFacRenScaleSystematic( float mr, float rsq );
   static float GetHggBF( );
 
   bool SetBinningMap( std::map<std::pair<float, float>, std::vector<float>> myMap ){ this->binningMap = myMap; return true;};
+  bool SetBinningVector( std::vector<float*> myVect ){ this->binningVect = myVect; return true;};
   bool SetNeventsHisto( TH1F* histo );
   bool SetFacScaleWeightsHisto( TH1F* histo );
   bool SetPdfWeightsHisto( TH1F* histo );
@@ -42,6 +47,7 @@ private:
 
   static constexpr float hggBF = 2.28e-3;
   static float Lumi;//lumi in pb-1
+  static float NR_kf;//lumi in pb-1
   
   bool _debug;
   bool _info;
@@ -52,6 +58,7 @@ private:
   // D e f i n e   B i n n i n g
   //----------------------------
   std::map<std::pair<float, float>, std::vector<float>> binningMap;
+  std::vector<float*> binningVect;
   
   //TH2Poly Histos
   TH2Poly *h2p;

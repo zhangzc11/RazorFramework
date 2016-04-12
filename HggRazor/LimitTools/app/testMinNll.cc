@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
   TTree* smhTree = (TTree*)fsmh->Get("HggRazor");
   assert(smhTree);
 
-  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
+  TFile* fs = new TFile("~/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm470-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root");
   assert(fs);
   TTree* sTree = (TTree*)fs->Get("HggRazor");
   assert(sTree);
@@ -609,7 +609,7 @@ int main( int argc, char* argv[] )
   TH2Poly* h2p_smh = new TH2Poly();
   TH2Poly* h2p_s = new TH2Poly();
   TH2Poly* h2p_SoverSqrtB = new TH2Poly();
-  std::cout << "std::vector<float*> SetBinning()\n{\n";
+ 
   int ctr = 0;
   for ( auto tmp : myMap )
     {
@@ -636,7 +636,6 @@ int main( int argc, char* argv[] )
 
      
       std::cout << "float bin" << ctr << "[4] = {" << MR_low<< "," << Rsq_low << "," <<  MR_high << "," <<  Rsq_high << "};\n";
-      std::cout << "myVec.push_back(bin" << ctr << ");\n";
       ctr++;
       
       h2p->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
@@ -652,8 +651,14 @@ int main( int argc, char* argv[] )
       h2p_SoverSqrtB->SetBinContent( bin, tmp.second.s/sqrt(tmp.second.b_nr+tmp.second.s) );
     }
 
+  std::cout << "std::vector<float*> SetBinning()\n{\n";
+  for( int i = 0; i < myMap.size(); i++ )
+    {
+      std::cout << "myVec.push_back(bin" << ctr << ");\n";
+    }
   std::cout << "}\n";
-   //h_qnot->Write();
+
+  //h_qnot->Write();
   h2p->Write("h2p_bFull");
   h2p_nr->Write("h2pSR_bNR");
   h2p_smh->Write("h2pSR_bSMH");
