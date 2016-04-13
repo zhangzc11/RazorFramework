@@ -34,9 +34,19 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   TFile* f = new TFile( fname, "READ");
   assert( f );
   TTree* tree = (TTree*)f->Get("HggRazor");
+  TH1F* NEvents = (TH1F*)f->Get("NEvents");
+  TH1F* SumScaleWeights = (TH1F*)f->Get("SumScaleWeights");
+
+  float N_events          = NEvents->GetBinContent(1);
+  float N_facScaleUp      = SumScaleWeights->GetBinContent(1);
+  float N_facScaleDown    = SumScaleWeights->GetBinContent(2);
+  float N_renScaleUp      = SumScaleWeights->GetBinContent(3);
+  float N_renScaleDown    = SumScaleWeights->GetBinContent(4);
+  float N_facRenScaleUp   = SumScaleWeights->GetBinContent(5);
+  float N_facRenScaleDown = SumScaleWeights->GetBinContent(6);
   
   bool _prepareConfigCard = false;
-  TTree* treeSignal;
+  TTree* treeSignal = NULL;
   TFile* f2;
   if ( signalFile != "" && _createCF )
     {
@@ -315,21 +325,35 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   fout->cd();
   cut = cut + categoryCutString;
   TTree* cutTree = tree->CopyTree( cut );
-  float MR, t1Rsq, weight, pileupWeight;
+  float MR, t1Rsq, weight, pileupWeight, sf_facScaleUp, sf_facScaleDown, sf_renScaleUp, sf_renScaleDown, sf_facRenScaleUp, sf_facRenScaleDown;
   cutTree->SetBranchStatus("*", 0);
   cutTree->SetBranchStatus("weight", 1);
   cutTree->SetBranchStatus("pileupWeight", 1);
   cutTree->SetBranchStatus("MR", 1);
   cutTree->SetBranchStatus("t1Rsq", 1);
+  cutTree->SetBranchStatus("sf_facScaleUp", 1);
+  cutTree->SetBranchStatus("sf_facScaleDown", 1);
+  cutTree->SetBranchStatus("sf_renScaleUp", 1);
+  cutTree->SetBranchStatus("sf_renScaleDown", 1);
+  cutTree->SetBranchStatus("sf_facRenScaleUp", 1);
+  cutTree->SetBranchStatus("sf_facRenScaleDown", 1);
   //addresses
   cutTree->SetBranchAddress("weight", &weight);
   cutTree->SetBranchAddress("pileupWeight", &pileupWeight);
   cutTree->SetBranchAddress("MR", &MR);
   cutTree->SetBranchAddress("t1Rsq", &t1Rsq);
-  
+  cutTree->SetBranchAddress("sf_facScaleUp", &sf_facScaleUp);
+  cutTree->SetBranchAddress("sf_facScaleDown", &sf_facScaleDown);
+  cutTree->SetBranchAddress("sf_renScaleUp", &sf_renScaleUp);
+  cutTree->SetBranchAddress("sf_renScaleDown", &sf_renScaleDown);
+  cutTree->SetBranchAddress("sf_facRenScaleUp", &sf_facRenScaleUp);
+  cutTree->SetBranchAddress("sf_facRenScaleDown", &sf_facRenScaleDown);
   //Signal
-  TTree* cutTreeSignal;
-  float MR_s, t1Rsq_s, weight_s, pileupWeight_s;
+  TTree* cutTreeSignal = NULL;
+  float MR_s           = 0;
+  float t1Rsq_s        = 0;
+  float weight_s       = 0;
+  float pileupWeight_s = 0;
   std::cout << "config signal TTree" << std::endl;
   if ( _prepareConfigCard )
     {
@@ -349,7 +373,15 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
     }
   
   std::cout << "clonning TH2Poly" << std::endl;
-  TH2Poly* h2pSignal = (TH2Poly*)h2p->Clone("h2pSignal"); 
+  TH2Poly* h2pSignal = (TH2Poly*)h2p->Clone("h2pSignal");
+
+  TH2Poly* h2p_facScaleUp      = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_facScaleDown    = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_renScaleUp      = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_renScaleDown    = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_facRenScaleUp   = (TH2Poly*)h2p->Clone("h2pSignal");
+  TH2Poly* h2p_facRenScaleDown = (TH2Poly*)h2p->Clone("h2pSignal");
+  
   h2p->Sumw2();
   h2pSignal->Sumw2();
   
@@ -364,8 +396,33 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
       //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi*kf );//nonRes
       //else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi*kf );//nonRes
       
-      if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
-      else  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
+      if ( t1Rsq < 1.0 )
+	{
+	  h2p->Fill( MR, t1Rsq, weight*pileupWeight*lumi );//sm-higgs
+	  
+	  h2p_facScaleUp->Fill( MR, t1Rsq, weight*sf_facScaleUp*pileupWeight*lumi*N_events/N_facScaleUp );
+	  h2p_facScaleDown->Fill( MR, t1Rsq, weight*sf_facScaleDown*pileupWeight*lumi*N_events/N_facScaleDown );
+	  
+	  h2p_renScaleUp->Fill( MR, t1Rsq, weight*sf_renScaleUp*pileupWeight*lumi*N_events/N_renScaleUp );
+	  h2p_renScaleDown->Fill( MR, t1Rsq, weight*sf_renScaleDown*pileupWeight*lumi*N_events/N_renScaleDown );
+
+	  h2p_facRenScaleUp->Fill( MR, t1Rsq, weight*sf_facRenScaleUp*pileupWeight*lumi*N_events/N_facRenScaleUp );
+	  h2p_facRenScaleDown->Fill( MR, t1Rsq, weight*sf_facRenScaleDown*pileupWeight*lumi*N_events/N_facRenScaleDown );
+	}
+      else
+	{
+	  h2p->Fill( MR, 0.999, weight*pileupWeight*lumi );//sm-higgs
+
+	  h2p_facScaleUp->Fill( MR, 0.999, weight*sf_facScaleUp*pileupWeight*lumi*N_events/N_facScaleUp );
+	  h2p_facScaleDown->Fill( MR, 0.999, weight*sf_facScaleDown*pileupWeight*lumi*N_events/N_facScaleDown );
+
+	  h2p_renScaleUp->Fill( MR, 0.999, weight*sf_renScaleUp*pileupWeight*lumi*N_events/N_renScaleUp );
+	  h2p_renScaleDown->Fill( MR, 0.999, weight*sf_renScaleDown*pileupWeight*lumi*N_events/N_renScaleDown );
+
+	  h2p_facRenScaleUp->Fill( MR, 0.999, weight*sf_facRenScaleUp*pileupWeight*lumi*N_events/N_facRenScaleUp );
+	  h2p_facRenScaleDown->Fill( MR, 0.999, weight*sf_facRenScaleDown*pileupWeight*lumi*N_events/N_facRenScaleDown );
+	  
+	}
       
       //if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, weight*lumi );//no pileup
       //else  h2p->Fill( MR, 0.999, weight*lumi );//no pileup
@@ -373,17 +430,17 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
       //else  h2p->Fill( MR, 0.999, 1.0 );
     } 
   
- if ( _prepareConfigCard )
-   {
-     nentries = cutTreeSignal->GetEntries();
-     for ( long i = 0; i < nentries; i++ )
-       {
-	 cutTreeSignal->GetEntry(i);
-	 //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
-	 if ( t1Rsq < 1.0 ) h2pSignal->Fill( MR_s, t1Rsq_s, weight_s*lumi );//sm-higgs
-	 else  h2pSignal->Fill( MR_s, 0.999, weight_s*lumi );//sm-higgs
-       } 
-   }
+  if ( _prepareConfigCard )
+    {
+      nentries = cutTreeSignal->GetEntries();
+      for ( long i = 0; i < nentries; i++ )
+	{
+	  cutTreeSignal->GetEntry(i);
+	  //if ( i%10000 == 0 ) std::cout << weight << " " << pileupWeight << " " << MR << " " << t1Rsq << std::endl;
+	  if ( t1Rsq < 1.0 ) h2pSignal->Fill( MR_s, t1Rsq_s, weight_s*lumi );//sm-higgs
+	  else  h2pSignal->Fill( MR_s, 0.999, weight_s*lumi );//sm-higgs
+	} 
+    }
   
   
   int nbinsT = h2p->GetNumberOfBins();
@@ -397,16 +454,63 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   if ( _prepareConfigCard )
     {
       std::string ofsName = categoryMode + "_configCard.txt";
+      std::cout << "[INFO]: producing configCard: " << ofsName << std::endl;
       std::ofstream ofs ( ofsName.c_str(), std::ofstream::out );
-      ofs << "#cat\t\tMR_l\t\tMR_h\t\tRsq_l\t\tRsq_h\t\tSMH\t\t\tSMH_Err\t\tSignal\t\tBkg_f" << std::endl;
+      ofs << "#cat\t\tMR_l\t\tMR_h\t\tRsq_l\t\tRsq_h\t\tSMH\t\t\tSMH_facScale\t\tSMH_renScale\t\tSMH_facRenScale\t\tSignal\t\tBkg_f" << std::endl;
       for ( auto& tmp : binningMap )
 	{
 	  for ( int i = 0; i < (int)tmp.second.size() - 1; i++ )
 	    {
+	      float smhY                 = h2p->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) );
+	      
+	      float smhY_facScaleUp      = h2p_facScaleUp->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhY_facScaleDown    = h2p_facScaleDown->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhSys_facScaleUp, smhSys_facScaleDown;
+	      if ( smhY_facScaleUp > smhY_facScaleDown )
+		{
+		  smhSys_facScaleUp   = smhY_facScaleUp;
+		  smhSys_facScaleDown = smhY_facScaleDown;
+		}
+	      else
+		{
+		  smhSys_facScaleUp   = smhY_facScaleDown;
+		  smhSys_facScaleDown = smhY_facScaleUp;
+		}
+	      float smhY_renScaleUp      = h2p_renScaleUp->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhY_renScaleDown    = h2p_renScaleDown->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhSys_renScaleUp, smhSys_renScaleDown;
+	      if ( smhY_renScaleUp > smhY_renScaleDown )
+		{
+		  smhSys_renScaleUp   = smhY_renScaleUp;
+		  smhSys_renScaleDown = smhY_renScaleDown;
+		}
+	      else
+		{
+		  smhSys_renScaleUp   = smhY_renScaleDown;
+		  smhSys_renScaleDown = smhY_renScaleUp;
+		}
+	      float smhY_facRenScaleUp   = h2p_facRenScaleUp->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhY_facRenScaleDown = h2p_facRenScaleDown->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) )/smhY;
+	      float smhSys_facRenScaleUp, smhSys_facRenScaleDown;
+	      if ( smhY_facRenScaleUp > smhY_facRenScaleDown )
+		{
+		  smhSys_facRenScaleUp   = smhY_facRenScaleUp;
+		  smhSys_facRenScaleDown = smhY_facRenScaleDown;
+		}
+	      else
+		{
+		  smhSys_facRenScaleUp   = smhY_facRenScaleDown;
+		  smhSys_facRenScaleDown = smhY_facRenScaleUp;
+		}
+	      
+	      
+	      float signalY = h2pSignal->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) );
 	      ofs << categoryMode << "\t\t" <<  tmp.first.first << "\t\t" << tmp.first.second << "\t\t" <<  tmp.second.at(i) << "\t\t" << tmp.second.at(i+1)
-		  << "\t\t" << h2p->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t"
-		  << h2p->GetBinError( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t" 
-		  << h2pSignal->GetBinContent( h2p->FindBin(tmp.first.first+10, tmp.second.at(i)+0.001) ) << "\t\t"
+		  << "\t\t" << smhY << "\t\t"
+		  << smhSys_facScaleUp << "/" << smhSys_facScaleDown << "\t\t"
+		  << smhSys_renScaleUp << "/" << smhSys_renScaleDown << "\t\t"
+		  << smhSys_facRenScaleUp << "/" << smhSys_facRenScaleDown << "\t\t"
+		  << signalY << "\t\t"
 		  << "singleExp" << std::endl;
 	    }
 	}
@@ -418,5 +522,17 @@ void PlotBinningAndCreateConfigFile( TString fname, std::string categoryMode = "
   h2p->SetStats(0);
   //h2p->Draw("colz L");
   h2p->Draw("colz text");
+  fout->cd();
+
+  h2p->Write("smh_nominal");
+  h2p_facScaleUp->Write("smh_facScaleUp");
+  h2p_facScaleDown->Write("smh_facScaleDown");
+  h2p_renScaleUp->Write("smh_renScaleUp");
+  h2p_renScaleDown->Write("smh_renScaleDown");
+  h2p_facRenScaleUp->Write("smh_facRenScaleUp");
+  h2p_facRenScaleDown->Write("smh_facRenScaleDown");
+  
+  
+  fout->Close();
   return;
 };

@@ -79,6 +79,13 @@ int main( int argc, char* argv[])
       return -1;
     }
 
+  std::string runPeriod = ParseCommandLine( argc, argv, "-runPeriod=" );
+  if (  runPeriod == "" )
+    {
+      std::cerr << "[ERROR]: please provide a fit mode using --runPeriod=<run1/run2>" << std::endl; 
+      return -1;
+    }
+
   std::string f1 = ParseCommandLine( argc, argv, "-f1=" );
   if (  f1 == "" && fitMode == "bias" )
     {
@@ -177,16 +184,26 @@ int main( int argc, char* argv[])
       _SMH_Yield = atof( SMH_Yield.c_str() );
     }
 
-  std::string SMH_YieldUn = ParseCommandLine( argc, argv, "-SMH_YieldUn=" );
-  float _SMH_YieldUn = 1.e-2;
-  if (  SMH_YieldUn == "" && fitMode == "datacard" )
+  std::string SMH_facScale = ParseCommandLine( argc, argv, "-SMH_facScale=" );
+  if (  SMH_facScale == "" && fitMode == "datacard" )
     {
-      std::cerr << "[WARNING]: please provide an input SMH_YieldUn, --SMH_Yield=<Yield_Uncertainty>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input SMH_facScale, --SMH_facScale=<facScale>" << std::endl;
+      return -1;
     }
-   else
-     {
-       _SMH_YieldUn = atof( SMH_YieldUn.c_str() );
-     }
+
+  std::string SMH_renScale = ParseCommandLine( argc, argv, "-SMH_renScale=" );
+  if (  SMH_renScale == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[ERROR]: please provide an input SMH_renScale, --SMH_renScale=<renScale>" << std::endl;
+      return -1;
+    }
+  
+  std::string SMH_facRenScale = ParseCommandLine( argc, argv, "-SMH_facRenScale=" );
+  if (  SMH_facRenScale == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[ERROR]: please provide an input SMH_facRenScale, --SMH_facRenScale=<facRenScale>" << std::endl;
+      return -1;
+    }
   
   std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
   float _Signal_Yield = 1.;
@@ -334,6 +351,8 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  //assymetric cut on photon PT
+  //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   TString cutMETfilters = "";
   TString cutTrigger = "";
@@ -354,6 +373,15 @@ int main( int argc, char* argv[])
       else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
       else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
       else if (categoryMode == "inclusive") categoryCutString = "";
+    }
+  else if ( runPeriod == "run1" )
+    {
+      if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
+      else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15";
+      else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbZ-91.) < 15 && abs(mbbH-125.) >= 15 )";
+      else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH-125.) < 15 || ( abs(mbbZ-91.) < 15 && abs(mbbH-125.) >= 15 ) )";
+      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && (pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015)";
+      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015)";
     }
   else
     {
@@ -440,7 +468,7 @@ int main( int argc, char* argv[])
   else if ( fitMode == "datacard" )
     {
       RooWorkspace* w_sb;
-      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, _SMH_YieldUn, _Signal_Yield, binNumber );
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_facScale, SMH_renScale, SMH_facRenScale, _Signal_Yield, binNumber );
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
@@ -537,6 +565,7 @@ int main( int argc, char* argv[])
   else if ( fitMode == "signalFit" )
     {
       RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
+      //RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

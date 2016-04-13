@@ -4,6 +4,8 @@
 //LOCAL INCLUDES
 #include "CommandLineInput.hh"
 
+//std::string ntupleDir = "/Users/cmorgoth/Work/data/HggRazorRun2/Analysis13TeV/CMSSW_7_6_March15_Ntuples/";
+std::string ntupleDir = "/Users/cmorgoth/Work/data/HggRazorRun2/MC/CMSSW_7_6_March15_Ntuples/";
 
 int main( int argc, char* argv[] )
 {
@@ -22,25 +24,29 @@ int main( int argc, char* argv[] )
   int binNumber = 0;
   while( ifs.good() )
     {
-      std::string category, MR_l, MR_h, Rsq_l, Rsq_h, SMH, SMH_Err, Signal, Bkg_f1;
+      std::string category, MR_l, MR_h, Rsq_l, Rsq_h, SMH, SMH_facScale, SMH_renScale, SMH_facRenScale, Signal, Bkg_f1;
       ifs >> configCardName;
       if( ifs.eof() ) break;
-      //std::cout << configCardName << std::endl;
+      std::cout << "[INFO]: opening configDataCard: "<< configCardName << std::endl;
       std::ifstream tmpF( configCardName.c_str(), std::ifstream::in );
+      assert(tmpF);
       while( tmpF.good() )
 	{
-	  tmpF >> category >> MR_l >> MR_h >> Rsq_l >> Rsq_h >> SMH >> SMH_Err >> Signal >> Bkg_f1;
+	  tmpF >> category >> MR_l >> MR_h >> Rsq_l >> Rsq_h >> SMH >> SMH_facScale >> SMH_renScale >> SMH_facRenScale >> Signal >> Bkg_f1;
 	  if ( category.find("#") != std::string::npos ) continue;
 	  if ( tmpF.eof() ) break;
 	  //std::cout << category << " " << MR_l << " " << MR_h << " " << Rsq_l << " " << Rsq_h << " " << SMH << " " << SMH_Err
 	  //		    << " " << Signal << " "  << Bkg_f1 << std::endl;
 	  std::cout << "./MakeFitRun2 " 
-		    << "--inputFile=/Users/cmorgoth/Work/data/HggRazorRun2/Analysis13TeV/CMSSW_7_6_March15_Ntuples/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root"
-		    << " --inputFileSignal=/Users/cmorgoth/Work/data/HggRazorRun2/Analysis13TeV/CMSSW_7_6_March15_Ntuples/T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root"
-		    << " --inputFileSMH=/Users/cmorgoth/Work/data/HggRazorRun2/Analysis13TeV/CMSSW_7_6_March15_Ntuples/SM-Higgs_1pb_weighted.root"
+		    << "--inputFile=" << ntupleDir << "DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root"
+		    << " --inputFileSignal=" << ntupleDir << "T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root"
+		    << " --inputFileSMH=" << ntupleDir << "SM-Higgs_1pb_weighted.root"
 		    << " --treeName=HggRazor --dataMode=data+signal --fitMode=datacard --category=" << category<< " --LowMRcut=" << MR_l 
 		    << " --HighMRcut=" << MR_h << " --LowRSQcut=" << Rsq_l << " --HighRSQcut=" << Rsq_h << " --f1=" << Bkg_f1
-		    << " --SMH_Yield=" << SMH << " --SMH_YieldUn=" << SMH_Err << " --Signal_Yield=" << Signal << " --binNumber=" << binNumber << std::endl;
+		    << " --SMH_Yield=" << SMH << " --SMH_facScale=" << SMH_facScale
+		    << " --SMH_renScale=" << SMH_renScale
+		    << " --SMH_facRenScale=" << SMH_facRenScale
+		    << " --Signal_Yield=" << Signal << " --binNumber=" << binNumber << std::endl;
 	  binNumber++;
 	}
       tmpF.close();

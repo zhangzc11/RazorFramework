@@ -12,13 +12,14 @@
 //LOCAL INCLUDES
 
 RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float forceMu, TString mggName );
+RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB = 125., float sigmaCB = 2. );
 double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName );
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName );
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName );
-RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield = 1e-2, float SMH_YieldUn = 1e-2,
-			    float Signal_Yield = 1.0, TString binNumber = "-1" );
+RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield = 1e-2, TString SMH_facScale = "1.01/0.99",
+			    TString SMH_renScale = "1.01/0.99", TString SMH_facRenScale = "1.01/0.99", float Signal_Yield = 1.0, TString binNumber = "-1" );
 
 RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, TString ffName );
 RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, int ntoys = 1e2, int npoints = 1e4 );
