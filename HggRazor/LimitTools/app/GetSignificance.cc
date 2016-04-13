@@ -97,6 +97,7 @@ float bin3[4] = {400,0,600,0.025};
 float bin4[4] = {400,0.025,600,0.175};
 float bin5[4] = {600,0,950,0.01};
 float bin6[4] = {950,0,10000,0.01};
+
 std::vector<float*> SetBinning()
 {
   std::vector<float*> myVec;

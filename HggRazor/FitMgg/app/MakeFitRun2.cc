@@ -79,6 +79,13 @@ int main( int argc, char* argv[])
       return -1;
     }
 
+  std::string runPeriod = ParseCommandLine( argc, argv, "-runPeriod=" );
+  if (  runPeriod == "" )
+    {
+      std::cerr << "[ERROR]: please provide a fit mode using --runPeriod=<run1/run2>" << std::endl; 
+      return -1;
+    }
+
   std::string f1 = ParseCommandLine( argc, argv, "-f1=" );
   if (  f1 == "" && fitMode == "bias" )
     {
@@ -344,6 +351,8 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  //assymetric cut on photon PT
+  //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   TString cutMETfilters = "";
   TString cutTrigger = "";
@@ -364,6 +373,15 @@ int main( int argc, char* argv[])
       else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
       else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
       else if (categoryMode == "inclusive") categoryCutString = "";
+    }
+  else if ( runPeriod == "run1" )
+    {
+      if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
+      else if (categoryMode == "hbb") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.) < 15";
+      else if (categoryMode == "zbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbZ-91.) < 15 && abs(mbbH-125.) >= 15 )";
+      else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH-125.) < 15 || ( abs(mbbZ-91.) < 15 && abs(mbbH-125.) >= 15 ) )";
+      else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && (pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015)";
+      else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH-125.)>=15 && abs(mbbZ-91.)>=15 && !(pho1sigmaEOverE < 0.015 && pho2sigmaEOverE < 0.015)";
     }
   else
     {
@@ -546,8 +564,8 @@ int main( int argc, char* argv[])
     }
   else if ( fitMode == "signalFit" )
     {
-      //RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
-      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
+      RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
+      //RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

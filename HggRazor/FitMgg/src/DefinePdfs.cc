@@ -45,8 +45,6 @@ TString MakeSingleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   
-  RooRealVar* Ns     = new RooRealVar( tag+"_SG_Ns", "N_{s}", 1e5, "events");
-  Ns->setConstant(kFALSE);
   //------------------
   //C r e a t e  p.d.f
   //------------------
