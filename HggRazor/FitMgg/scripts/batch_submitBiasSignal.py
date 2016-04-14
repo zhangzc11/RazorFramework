@@ -7,11 +7,11 @@ import subprocess, time, sys, os, shlex
 
 print "RUNNING BIAS TEST"
 
-inputFile = "/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
-outputDir = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_newbin_8nh_npoints/"
+inputFile = "/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/submission/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root" #"/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
+outputDir = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_test_28Mar2016_cmscaf1nd/"
 SoverB = ["0.0","1.0","3.0","5.0"]
 
-queue = "8nh" # change this to the queue you want to use in lxplus batch
+queue = "cmscaf1nd" # change this to the queue you want to use in lxplus batch
 
 if __name__ == "__main__":
 	bin_list_filename = sys.argv[1]
@@ -22,7 +22,7 @@ if __name__ == "__main__":
 	work_directory = pwd.replace("scripts","")
 	
 	#os.system("rm -rf "+pwd+"/submit_biasSignal")	
-	os.system("mkdir -p "+pwd+"/submit_biasSignal_8nh")	
+	os.system("mkdir -p "+pwd+"/submit_biasSignal_test_cmscaf1nd")	
 	with open(bin_list_filename,"r") as bin_list_file:
 		for this_bin in bin_list_file:
 			bin_array = shlex.split(this_bin)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 				os.system("mkdir -p "+outputDir+"trees/"+bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"/SoB_"+SoverB[SoverB_index])
 				for f1 in range(len(fitName)):
 					for f2 in range(len(fitName)): 
-						env_script_n = pwd + "/submit_biasSignal_8nh/" + bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"_SoB_"+SoverB[SoverB_index]+"_"+fitName[f1]+"_"+fitName[f2]+".sh"
+						env_script_n = pwd + "/submit_biasSignal_test_cmscaf1nd/" + bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"_SoB_"+SoverB[SoverB_index]+"_"+fitName[f1]+"_"+fitName[f2]+".sh"
 						env_script_f = open(env_script_n, 'w')
 						env_script_f.write("#!/bin/bash\n")
 						env_script_f.write("cd " + work_directory + "\n")
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 						env_script_f.write("rm -rf "+pwd + "/core.*")
 						changePermission = subprocess.Popen(['chmod 777 ' + env_script_n], stdout=subprocess.PIPE, shell=True);
 						debugout = changePermission.communicate()
-						submit_s = 'bsub -q '+queue+' -o ' + pwd + "/submit_biasSignal_8nh/"+bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"_SoB_"+SoverB[SoverB_index]+fitName[f1]+"_"+fitName[f2]+".log" + ' "source ' + env_script_n + '"'
+						submit_s = 'bsub -q '+queue+' -o ' + pwd + "/submit_biasSignal_test_cmscaf1nd/"+bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+"_SoB_"+SoverB[SoverB_index]+fitName[f1]+"_"+fitName[f2]+".log" + ' "source ' + env_script_n + '"'
 						print "[submit_BiasSignal]  '-- " + submit_s
 						submitJobs = subprocess.Popen([submit_s], stdout=subprocess.PIPE, shell=True);
 						output = (submitJobs.communicate()[0]).splitlines()
