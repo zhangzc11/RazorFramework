@@ -147,6 +147,13 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	std::string str_table_5 = "AIC_output/FitChoices_Table_"+category+"_ColorTable.tex";
         const char * file_Name_table_5 = str_table_5.c_str();
 	FILE* m_outfile_5 = fopen(file_Name_table_5, "a");
+
+	std::string str_list = "AIC_output/selected_func_list_fromAIC.list";
+        const char * file_Name_list = str_list.c_str();
+	FILE* m_outfile_list = fopen(file_Name_list, "a");
+	
+ 	fprintf(m_outfile_list,"%s %s %s %s %s ",category.c_str(),LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str());
+
 	fprintf(m_outfile_5,"\\begin{table*}[h] \n");
 	fprintf(m_outfile_5,"\\begin{center} \n");
 	fprintf(m_outfile_5,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
@@ -165,6 +172,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	{
 		  fprintf(m_outfile_5,"\\rowcolor[rgb]{0.31,0.78,0.47}  \n");
 		  fprintf(m_outfile_5,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
+		  fprintf(m_outfile_list,"%s ",tmp.second.c_str());
 	}
         else
 	{
@@ -173,6 +181,8 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	}
 	
  	}
+
+ 	fprintf(m_outfile_list," \n ");
 	fprintf(m_outfile_5,"\\hline \n");
 	fprintf(m_outfile_5,"\\end{tabular} \n");
 	fprintf(m_outfile_5,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
