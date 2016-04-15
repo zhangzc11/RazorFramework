@@ -118,7 +118,7 @@ TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+TString MakeDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale )
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
@@ -181,7 +181,7 @@ TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale )
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
@@ -200,8 +200,26 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   //------------------
   //C r e a t e  p.d.f
   //------------------
-  RooGaussian* gauss1    = new RooGaussian( tag + "_G1", "", mgg, *mu1, *sigma1 );
-  RooGaussian* gauss2    = new RooGaussian( tag + "_G2", "", mgg, *mu2, *sigma2 );
+  RooGaussian* gauss1;
+  RooGaussian* gauss2; 
+  if ( _globalScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      //muGlobal->setConstant(kFALSE);
+      RooFormulaVar* mu1G  = new RooFormulaVar( tag + "_DG_mu1G", "#mu_{1} - #mu_{g}", "(@0-@1)", RooArgList(*mu1, *muGlobal) );
+      RooFormulaVar* mu2G  = new RooFormulaVar( tag + "_DG_mu2G", "#mu_{2} - #mu_{g}", "(@0-@1)", RooArgList(*mu2, *muGlobal) );
+      gauss1 = new RooGaussian( tag + "_G1", "", mgg, *mu1G, *sigma1 );
+      gauss2 = new RooGaussian( tag + "_G2", "", mgg, *mu2G, *sigma2 );
+    }
+  else
+    {
+      gauss1 = new RooGaussian( tag + "_G1", "", mgg, *mu1, *sigma1 );
+      gauss2 = new RooGaussian( tag + "_G2", "", mgg, *mu2, *sigma2 );
+    }
+
+  //----------------------------
+  //Define out tag and RooAddPdf
+  //----------------------------
   TString pdf_name          = tag + "_DG";
   RooAddPdf* doublegauss = new RooAddPdf( pdf_name, "", RooArgList( *gauss1, *gauss2 ), *frac );
   w.import( *doublegauss );
