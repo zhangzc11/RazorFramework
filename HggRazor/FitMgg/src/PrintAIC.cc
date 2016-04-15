@@ -47,8 +47,9 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
     	std::string str_table = "AIC_output/FitChoices_Table_"+category+".tex";
         const char * file_Name_table = str_table.c_str();
 	FILE* m_outfile = fopen(file_Name_table, "a");
-	fprintf(m_outfile,"\\begin{table}[H] \n");
+	fprintf(m_outfile,"\\begin{table*}[htbH] \n");
 	fprintf(m_outfile,"\\begin{center} \n");
+	fprintf(m_outfile,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile,"\\begin{tabular}{|c|c|cc|cc|cc|} \n");
 	fprintf(m_outfile,"\\hline function & \\#P & $\\Delta A_1$ & $\\omega_1$ & $\\Delta A_2$ & $\\omega_2$ & $\\Delta A_3$ & $\\omega_3$ \\\\ \\hline \n");
 	double delta_aic[8];
@@ -63,27 +64,27 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	 }
 	fprintf(m_outfile,"\\hline \n");
 	fprintf(m_outfile,"\\end{tabular} \n");
-	fprintf(m_outfile,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile,"\\end{center} \n");
-	fprintf(m_outfile,"\\end{table} \n \n \n");
+	fprintf(m_outfile,"\\end{table*} \n \n \n");
 	//pring the plot to a file
 	std::string str_plot = "AIC_output/FitChoices_Plot_"+category+".tex";
         const char * file_Name_plot = str_plot.c_str();
 	FILE* m_outfile2 = fopen(file_Name_plot, "a");
-	fprintf(m_outfile2,"\\begin{figure}[H] \n");
+	fprintf(m_outfile2,"\\begin{figure}[hbtp] \n");
 	fprintf(m_outfile2,"\\begin{center} \n");
-	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{Figure/%s/%s_%s.pdf} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile2,"\\includegraphics[width=\\columnwidth]{figs/%s/%s_%s.pdf} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s -  %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
-	fprintf(m_outfile2,"\\label{Fig:%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile2,"\\label{Fig:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile2,"\\end{center} \n");
 	fprintf(m_outfile2,"\\end{figure} \n \n \n");
      //print the sorted AIC weight to a file
 	std::string str_table_2 = "AIC_output/FitChoices_Table_"+category+"_sortByWeight.tex";
         const char * file_Name_table_2 = str_table_2.c_str();
 	FILE* m_outfile_2 = fopen(file_Name_table_2, "a");
-	fprintf(m_outfile_2,"\\begin{table}[H] \n");
+	fprintf(m_outfile_2,"\\begin{table*}[htbH] \n");
 	fprintf(m_outfile_2,"\\begin{center} \n");
+	fprintf(m_outfile_2,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile_2,"\\begin{tabular}{|c|c|cc|cc|cc|} \n");
 	fprintf(m_outfile_2,"\\hline function & \\#P & $\\Delta A_1$ & $\\omega_1$ & $\\Delta A_2$ & $\\omega_2$ & $\\Delta A_3$ & $\\omega_3$ \\\\ \\hline \n");
 	for ( auto tmp :sort_func_name) 
@@ -92,16 +93,16 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	 }
 	fprintf(m_outfile_2,"\\hline \n");
 	fprintf(m_outfile_2,"\\end{tabular} \n");
-	fprintf(m_outfile_2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
-	fprintf(m_outfile_2,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_2,"\\label{tab:%s_%s_%s} \n", category.c_str(), LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile_2,"\\end{center} \n");
-	fprintf(m_outfile_2,"\\end{table} \n \n \n");
+	fprintf(m_outfile_2,"\\end{table*} \n \n \n");
       //print the final AIC to a file
 	std::string str_table_3 = "AIC_output/FitChoices_Table_"+category+"_FinalAIC.tex";
         const char * file_Name_table_3 = str_table_3.c_str();
 	FILE* m_outfile_3 = fopen(file_Name_table_3, "a");
-	fprintf(m_outfile_3,"\\begin{table}[H] \n");
+	fprintf(m_outfile_3,"\\begin{table*}[htbH] \n");
 	fprintf(m_outfile_3,"\\begin{center} \n");
+	fprintf(m_outfile_3,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile_3,"\\begin{tabular}{|c|c|cc|} \n");
 	fprintf(m_outfile_3,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$  \\\\ \\hline \n");
 	for ( auto tmp :sort_func_name) 
@@ -110,16 +111,16 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	 }
 	fprintf(m_outfile_3,"\\hline \n");
 	fprintf(m_outfile_3,"\\end{tabular} \n");
-	fprintf(m_outfile_3,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
-	fprintf(m_outfile_3,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_3,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile_3,"\\end{center} \n");
-	fprintf(m_outfile_3,"\\end{table} \n \n \n");
+	fprintf(m_outfile_3,"\\end{table*} \n \n \n");
       //print the AIC that pass the test to a file
 	std::string str_table_4 = "AIC_output/FitChoices_Table_"+category+"_PassAIC.tex";
         const char * file_Name_table_4 = str_table_4.c_str();
 	FILE* m_outfile_4 = fopen(file_Name_table_4, "a");
-	fprintf(m_outfile_4,"\\begin{table}[H] \n");
+	fprintf(m_outfile_4,"\\begin{table*}[htbH] \n");
 	fprintf(m_outfile_4,"\\begin{center} \n");
+	fprintf(m_outfile_4,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
 	fprintf(m_outfile_4,"\\begin{tabular}{|c|c|cc|} \n");
 	fprintf(m_outfile_4,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$  \\\\ \\hline \n");
          double max_AIC_weight = 1.0;
@@ -138,10 +139,9 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
  	}
 	fprintf(m_outfile_4,"\\hline \n");
 	fprintf(m_outfile_4,"\\end{tabular} \n");
-	fprintf(m_outfile_4,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
-	fprintf(m_outfile_4,"\\label{tab:FitChoices_%s_%s} \n", LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_4,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
 	fprintf(m_outfile_4,"\\end{center} \n");
-	fprintf(m_outfile_4,"\\end{table} \n \n \n");
+	fprintf(m_outfile_4,"\\end{table*} \n \n \n");
 
 
 
