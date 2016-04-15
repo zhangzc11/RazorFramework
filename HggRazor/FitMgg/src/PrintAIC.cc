@@ -143,7 +143,43 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	fprintf(m_outfile_4,"\\end{center} \n");
 	fprintf(m_outfile_4,"\\end{table*} \n \n \n");
 
+       //print the AIC table with color to a file
+	std::string str_table_5 = "AIC_output/FitChoices_Table_"+category+"_ColorTable.tex";
+        const char * file_Name_table_5 = str_table_5.c_str();
+	FILE* m_outfile_5 = fopen(file_Name_table_5, "a");
+	fprintf(m_outfile_5,"\\begin{table*}[h] \n");
+	fprintf(m_outfile_5,"\\begin{center} \n");
+	fprintf(m_outfile_5,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_5,"\\begin{tabular}{|c|c|cc|} \n");
+	fprintf(m_outfile_5,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$  \\\\ \\hline \n");
+        max_AIC_weight = 1.0;
+        isMaxAIC = true;
+	for ( auto tmp :sort_func_name) 
+      {
+	if(isMaxAIC)
+	{
+		max_AIC_weight = aic_weight_map[tmp.second];
+		isMaxAIC = false;
+	}
+	if(aic_weight_map[tmp.second] > 0.1*max_AIC_weight)
+	{
+		  fprintf(m_outfile_5,"\\rowcolor[rgb]{0.31,0.78,0.47}  \n");
+		  fprintf(m_outfile_5,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
+	}
+        else
+	{
+		  fprintf(m_outfile_5,"\\rowcolor[rgb]{1.0,0.41,0.38}  \n");
+		  fprintf(m_outfile_5,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
+	}
+	
+ 	}
+	fprintf(m_outfile_5,"\\hline \n");
+	fprintf(m_outfile_5,"\\end{tabular} \n");
+	fprintf(m_outfile_5,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_5,"\\end{center} \n");
+	fprintf(m_outfile_5,"\\end{table*} \n \n \n");
 
+ 
 
 	
 	//plot the fit
