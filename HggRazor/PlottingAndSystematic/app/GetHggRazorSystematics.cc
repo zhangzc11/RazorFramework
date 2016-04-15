@@ -38,10 +38,88 @@ float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,1.0};
 float  lowresRSQedges2[3] = {0,0.02,1.0};
 float  lowresRSQedges3[2] = {0,1.0};
 
+
+
+//-----------------------------------------
+//New Binning From Significance Calculation
+//-----------------------------------------
+//HighPt
+float bin_highpt0[4] = {150,0.13,10000,1};
+float bin_highpt1[4] = {750,0,10000,0.01};
+float bin_highpt2[4] = {750,0.01,10000,0.13};
+float bin_highpt3[4] = {500,0,750,0.03};
+float bin_highpt4[4] = {500,0.03,750,0.13};
+float bin_highpt5[4] = {150,0,400,0.13};
+float bin_highpt6[4] = {400,0,500,0.045};
+float bin_highpt7[4] = {400,0.045,500,0.13};
+std::vector<float*> SetBinning_highpt()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_highpt0);
+  myVec.push_back(bin_highpt1);
+  myVec.push_back(bin_highpt2);
+  myVec.push_back(bin_highpt3);
+  myVec.push_back(bin_highpt4);
+  myVec.push_back(bin_highpt5);
+  myVec.push_back(bin_highpt6);
+  myVec.push_back(bin_highpt7);
+  return myVec;
+};
+//HZbb
+float bin_hzbb0[4] = {150,0,10000,1};
+std::vector<float*> SetBinning_hzbb()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_hzbb0);
+  return myVec;
+};
+//HighRes
+float bin_highres0[4] = {600,0.01,10000,1};
+float bin_highres1[4] = {150,0.175,600,1};
+float bin_highres2[4] = {150,0,400,0.175};
+float bin_highres3[4] = {400,0,600,0.025};
+float bin_highres4[4] = {400,0.025,600,0.175};
+float bin_highres5[4] = {600,0,950,0.01};
+float bin_highres6[4] = {950,0,10000,0.01};
+std::vector<float*> SetBinning_highres()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_highres0);
+  myVec.push_back(bin_highres1);
+  myVec.push_back(bin_highres2);
+  myVec.push_back(bin_highres3);
+  myVec.push_back(bin_highres4);
+  myVec.push_back(bin_highres5);
+  myVec.push_back(bin_highres6);
+  return myVec;
+};
+//LowRes
+float bin_lowres0[4] = {500,0.01,10000,1};
+float bin_lowres1[4] = {150,0.15,500,1};
+float bin_lowres2[4] = {150,0,400,0.15};
+float bin_lowres3[4] = {400,0,500,0.015};
+float bin_lowres4[4] = {400,0.015,500,0.15};
+float bin_lowres5[4] = {500,0,800,0.01};
+float bin_lowres6[4] = {800,0,10000,0.01};
+std::vector<float*> SetBinning_lowres()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_lowres0);
+  myVec.push_back(bin_lowres1);
+  myVec.push_back(bin_lowres2);
+  myVec.push_back(bin_lowres3);
+  myVec.push_back(bin_lowres4);
+  myVec.push_back(bin_lowres5);
+  myVec.push_back(bin_lowres6);
+  return myVec;
+};
+
+
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi = 2300.0;
+float HggRazorSystematics::Lumi  = 2300.0;
+float HggRazorSystematics::NR_kf = 1.0;
 
 void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
 
@@ -121,16 +199,38 @@ int main( int argc, char* argv[] )
       //---------------------------
       HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, true, true );
       hggSys->PrintBinning();
-      hggSys->SetBinningMap( binningMap );
+      //hggSys->SetBinningMap( binningMap );
+      if ( categoryMode == "highpt")
+	{
+	  hggSys->SetBinningVector( SetBinning_highpt() );
+	}
+      else if ( categoryMode == "hzbb" )
+	{
+	  hggSys->SetBinningVector( SetBinning_hzbb() );
+	}
+      else if ( categoryMode == "highres" )
+	{
+	  hggSys->SetBinningVector( SetBinning_highres() );
+	}
+      else if ( categoryMode == "lowres" )
+	{
+	  hggSys->SetBinningVector( SetBinning_lowres() );
+	}
+      else
+	{
+	  std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
+	  return -1;
+	}
+      
       hggSys->PrintBinning();
-      hggSys->InitMrRsqTH2Poly();
+      hggSys->InitMrRsqTH2Poly( 1 );
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->Loop();
-      facScaleSys.push_back( hggSys->GetFacScaleSystematic( 1000, 0 ) );
-      renScaleSys.push_back( hggSys->GetRenScaleSystematic( 1000, 0 ) );
-      facRenScaleSys.push_back( hggSys->GetFacRenScaleSystematic( 1000, 0 ) );
+      facScaleSys.push_back( hggSys->GetFacScaleSystematic( 200, 0 ) );
+      renScaleSys.push_back( hggSys->GetRenScaleSystematic( 200, 0 ) );
+      facRenScaleSys.push_back( hggSys->GetFacRenScaleSystematic( 200, 0 ) );
       
       hggSys->WriteOutput( "histoMR_Rsq" );
       delete hggSys;
