@@ -720,7 +720,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar SMH_norm( combineSMH+"_norm" ,"", SMH_Yield);
   //SMH_norm.setConstant(kFALSE);
   combine_ws->import( SMH_norm );
-  TString combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws );
+  TString combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
   combine_ws->var( combineSignal+"_frac")->setVal(gausFrac);
   combine_ws->var( combineSignal+"_mu1")->setVal(gausMu1);
   combine_ws->var( combineSignal+"_mu2")->setVal(gausMu2);

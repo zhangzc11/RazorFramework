@@ -68,6 +68,9 @@ private:
   TH2Poly *h2p_renScaleDown;
   TH2Poly *h2p_facRenScaleUp;
   TH2Poly *h2p_facRenScaleDown;
+  //JES
+  TH2Poly *h2p_JesUp;
+  TH2Poly *h2p_JesDown;
 
   //Systematic Histos(user must set these)
   TH1F* NEvents;

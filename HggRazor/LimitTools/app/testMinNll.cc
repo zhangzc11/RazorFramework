@@ -635,7 +635,7 @@ int main( int argc, char* argv[] )
       */
 
      
-      std::cout << "float bin" << ctr << "[4] = {" << MR_low<< "," << Rsq_low << "," <<  MR_high << "," <<  Rsq_high << "};\n";
+      std::cout << "float bin_" << categoryMode << ctr << "[4] = {" << MR_low<< "," << Rsq_low << "," <<  MR_high << "," <<  Rsq_high << "};\n";
       ctr++;
       
       h2p->AddBin( MR_low, Rsq_low, MR_high, Rsq_high );
@@ -651,12 +651,13 @@ int main( int argc, char* argv[] )
       h2p_SoverSqrtB->SetBinContent( bin, tmp.second.s/sqrt(tmp.second.b_nr+tmp.second.s) );
     }
 
-  std::cout << "std::vector<float*> SetBinning()\n{\n";
+  std::cout << "std::vector<float*> SetBinning_" << categoryMode << "()\n{\n";
+  std::cout << "std::vector<float*> myVec;\n";
   for( int i = 0; i < myMap.size(); i++ )
     {
-      std::cout << "myVec.push_back(bin" << i << ");\n";
+      std::cout << "myVec.push_back(bin_" << categoryMode << i << ");\n";
     }
-  std::cout << "}\n";
+  std::cout << "return myVec;\n}\n";
 
   //h_qnot->Write();
   h2p->Write("h2p_bFull");

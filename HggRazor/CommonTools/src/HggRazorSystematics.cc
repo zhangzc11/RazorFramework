@@ -80,6 +80,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_renScaleDown    = new TH2Poly("renScaleDown", "", 150, 10000, 0, 1);
       h2p_facRenScaleUp   = new TH2Poly("facRenScaleUp", "", 150, 10000, 0, 1);
       h2p_facRenScaleDown = new TH2Poly("facRenScaleDown", "", 150, 10000, 0, 1);
+      h2p_JesUp           = new TH2Poly("JesUp", "", 150, 10000, 0, 1);
+      h2p_JesDown         = new TH2Poly("JesDown", "", 150, 10000, 0, 1);
       //adding bins
       for ( auto tmp : this->binningMap )
 	{
@@ -93,8 +95,12 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	      h2p_renScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facRenScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facRenScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_JesUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_JesDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	    }
 	}
+      
+      return true;
     }
   else if ( mode == 1 )
     {
@@ -110,6 +116,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_renScaleDown    = new TH2Poly("renScaleDown", "", 150, 10000, 0, 1);
       h2p_facRenScaleUp   = new TH2Poly("facRenScaleUp", "", 150, 10000, 0, 1);
       h2p_facRenScaleDown = new TH2Poly("facRenScaleDown", "", 150, 10000, 0, 1);
+      h2p_JesUp           = new TH2Poly("JesUp", "", 150, 10000, 0, 1);
+      h2p_JesDown         = new TH2Poly("JesDown", "", 150, 10000, 0, 1);
       for ( auto tmp : binningVect )
 	{
 	  std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
@@ -120,10 +128,14 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  h2p_facScaleDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_renScaleUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_facRenScaleDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_JesUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_JesDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	}
-      
+
+      return true;
     }
-  
+
+  return true;
 };
 
 void HggRazorSystematics::Loop()
@@ -189,6 +201,14 @@ void HggRazorSystematics::Loop()
 	  h2p_facRenScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
 	  h2p_facRenScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
 	}
+
+      //JES Up
+      if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, this->Lumi*weight*pileupWeight );
+      else h2p_JesUp->Fill( MR_JESUp, 0.999, this->Lumi*weight*pileupWeight );
+      //JES Down
+      if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, this->Lumi*weight*pileupWeight );
+      else h2p_JesDown->Fill( MR_JESDown, 0.999, this->Lumi*weight*pileupWeight );
+	
     }
 
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
@@ -330,6 +350,8 @@ bool HggRazorSystematics::WriteOutput( TString outName )
   if ( h2p_renScaleDown != NULL ) h2p_renScaleDown->Write( this->boxName + "_histo_renScaleDown" );
   if ( h2p_facRenScaleUp != NULL ) h2p_facRenScaleUp->Write( this->boxName + "_histo_facRenScaleUp" );
   if ( h2p_facRenScaleDown != NULL ) h2p_facRenScaleDown->Write( this->boxName + "_histo_facRenScaleDown" );
+  if ( h2p_JesUp != NULL ) h2p_JesUp->Write( this->boxName + "_histo_JesUp" );
+  if ( h2p_JesDown != NULL ) h2p_JesDown->Write( this->boxName + "_histo_JesDown" );
    
   fout->Close();
   if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
