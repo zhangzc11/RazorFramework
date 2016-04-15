@@ -37,7 +37,7 @@ if __name__ == "__main__":
 	with open(bin_list_filename,"r") as bin_list_file:
 		for this_bin in bin_list_file:
 			bin_array = shlex.split(this_bin)
-			env_script_f.write("./MakeFitRun2 --inputFile="+inputFile+" --treeName=HggRazor --LowMRcut="+bin_array[1]+" --HighMRcut="+bin_array[2]+" --LowRSQcut="+bin_array[3]+" --HighRSQcut="+bin_array[4]+" --dataMode=data --category="+bin_array[0]+" --fitMode=AIC2 --outputFile="+work_directory+"AIC_output/"+bin_array[0]+"/"+ bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+".root"+" \n")
+			env_script_f.write("./MakeFitRun2 --inputFile="+inputFile+" --treeName=HggRazor --LowMRcut="+bin_array[1]+" --HighMRcut="+bin_array[2]+" --LowRSQcut="+bin_array[3]+" --HighRSQcut="+bin_array[4]+" --dataMode=data --category="+bin_array[0]+" --fitMode=AIC2 --runPeriod=run2 --outputFile="+work_directory+"AIC_output/"+bin_array[0]+"/"+ bin_array[0]+"_"+bin_array[1]+"_"+bin_array[3]+".root"+" \n")
 			
 	changePermission = subprocess.Popen(['chmod 777 ' + env_script_n], stdout=subprocess.PIPE, shell=True);
 	debugout = changePermission.communicate()
