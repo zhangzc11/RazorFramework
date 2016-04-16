@@ -485,6 +485,8 @@ std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, fl
   float smhY      = h2p->GetBinContent( bin );
   float smhY_Up   = (h2p_facScaleUp->GetBinContent( bin )-smhY)/smhY;
   float smhY_Down = (h2p_facScaleDown->GetBinContent( bin )-smhY)/smhY;
+  //float smhY_Down = (h2p_Pdf[0]->GetBinContent( bin )-smhY)/smhY;
+  
   std::cout << "MR: " << mr << " , Rsq: " << rsq << ";; bin: " << bin
 	    << " --> Up: " << smhY_Up << ", Down: " << smhY_Down << ", nominal: " << smhY << std::endl;
   return std::make_pair( smhY_Up, smhY_Down );
@@ -494,8 +496,8 @@ std::pair<float, float> HggRazorSystematics::GetRenScaleSystematic( float mr, fl
 {
   int bin = h2p->FindBin( mr+10, rsq+0.0001 );
   float smhY      = h2p->GetBinContent( bin );
-  float smhY_Up   = h2p_renScaleUp->GetBinContent( bin ) - smhY;
-  float smhY_Down = h2p_renScaleDown->GetBinContent( bin ) - smhY;
+  float smhY_Up   = (h2p_renScaleUp->GetBinContent( bin ) - smhY)/smhY;
+  float smhY_Down = (h2p_renScaleDown->GetBinContent( bin ) - smhY)/smhY;
   std::cout << "MR: " << mr << " , Rsq: " << rsq << ";; bin: " << bin
 	    << " --> Up: " << smhY_Up << ", Down: " << smhY_Down << ", nominal: " << smhY << std::endl;
   return std::make_pair( smhY_Up, smhY_Down );
@@ -505,8 +507,8 @@ std::pair<float, float> HggRazorSystematics::GetFacRenScaleSystematic( float mr,
 {
   int bin = h2p->FindBin( mr+10, rsq+0.0001 );
   float smhY      = h2p->GetBinContent( bin );
-  float smhY_Up   = h2p_facRenScaleUp->GetBinContent( bin ) - smhY;
-  float smhY_Down = h2p_facRenScaleDown->GetBinContent( bin ) - smhY;
+  float smhY_Up   = (h2p_facRenScaleUp->GetBinContent( bin ) - smhY)/smhY;
+  float smhY_Down = (h2p_facRenScaleDown->GetBinContent( bin ) - smhY)/smhY;
   std::cout << "MR: " << mr << " , Rsq: " << rsq << ";; bin: " << bin
 	    << " --> Up: " << smhY_Up << ", Down: " << smhY_Down << ", nominal: " << smhY << std::endl;
   return std::make_pair( smhY_Up, smhY_Down );
