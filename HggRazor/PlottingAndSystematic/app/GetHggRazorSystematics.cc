@@ -120,6 +120,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 float HggRazorSystematics::Lumi  = 2300.0;
 float HggRazorSystematics::NR_kf = 1.0;
+int   HggRazorSystematics::n_PdfSys = 60;
 
 void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
 
@@ -192,13 +193,13 @@ int main( int argc, char* argv[] )
       //-----------------------------
       //Map container for the binning
       //-----------------------------
-      std::map<std::pair<float, float>, std::vector<float>> binningMap;
-      SetMapBinning( binningMap, categoryMode );
+      //std::map<std::pair<float, float>, std::vector<float>> binningMap;
+      //SetMapBinning( binningMap, categoryMode );
       //---------------------------
       //Create HggSystematic object
       //---------------------------
       HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, true, true );
-      hggSys->PrintBinning();
+      //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       if ( categoryMode == "highpt")
 	{
@@ -222,7 +223,7 @@ int main( int argc, char* argv[] )
 	  return -1;
 	}
       
-      hggSys->PrintBinning();
+      //hggSys->PrintBinning();
       hggSys->InitMrRsqTH2Poly( 1 );
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );

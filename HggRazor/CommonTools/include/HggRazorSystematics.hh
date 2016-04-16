@@ -48,6 +48,7 @@ private:
   static constexpr float hggBF = 2.28e-3;
   static float Lumi;//lumi in pb-1
   static float NR_kf;//lumi in pb-1
+  static int n_PdfSys;
   
   bool _debug;
   bool _info;
@@ -61,17 +62,19 @@ private:
   std::vector<float*> binningVect;
   
   //TH2Poly Histos
-  TH2Poly *h2p;
-  TH2Poly *h2p_facScaleUp;
-  TH2Poly *h2p_facScaleDown;
-  TH2Poly *h2p_renScaleUp;
-  TH2Poly *h2p_renScaleDown;
-  TH2Poly *h2p_facRenScaleUp;
-  TH2Poly *h2p_facRenScaleDown;
+  TH2Poly* h2p;
+  TH2Poly* h2p_facScaleUp;
+  TH2Poly* h2p_facScaleDown;
+  TH2Poly* h2p_renScaleUp;
+  TH2Poly* h2p_renScaleDown;
+  TH2Poly* h2p_facRenScaleUp;
+  TH2Poly* h2p_facRenScaleDown;
   //JES
-  TH2Poly *h2p_JesUp;
-  TH2Poly *h2p_JesDown;
-
+  TH2Poly* h2p_JesUp;
+  TH2Poly* h2p_JesDown;
+  //PDF
+  TH2Poly* h2p_Pdf[60];
+  
   //Systematic Histos(user must set these)
   TH1F* NEvents;
   TH1F* SumScaleWeights;
