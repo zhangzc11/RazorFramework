@@ -273,6 +273,7 @@ int main( int argc, char* argv[] )
 	  facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	  JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	  JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
+	  std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; JesUp " << facSys.first << ", JesDown: " << facSys.second << std::endl;
 	  //PDF
 	  for ( int ipdf = 0; ipdf < 60; ipdf++ )
 	    {
