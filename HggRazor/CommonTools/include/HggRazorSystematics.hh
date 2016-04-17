@@ -33,9 +33,12 @@ public:
   int GetSizeMap( ){return this->binningMap.size(); };
   int GetSizeVector(){return this->binningVect.size(); };
   TH2Poly* GetNominalTH2Poly( ){ return this->h2p; };
+  float GetNominalYield( float mr, float rsq );
   std::pair<float, float> GetFacScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetFacRenScaleSystematic( float mr, float rsq );
+  std::pair<float, float> GetJesSystematic( float mr, float rsq );
+  float GetPdfSystematic( int i, float mr, float rsq );
   static float GetHggBF( );
 
   bool SetBinningMap( std::map<std::pair<float, float>, std::vector<float>> myMap ){ this->binningMap = myMap; return true;};

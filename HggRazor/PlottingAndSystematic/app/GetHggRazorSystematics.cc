@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 #include <assert.h>
 //ROOT INCLUDES
 #include <TFile.h>
@@ -161,7 +162,54 @@ int main( int argc, char* argv[] )
   std::vector<std::pair<float,float>> facScaleSys;
   std::vector<std::pair<float,float>> renScaleSys;
   std::vector<std::pair<float,float>> facRenScaleSys;
+
+  std::vector<float*> myVectBinning;
+  if ( categoryMode == "highpt")
+    {
+      myVectBinning = SetBinning_highpt();
+    }
+  else if ( categoryMode == "hzbb" )
+    {
+      myVectBinning = SetBinning_hzbb();
+    }
+  else if ( categoryMode == "highres" )
+    {
+      myVectBinning = SetBinning_highres();
+    }
+  else if ( categoryMode == "lowres" )
+    {
+      myVectBinning = SetBinning_lowres();
+    }
+  else
+    {
+      std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
+      return -1;
+    }
   
+  TH2Poly* nominal = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
+  TH2Poly* facScaleUn = new TH2Poly("facScale", "", 150, 10000, 0, 1 );
+  TH2Poly* renScaleUn = new TH2Poly("renScale", "", 150, 10000, 0, 1 );
+  TH2Poly* facRenScaleUn = new TH2Poly("facRenScale", "", 150, 10000, 0, 1 );
+  TH2Poly* JesUp   = new TH2Poly("JesUp", "", 150, 10000, 0, 1 );
+  TH2Poly* JesDown = new TH2Poly("JesDown", "", 150, 10000, 0, 1 );
+  TH2Poly* pdf[60];
+  for ( int i = 0; i < 60; i++ )
+    {
+      TString pdfName = Form("pdf%d", i);
+      pdf[i] = new TH2Poly( pdfName, "", 150, 10000, 0, 1 );
+    }
+  std::map< std::pair<float,float>, float > sysMap;
+  for ( auto tmp : myVectBinning )
+    {
+      nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      facScaleUn->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      renScaleUn->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      facRenScaleUn->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      JesUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      JesDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      for( int i = 0; i < 60; i++ ) pdf[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+    }
+    
   std::string process, rootFileName;
   while ( ifs.good() )
     {
@@ -201,37 +249,36 @@ int main( int argc, char* argv[] )
       HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, true, true );
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
-      if ( categoryMode == "highpt")
-	{
-	  hggSys->SetBinningVector( SetBinning_highpt() );
-	}
-      else if ( categoryMode == "hzbb" )
-	{
-	  hggSys->SetBinningVector( SetBinning_hzbb() );
-	}
-      else if ( categoryMode == "highres" )
-	{
-	  hggSys->SetBinningVector( SetBinning_highres() );
-	}
-      else if ( categoryMode == "lowres" )
-	{
-	  hggSys->SetBinningVector( SetBinning_lowres() );
-	}
-      else
-	{
-	  std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
-	  return -1;
-	}
-      
       //hggSys->PrintBinning();
+      hggSys->SetBinningVector( myVectBinning );
       hggSys->InitMrRsqTH2Poly( 1 );
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->Loop();
-      facScaleSys.push_back( hggSys->GetFacScaleSystematic( 200, 0 ) );
-      renScaleSys.push_back( hggSys->GetRenScaleSystematic( 200, 0 ) );
-      facRenScaleSys.push_back( hggSys->GetFacRenScaleSystematic( 200, 0 ) );
+      for ( auto tmp: myVectBinning )
+	{
+	  int bin = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+	  nominal->SetBinContent( bin, nominal->GetBinContent(bin) + hggSys->GetNominalYield( tmp[0], tmp[1] ) );
+	  //facScale
+	  std::pair<float, float> facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
+	  facScaleUn->SetBinContent( bin, facScaleUn->GetBinContent(bin) + pow(fmax( fabs(facSys.first), fabs(facSys.second) ),2) );
+	  //renScale
+	  facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
+	  renScaleUn->SetBinContent( bin, renScaleUn->GetBinContent(bin) + pow(fmax( fabs(facSys.first), fabs(facSys.second) ),2) );
+	  //facRenScale
+	  facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
+	  facRenScaleUn->SetBinContent( bin, facRenScaleUn->GetBinContent(bin) + pow(fmax( fabs(facSys.first), fabs(facSys.second) ),2) );
+	  //JES
+	  facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
+	  JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
+	  JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
+	  //PDF
+	  for ( int ipdf = 0; ipdf < 60; ipdf++ )
+	    {
+	      pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent(bin) + hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
+	    }
+	}
       
       hggSys->WriteOutput( "histoMR_Rsq" );
       delete hggSys;
@@ -248,6 +295,29 @@ int main( int argc, char* argv[] )
       facScaleTotal[1] += tmp.second;
     } 
   std::cout << "facScaleUp: " << facScaleTotal[0] << " facScaleDown: " << facScaleTotal[1] << std::endl;
+
+   for ( auto tmp: myVectBinning )
+     {
+       int bin = facScaleUn->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+       float nom = nominal->GetBinContent( bin );
+       facScaleUn->SetBinContent( bin, sqrt( facScaleUn->GetBinContent(bin) )/nom );
+       renScaleUn->SetBinContent( bin, sqrt( renScaleUn->GetBinContent(bin) )/nom );
+       facRenScaleUn->SetBinContent( bin, sqrt( facRenScaleUn->GetBinContent(bin) )/nom );
+       JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
+       JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
+       for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+     }
+   
+  TFile* sF = new TFile( "fullSys.root", "recreate" );
+  nominal->Write("SMH_nominal");
+  facScaleUn->Write("facScaleUn");
+  renScaleUn->Write("renScaleUn");
+  facRenScaleUn->Write("facRenScaleUn");
+  JesUp->Write("JesUp");
+  JesDown->Write("JesDown");
+  for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
+  sF->Close();
+  
   
   /*
   //-----------------------------
