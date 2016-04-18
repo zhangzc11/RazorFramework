@@ -131,17 +131,22 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  return false;
 	}
 
-      /*
+      
       h2p = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
+
       h2p_renScaleUp      = new TH2Poly(this->processName+"_renScaleUp", "", 150, 10000, 0, 1);
       h2p_renScaleDown    = new TH2Poly(this->processName+"_renScaleDown", "", 150, 10000, 0, 1);
+
       h2p_facRenScaleUp   = new TH2Poly(this->processName+"_facRenScaleUp", "", 150, 10000, 0, 1);
       h2p_facRenScaleDown = new TH2Poly(this->processName+"_facRenScaleDown", "", 150, 10000, 0, 1);
+
       h2p_JesUp           = new TH2Poly(this->processName+"_JesUp", "", 150, 10000, 0, 1);
       h2p_JesDown         = new TH2Poly(this->processName+"_JesDown", "", 150, 10000, 0, 1);
-      */
+      
+      /*
       h2p = new TH2Poly( );
       h2p->SetName( this->processName+"_nominal" );
       
@@ -164,6 +169,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_JesUp->SetName( this->processName+"_JesUp" );
       h2p_JesDown         = new TH2Poly( );
       h2p_JesDown->SetName( this->processName+"_JesDown" );
+      */
       for( int i = 0; i < n_PdfSys; i++ )
 	{
 	  TString PdfSysName = Form(this->processName+"_PdfEigenVect_%d",i);
