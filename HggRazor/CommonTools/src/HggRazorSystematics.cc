@@ -263,7 +263,7 @@ void HggRazorSystematics::Loop()
 	  //PDF
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	    {
-	      h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*fabs(weight)*pdfWeights->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
+	      h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*pdfWeights->at(ipdf)*pileupWeight/N_Pdf[ipdf] );
 	    }
 	}
       else
@@ -282,7 +282,7 @@ void HggRazorSystematics::Loop()
 	  //PDF
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	    {
-	      h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*fabs(weight)*pdfWeights->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
+	      h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*pdfWeights->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
 	    }
 	}
 

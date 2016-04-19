@@ -313,16 +313,16 @@ int main( int argc, char* argv[] )
     } 
   std::cout << "facScaleUp: " << facScaleTotal[0] << " facScaleDown: " << facScaleTotal[1] << std::endl;
 
+
+  //std::cout << "#mr_l\tmr_h\trsq_l\trsq_h\tSMHY\tFSU\tFSD\tRSU\tRSD\tFRSU\t\FRSD\tJESU\tJESD\tPDF0\PDF1"<< std::endl;
+  std::cout << "#mr_l\tmr_h\trsq_l\trsq_h\tSMHY\t\tFSU\t\tFSD\t\tPDF0\t\tPDF1\t\tJESU\t\tJESD"<< std::endl;
    for ( auto tmp: myVectBinning )
      {
        int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
        float nom = nominal->GetBinContent( bin );
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
-       std::cout << "mr: " << tmp[0] << "-" << tmp[2] << " Rsq: " << tmp[1] << "-" << tmp[3]
-		 << "; facScaleUp: " <<  facScaleUp->GetBinContent( bin )
-		 << "; facScaleDow: " <<  facScaleDown->GetBinContent( bin )
-		 << std::endl;
+       
        renScaleUp->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nom );
        renScaleDown->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nom );
        facRenScaleUp->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nom );
@@ -330,6 +330,21 @@ int main( int argc, char* argv[] )
        JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
        JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
        for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+
+       /*std::cout << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
+		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
+		 <<  renScaleUp->GetBinContent( bin ) << "\t" <<  renScaleDown->GetBinContent( bin ) << "\t"
+		 <<  facRenScaleUp->GetBinContent( bin ) << "\t" <<  facRenScaleDown->GetBinContent( bin ) << "\t"
+		 <<  JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
+		 <<  pdf[0]->GetBinContent( bin ) << "\t" <<  pdf[1]->GetBinContent( bin ) << "\t"
+		 << std::endl;*/
+       std::cout << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t" << nominal->GetBinContent( bin ) << "\t"
+		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
+		 <<  pdf[0]->GetBinContent( bin ) << "\t" <<  pdf[1]->GetBinContent( bin ) << "\t"
+		 <<  JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
+		 << std::endl;
+
+       
      }
 
    
