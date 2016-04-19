@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr  5 08:54:09 2016 by ROOT version 6.04/06
+// Tue Apr 19 00:15:26 2016 by ROOT version 6.06/00
 // from TTree HggTree/Info on selected razor inclusive events
-// found on file: ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root
+// found on file: ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root
 //////////////////////////////////////////////////////////
 
 #ifndef HggTree_h
@@ -41,6 +41,7 @@ public :
    Float_t         sf_facRenScaleUp;
    Float_t         sf_facRenScaleDown;
    std::vector<float>   *pdfWeights;
+   std::vector<float>   *sf_pdf;
    Bool_t          Flag_HBHENoiseFilter;
    Bool_t          Flag_HBHEIsoNoiseFilter;
    Bool_t          Flag_CSCTightHaloFilter;
@@ -130,22 +131,22 @@ public :
    Float_t         mbbZ_L;
    Float_t         mbbH_L;
    Int_t           n_Jets;
-   Float_t         jet_E[99];   //[n_Jets]
-   Float_t         jet_Pt[99];   //[n_Jets]
-   Float_t         jet_Eta[99];   //[n_Jets]
-   Float_t         jet_Phi[99];   //[n_Jets]
+   Float_t         jet_E[15];   //[n_Jets]
+   Float_t         jet_Pt[15];   //[n_Jets]
+   Float_t         jet_Eta[15];   //[n_Jets]
+   Float_t         jet_Phi[15];   //[n_Jets]
    Int_t           n_Jets_JESUp;
    Int_t           n_Jets_JESDown;
    Bool_t          HLTDecision[300];
    Int_t           nGenParticle;
-   Int_t           gParticleMotherId[200];   //[nGenParticle]
-   Int_t           gParticleMotherIndex[200];   //[nGenParticle]
-   Int_t           gParticleId[200];   //[nGenParticle]
-   Int_t           gParticleStatus[200];   //[nGenParticle]
-   Float_t         gParticleE[200];   //[nGenParticle]
-   Float_t         gParticlePt[200];   //[nGenParticle]
-   Float_t         gParticlePhi[200];   //[nGenParticle]
-   Float_t         gParticleEta[200];   //[nGenParticle]
+   Int_t           gParticleMotherId[62];   //[nGenParticle]
+   Int_t           gParticleMotherIndex[62];   //[nGenParticle]
+   Int_t           gParticleId[62];   //[nGenParticle]
+   Int_t           gParticleStatus[62];   //[nGenParticle]
+   Float_t         gParticleE[62];   //[nGenParticle]
+   Float_t         gParticlePt[62];   //[nGenParticle]
+   Float_t         gParticlePhi[62];   //[nGenParticle]
+   Float_t         gParticleEta[62];   //[nGenParticle]
 
    // List of branches
    TBranch        *b_weight;   //!
@@ -166,6 +167,7 @@ public :
    TBranch        *b_sf_facRenScaleUp;   //!
    TBranch        *b_sf_facRenScaleDown;   //!
    TBranch        *b_pdfWeights;   //!
+   TBranch        *b_sf_pdf;   //!
    TBranch        *b_Flag_HBHENoiseFilter;   //!
    TBranch        *b_Flag_HBHEIsoNoiseFilter;   //!
    TBranch        *b_Flag_CSCTightHaloFilter;   //!
@@ -291,9 +293,9 @@ HggTree::HggTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("ttHToGG_M125_13TeV_powheg_pythia8_v2_CMSSW_7_6_X_systematics_1pb_weighted.root");
+         f = new TFile("ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root");
       }
       f->GetObject("HggTree",tree);
 
@@ -338,6 +340,7 @@ void HggTree::Init(TTree *tree)
 
    // Set object pointer
    pdfWeights = 0;
+   sf_pdf = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -362,6 +365,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("sf_facRenScaleUp", &sf_facRenScaleUp, &b_sf_facRenScaleUp);
    fChain->SetBranchAddress("sf_facRenScaleDown", &sf_facRenScaleDown, &b_sf_facRenScaleDown);
    fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
+   fChain->SetBranchAddress("sf_pdf", &sf_pdf, &b_sf_pdf);
    fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
    fChain->SetBranchAddress("Flag_HBHEIsoNoiseFilter", &Flag_HBHEIsoNoiseFilter, &b_Flag_HBHEIsoNoiseFilter);
    fChain->SetBranchAddress("Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);

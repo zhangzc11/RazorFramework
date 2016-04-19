@@ -247,7 +247,7 @@ void HggRazorSystematics::Loop()
       
       if ( t1Rsq < 1.0 )
 	{
-	  //std::cout << "PDF: " << weight << " " << weight*pdfWeights->at(0)*N_events/N_Pdf[0] << std::endl;
+	  //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
 	  //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
 	  h2p->Fill( MR, t1Rsq, this->Lumi*weight*pileupWeight );//sm-higgs
 	  
@@ -263,7 +263,7 @@ void HggRazorSystematics::Loop()
 	  //PDF
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	    {
-	      h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*pdfWeights->at(ipdf)*pileupWeight/N_Pdf[ipdf] );
+	      h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
 	    }
 	}
       else
@@ -282,7 +282,7 @@ void HggRazorSystematics::Loop()
 	  //PDF
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	    {
-	      h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*pdfWeights->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
+	      h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
 	    }
 	}
 
