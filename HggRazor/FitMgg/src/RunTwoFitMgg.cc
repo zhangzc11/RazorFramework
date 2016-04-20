@@ -563,9 +563,22 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
-RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield,
-			    TString SMH_facScale, TString SMH_renScale, TString SMH_facRenScale, float Signal_Yield, TString binNumber )
+RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
+			    float Signal_Yield, std::string Signal_CF, TString binNumber )
 {
+  std::cout << "entering datacard: " << SMH_CF << std::endl;
+  std::stringstream ss;
+  ss << SMH_CF;
+  float tmp;
+  while ( ss.good() )
+    {
+      ss >> tmp;
+      std::cout << "tmp: " << tmp << std::endl;
+      if ( ss.eof() ) break;
+      
+    }
+  
+  return NULL;
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
   //------------------------------------------------
@@ -765,9 +778,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
   ofs << "----------------------------------------------------------------------------------------\n";
   ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
-  ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << SMH_facScale << "\t\t-\n";
-  ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
-  ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
+  //ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << SMH_facScale << "\t\t-\n";
+  //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
+  //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
   //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
   ofs.close();
   return ws;

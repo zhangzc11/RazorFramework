@@ -10,6 +10,8 @@
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
+const bool _debug = false;
+
 //---------------
 //Binning
 //---------------
@@ -227,11 +229,11 @@ int main( int argc, char* argv[] )
       ifs >> process >> rootFileName;
       if ( ifs.eof() ) break;
       if ( process.find("#") != std::string::npos ) continue;
-      std::cout << process << " " << rootFileName << std::endl;
+      if ( _debug ) std::cout << process << " " << rootFileName << std::endl;
       TFile* fin = new TFile( rootFileName.c_str(), "READ");
-      std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
+      //std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
       assert( fin );
-      std::cout << "[INFO]: file: " << rootFileName << " passed check\n\n"<< std::endl;
+      if ( _debug ) std::cout << "[INFO]: file: " << rootFileName << " passed check\n\n"<< std::endl;
       
       //------------------------
       //Getting TTree and Histos
@@ -257,7 +259,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, true, true );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, false, false );
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       //hggSys->PrintBinning();
@@ -287,7 +289,6 @@ int main( int argc, char* argv[] )
 	  facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	  JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	  JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
-	  std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; JesUp " << facSys.first << ", JesDown: " << facSys.second << std::endl;
 	  //PDF
 	  for ( int ipdf = 0; ipdf < 60; ipdf++ )
 	    {
@@ -299,23 +300,26 @@ int main( int argc, char* argv[] )
       
       hggSys->WriteOutput( "histoMR_Rsq" );
       delete hggSys;
-      std::cout << "deleted hggSys" << std::endl;
+      if ( _debug ) std::cout << "deleted hggSys" << std::endl;
       //delete tmp;
-      std::cout << "deleted tmp File" << std::endl;
+      if ( _debug ) std::cout << "deleted tmp File" << std::endl;
     }
 
   float facScaleTotal[2] = {0,0};
   for ( auto tmp : facScaleSys )
     {
-      std::cout << "Up: " << tmp.first << " , Down: " << tmp.second << std::endl;
+      //std::cout << "Up: " << tmp.first << " , Down: " << tmp.second << std::endl;
       facScaleTotal[0] += tmp.first;
       facScaleTotal[1] += tmp.second;
     } 
-  std::cout << "facScaleUp: " << facScaleTotal[0] << " facScaleDown: " << facScaleTotal[1] << std::endl;
+  //std::cout << "facScaleUp: " << facScaleTotal[0] << " facScaleDown: " << facScaleTotal[1] << std::endl;
 
 
   //std::cout << "#mr_l\tmr_h\trsq_l\trsq_h\tSMHY\tFSU\tFSD\tRSU\tRSD\tFRSU\t\FRSD\tJESU\tJESD\tPDF0\PDF1"<< std::endl;
-  std::cout << "#mr_l\tmr_h\trsq_l\trsq_h\tSMHY\t\tFSU\t\tFSD\t\tPDF0\t\tPDF1\t\tJESU\t\tJESD"<< std::endl;
+  std::cout << "#category\t\tmr_l\tmr_h\trsq_l\trsq_h\tSMHY\t\tFSU\t\tFSD";
+  for( int ipdf = 0; ipdf < 60; ipdf++ ) std::cout << "\t\tPDF" << ipdf;
+  std::cout << "\t\tJESU\t\tJESD"<< std::endl;
+  
    for ( auto tmp: myVectBinning )
      {
        int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
@@ -329,21 +333,25 @@ int main( int argc, char* argv[] )
        facRenScaleDown->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nom );
        JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
        JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
-       for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 
-       /*std::cout << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
-		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
-		 <<  renScaleUp->GetBinContent( bin ) << "\t" <<  renScaleDown->GetBinContent( bin ) << "\t"
-		 <<  facRenScaleUp->GetBinContent( bin ) << "\t" <<  facRenScaleDown->GetBinContent( bin ) << "\t"
-		 <<  JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
-		 <<  pdf[0]->GetBinContent( bin ) << "\t" <<  pdf[1]->GetBinContent( bin ) << "\t"
-		 << std::endl;*/
-       std::cout << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t" << nominal->GetBinContent( bin ) << "\t"
-		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
-		 <<  pdf[0]->GetBinContent( bin ) << "\t" <<  pdf[1]->GetBinContent( bin ) << "\t"
-		 <<  JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
+       std::cout << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t" << nominal->GetBinContent( bin ) << "\t"
+		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t";
+       for( int ipdf = 0; ipdf < 60; ipdf++ )
+	 {
+	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+	   std::cout << "\t" << pdf[ipdf]->GetBinContent( bin );
+	 }
+       std::cout << "\t" << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t";
+       
+       std::cout <<  6*nominal->GetBinContent( bin ) << "\t" << facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t";
+       for( int ipdf = 0; ipdf < 60; ipdf++ )
+	 {
+	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+	   std::cout << "\t" << pdf[ipdf]->GetBinContent( bin );
+	 }
+       std::cout << "\t" << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
 		 << std::endl;
-
+       
        
      }
 

@@ -67,7 +67,7 @@ HggRazorSystematics::~HggRazorSystematics()
 
 void HggRazorSystematics::PrintBinning()
 {
-  std::cout << "[INFO]: this is the binning for category <" << this->boxName << ">" << std::endl;
+  if ( _debug ) std::cout << "[INFO]: this is the binning for category <" << this->boxName << ">" << std::endl;
   if ( this->binningMap.size() == 0 ) std::cerr << "[WARNING]: no binning defined yet, please use object->SetBinningMap( yourMap );" << std::endl;
   for ( auto tmp : this->binningMap )
     {
@@ -81,7 +81,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 {
   if ( mode == 0 )
     {
-      std::cout << "[INFO]: Creating TH2Poly mode: " << mode << std::endl;
+      if ( _debug ) std::cout << "[INFO]: Creating TH2Poly mode: " << mode << std::endl;
       if ( this->binningMap.size() == 0 )
 	{
 	  std::cerr << "[ERROR]: Imposible to create TH2Poly; no binning defined yet, please use object->SetBinningMap( yourMap );" << std::endl;
@@ -124,7 +124,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
     }
   else if ( mode == 1 )
     {
-      std::cout << "[INFO]: Creating TH2Poly mode: " << mode << std::endl;
+      if ( _debug ) std::cout << "[INFO]: Creating TH2Poly mode: " << mode << std::endl;
       if ( this->binningVect.size() == 0 )
 	{
 	  std::cerr << "[ERROR]: Imposible to create TH2Poly; no binning defined yet, please use object->SetBinningVect( yourVect );" << std::endl;
@@ -178,7 +178,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
        
       for ( auto tmp : binningVect )
 	{
-	  std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
+	  if ( _debug ) std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
 	  h2p->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 
 	  h2p_facScaleUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
@@ -497,7 +497,7 @@ std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, fl
   float smhY      = h2p->GetBinContent( bin );
   float smhY_Up   = h2p_facScaleUp->GetBinContent( bin )-smhY;
   float smhY_Down = h2p_facScaleDown->GetBinContent( bin )-smhY;
-  std::cout << "mr: " << mr << " rsq: " << rsq << "; up: " << smhY_Up << ", down: " << smhY_Down << std::endl;
+  //std::cout << "mr: " << mr << " rsq: " << rsq << "; up: " << smhY_Up << ", down: " << smhY_Down << std::endl;
   return std::make_pair( smhY_Up, smhY_Down );
 };
 
