@@ -471,7 +471,7 @@ int main( int argc, char* argv[])
       RooWorkspace* w_sb;
       std::cout << "calling MakeDataCard" << std::endl;
       w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-      			   _Signal_Yield, Signal_CL, binNumber );
+      			   _Signal_Yield, Signal_CL, binNumber, categoryMode );
       std::cout << "finish MakeDataCard" << std::endl;
       w_sb->Write("w_sb");
     }

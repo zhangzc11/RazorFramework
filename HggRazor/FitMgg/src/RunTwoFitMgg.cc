@@ -564,7 +564,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 }
 
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber )
+			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category )
 {
   std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
   std::stringstream ss_smh, ss_signal;
@@ -731,9 +731,14 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   // P r e p a r a t i o n   t o   C o m b i n e  I n p u t
   //-------------------------------------------------------
   ws->Write("w_sb");
-  
+
+  //--------------
+  //SMH line shape
+  //--------------
   RooWorkspace* combine_ws = new RooWorkspace( "combine_ws", "" );
-  TString combineSMH    = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws );
+  TString combineSMH;
+  if ( category != "highres" ) combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
+  else combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );//adding global scale uncertainty only
   combine_ws->var( combineSMH+"_frac")->setVal(gausFrac_SMH);
   combine_ws->var( combineSMH+"_mu1")->setVal(gausMu1_SMH);
   combine_ws->var( combineSMH+"_mu2")->setVal(gausMu2_SMH);
@@ -747,7 +752,12 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar SMH_norm( combineSMH+"_norm" ,"", SMH_Yield);
   //SMH_norm.setConstant(kFALSE);
   combine_ws->import( SMH_norm );
-  TString combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
+  //-----------------
+  //Signal line shape
+  //-----------------
+  TString combineSignal;
+  if ( category != "highres" ) combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
+  else combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true );//add global scale uncertainty only
   combine_ws->var( combineSignal+"_frac")->setVal(gausFrac);
   combine_ws->var( combineSignal+"_mu1")->setVal(gausMu1);
   combine_ws->var( combineSignal+"_mu2")->setVal(gausMu2);
@@ -761,6 +771,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar Signal_norm( combineSignal + "_norm", "", Signal_Yield );
   //Signal_norm.setConstant(kFALSE);
   combine_ws->import( Signal_norm );
+  //---------
+  //Bkg model
+  //---------
   TString combineBkg    = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
   combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );

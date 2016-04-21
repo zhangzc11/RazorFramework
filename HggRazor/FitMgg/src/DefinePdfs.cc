@@ -181,7 +181,7 @@ TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale )
+TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale, bool _categoryScale, TString category )
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
@@ -202,12 +202,28 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bo
   //------------------
   RooGaussian* gauss1;
   RooGaussian* gauss2; 
-  if ( _globalScale )
+  if ( _globalScale && _categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mu1G  = new RooFormulaVar( tag + "_DG_mu1G", "#mu_{1} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(*mu1, *muGlobal, *muCat) );
+      RooFormulaVar* mu2G  = new RooFormulaVar( tag + "_DG_mu2G", "#mu_{2} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(*mu2, *muGlobal, *muCat) );
+      gauss1 = new RooGaussian( tag + "_G1", "", mgg, *mu1G, *sigma1 );
+      gauss2 = new RooGaussian( tag + "_G2", "", mgg, *mu2G, *sigma2 );
+    }
+  else if ( _globalScale && !_categoryScale )
     {
       RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
-      //muGlobal->setConstant(kFALSE);
       RooFormulaVar* mu1G  = new RooFormulaVar( tag + "_DG_mu1G", "#mu_{1} - #mu_{g}", "(@0-@1)", RooArgList(*mu1, *muGlobal) );
       RooFormulaVar* mu2G  = new RooFormulaVar( tag + "_DG_mu2G", "#mu_{2} - #mu_{g}", "(@0-@1)", RooArgList(*mu2, *muGlobal) );
+      gauss1 = new RooGaussian( tag + "_G1", "", mgg, *mu1G, *sigma1 );
+      gauss2 = new RooGaussian( tag + "_G2", "", mgg, *mu2G, *sigma2 );
+    }
+  else if ( !_globalScale && _categoryScale )
+    {
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mu1G  = new RooFormulaVar( tag + "_DG_mu1G", "#mu_{1} - #mu_{"+category+"}", "(@0-@1)", RooArgList(*mu1, *muCat) );
+      RooFormulaVar* mu2G  = new RooFormulaVar( tag + "_DG_mu2G", "#mu_{2} - #mu_{"+category+"}", "(@0-@1)", RooArgList(*mu2, *muCat) );
       gauss1 = new RooGaussian( tag + "_G1", "", mgg, *mu1G, *sigma1 );
       gauss2 = new RooGaussian( tag + "_G2", "", mgg, *mu2G, *sigma2 );
     }

@@ -14,7 +14,7 @@ TString MakeSingleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//mu is fixed to be the same in both Gaussians
 TString MakeDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false );//mu is fixed to be the same in both Gaussians
 TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
-TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false );//all parameters are floated NonExtended
+TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false, bool _categoryScale = false, TString category = "category" );//all parameters are floated NonExtended
 TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeFullTripleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
 TString MakeDoubleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
