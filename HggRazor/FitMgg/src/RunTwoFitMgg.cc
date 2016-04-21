@@ -566,19 +566,33 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
 			    float Signal_Yield, std::string Signal_CF, TString binNumber )
 {
-  std::cout << "entering datacard: " << SMH_CF << std::endl;
-  std::stringstream ss;
-  ss << SMH_CF;
+  std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
+  std::stringstream ss_smh, ss_signal;
+  ss_smh << SMH_CF;
+  ss_signal << Signal_CF;
   float tmp;
-  while ( ss.good() )
+  std::vector<float> smh_sys, signal_sys;
+  //---------------------------
+  //SMH systematics into vector
+  //---------------------------
+  while ( ss_smh.good() )
     {
-      ss >> tmp;
-      std::cout << "tmp: " << tmp << std::endl;
-      if ( ss.eof() ) break;
-      
+      ss_smh >> tmp;
+      smh_sys.push_back( 1.0 + tmp );
+      //std::cout << "tmp: " << tmp << std::endl;
+      if ( ss_smh.eof() ) break;
+    }
+  //------------------------------
+  //Signal systematics into vector
+  //------------------------------
+  while ( ss_signal.good() )
+    {
+      ss_signal >> tmp;
+      signal_sys.push_back( 1.0 + tmp );
+      //std::cout << "tmp: " << tmp << std::endl;
+      if ( ss_signal.eof() ) break;
     }
   
-  return NULL;
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
   //------------------------------------------------
@@ -778,7 +792,36 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
   ofs << "----------------------------------------------------------------------------------------\n";
   ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
-  //ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << SMH_facScale << "\t\t-\n";
+  ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
+  ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
+  ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+  int totalSys = smh_sys.size();
+  int ctr = 0;
+  for( int isys = 0; isys < totalSys; isys++ )
+    {
+      if ( isys == 0 )
+	{
+	  ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	}
+      else if ( isys == 2 )
+	{
+	  ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	}
+      else if ( isys == 4 )
+	{
+	  ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	}
+      else if ( isys == 6 )
+	{
+	  ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	}
+      else if ( isys > 7 )
+	{
+	  ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	  ctr++;
+	}
+    }
+  ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
   //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
   //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
   //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;

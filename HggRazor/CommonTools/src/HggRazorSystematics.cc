@@ -51,17 +51,19 @@ HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TStr
 HggRazorSystematics::~HggRazorSystematics()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Destructor" << std::endl;
-  delete h2p;
-  delete h2p_facScaleUp;
-  delete h2p_facScaleDown;
-  delete h2p_renScaleUp;
-  delete h2p_renScaleDown;
-  delete h2p_facRenScaleUp;
-  delete h2p_facRenScaleDown;
   
-  delete NEvents;
-  delete SumScaleWeights;
-  delete SumPdfWeights;
+  if ( this->h2p != NULL ) delete h2p;
+  if ( this->h2p_facScaleUp != NULL ) delete h2p_facScaleUp;
+  if ( this->h2p_facScaleDown != NULL ) delete h2p_facScaleDown;
+  if ( this->h2p_renScaleUp != NULL ) delete h2p_renScaleUp;
+  if ( this->h2p_renScaleDown != NULL ) delete h2p_renScaleDown;
+  if ( this->h2p_facRenScaleUp != NULL ) delete h2p_facRenScaleUp;
+  if ( this->h2p_facRenScaleDown != NULL ) delete h2p_facRenScaleDown;
+  
+  if ( this->NEvents != NULL ) delete NEvents;
+  if ( this->SumScaleWeights != NULL ) delete SumScaleWeights;
+  if ( this->SumPdfWeights != NULL ) delete SumPdfWeights;
+  
   if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
 
@@ -203,8 +205,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 };
 
 void HggRazorSystematics::Loop()
-  {
-    if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
   if (fChain == 0)
     {
       std::cerr << "[ERROR]: TTree is NULL;" << std::endl;
@@ -216,22 +218,26 @@ void HggRazorSystematics::Loop()
       return;
     }
   
-  if ( this->NEvents == NULL || this->SumScaleWeights == NULL || this->SumPdfWeights == NULL )
+  if ( (this->NEvents == NULL || this->SumScaleWeights == NULL || this->SumPdfWeights == NULL ) && this->processName != "signal" )
     {
       std::cerr << "[ERROR]: NEvents and/or SumScaleWeights and/or SumPdfWeights have not been set" << std::endl;
       return;
     }
   
   if ( _debug ) std::cout << "[DEBUG]: Setting N_events and N_facScale" << std::endl;
-  float N_events = this->NEvents->GetBinContent(1);
+  
+  float N_events;
   //factorization/renormalization 
   const int n_facScaleSys = 6;
   float N_facScale[n_facScaleSys];
-  for ( int i = 0; i < n_facScaleSys; i++ ) N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
   //PDF
-  //const int n_PdfSys = 60;
   float N_Pdf[n_PdfSys];
-  for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
+  if ( this->processName != "signal" )
+    {
+      N_events= this->NEvents->GetBinContent(1);
+      for ( int i = 0; i < n_facScaleSys; i++ ) N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
+      for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
+    }
   
   if ( _debug ) std::cout << "[DEBUG]: Passed N_events, N_facScale, N_PDF" << std::endl;
   
@@ -244,57 +250,63 @@ void HggRazorSystematics::Loop()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      
-      if ( t1Rsq < 1.0 )
+
+      if ( this->processName == "signal" )
 	{
-	  //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
-	  //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
-	  h2p->Fill( MR, t1Rsq, this->Lumi*weight*pileupWeight );//sm-higgs
-	  
-	  h2p_facScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
-	  h2p_facScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
-	  
-	  h2p_renScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
-	  h2p_renScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
-
-	  h2p_facRenScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
-	  h2p_facRenScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
-
-	  //PDF
-	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-	    {
-	      h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
-	    }
+	  if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, this->Lumi*weight );
+	  else h2p->Fill( MR, 0.999, this->Lumi*weight);
 	}
-      else
-	{
-	  h2p->Fill( MR, 0.999, this->Lumi*weight*pileupWeight );//sm-higgs
-	  
-	  h2p_facScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
-	  h2p_facScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
-	  
-	  h2p_renScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
-	  h2p_renScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
-	  
-	  h2p_facRenScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
-	  h2p_facRenScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
-
-	  //PDF
-	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-	    {
-	      h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
-	    }
-	}
-
-      //JES Up
-      if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, this->Lumi*weight*pileupWeight );
-      else h2p_JesUp->Fill( MR_JESUp, 0.999, this->Lumi*weight*pileupWeight );
-      //JES Down
-      if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, this->Lumi*weight*pileupWeight );
-      else h2p_JesDown->Fill( MR_JESDown, 0.999, this->Lumi*weight*pileupWeight );
+      else{
+	if ( t1Rsq < 1.0 )
+	  {
+	    //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
+	    //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
+	    h2p->Fill( MR, t1Rsq, this->Lumi*weight*pileupWeight );//sm-higgs
+	    
+	    h2p_facScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
+	    h2p_facScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
+	    
+	    h2p_renScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
+	    h2p_renScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
+	    
+	    h2p_facRenScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
+	    h2p_facRenScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
+	    
+	    //PDF
+	    for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+	      {
+		h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
+	      }
+	  }
+	else
+	  {
+	    h2p->Fill( MR, 0.999, this->Lumi*weight*pileupWeight );//sm-higgs
+	    
+	    h2p_facScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
+	    h2p_facScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
+	    
+	    h2p_renScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
+	    h2p_renScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
+	    
+	    h2p_facRenScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
+	    h2p_facRenScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
+	    
+	    //PDF
+	    for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+	      {
+		h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
+	      }
+	  }
 	
+	//JES Up
+	if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, this->Lumi*weight*pileupWeight );
+	else h2p_JesUp->Fill( MR_JESUp, 0.999, this->Lumi*weight*pileupWeight );
+	//JES Down
+	if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, this->Lumi*weight*pileupWeight );
+	else h2p_JesDown->Fill( MR_JESDown, 0.999, this->Lumi*weight*pileupWeight );
+      }
     }
-
+  
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
@@ -454,9 +466,10 @@ float HggRazorSystematics::GetHggBF( )
 
 bool HggRazorSystematics::SetNeventsHisto( TH1F* histo )
 {
+  this->NEvents = NULL;
   if ( histo == NULL )
     {
-      std::cerr << "[ERROR]: histogram provided is equal to NULL" << std::endl;
+      std::cerr << "[ERROR]: Nevents histogram provided is equal to NULL" << std::endl;
       return false;
     }
   this->NEvents = new TH1F( *histo );
@@ -465,9 +478,10 @@ bool HggRazorSystematics::SetNeventsHisto( TH1F* histo )
 
 bool HggRazorSystematics::SetFacScaleWeightsHisto( TH1F* histo )
 {
+  this->SumScaleWeights = NULL;
   if ( histo == NULL )
     {
-      std::cerr << "[ERROR]: histogram provided is equal to NULL" << std::endl;
+      std::cerr << "[ERROR]: Scale histogram provided is equal to NULL" << std::endl;
       return false;
     }
   this->SumScaleWeights = new TH1F( *histo );
@@ -476,9 +490,10 @@ bool HggRazorSystematics::SetFacScaleWeightsHisto( TH1F* histo )
 
 bool HggRazorSystematics::SetPdfWeightsHisto( TH1F* histo )
 {
+  this->SumPdfWeights = NULL;
   if ( histo == NULL )
     {
-      std::cerr << "[ERROR]: histogram provided is equal to NULL" << std::endl;
+      std::cerr << "[ERROR]: PDF histogram provided is equal to NULL" << std::endl;
       return false;
     }
   this->SumPdfWeights = new TH1F( *histo );

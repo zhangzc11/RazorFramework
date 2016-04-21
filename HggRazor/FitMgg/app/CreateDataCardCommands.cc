@@ -27,9 +27,7 @@ int main( int argc, char* argv[] )
   while( ifs.good() )
     {
       std::string category, MR_l, MR_h, Rsq_l, Rsq_h, SMH, Signal, Bkg_f1;
-      std::stringstream SMH_sys;
-      std::stringstream Signal_sys;
-      
+      Bkg_f1 = "singleExp";
       ifs >> configCardName;
       if( ifs.eof() ) break;
       std::cout << "[INFO]: opening configDataCard: "<< configCardName << std::endl;
@@ -37,37 +35,42 @@ int main( int argc, char* argv[] )
       assert(tmpF);
       while( tmpF.good() )
 	{
+	  std::stringstream SMH_sys;
+	  std::stringstream Signal_sys;
 	  tmpF >> category >> MR_l >> MR_h >> Rsq_l >> Rsq_h >> SMH;
 	  if ( category.find("#") != std::string::npos ) continue;
 	  std::string tmp1;
+	  SMH_sys << "\"";
 	  for ( int i = 0; i < 68; i++ )
 	    {
 	      tmpF >> tmp1;
-	      SMH_sys << tmp1 << "\t";
+	      if ( i < 67 ) SMH_sys << tmp1 << " ";
+	      else SMH_sys << tmp1 << "\"";
 	    }
 	  tmpF >> Signal;
+	  Signal_sys << "\"";
 	  for ( int i = 0; i < 68; i++ )
 	    {
 	      tmpF >> tmp1;
-	      Signal_sys << tmp1 << "\t";
+	      if ( i < 67 ) Signal_sys << tmp1 << " ";
+	      else Signal_sys << tmp1 << "\"";
 	    }
 	  
 	 
 	  if ( tmpF.eof() ) break;
-	  std::cout << category << " " << MR_l << " " << MR_h << " " << Rsq_l << " " << Rsq_h << " " << SMH << " " << Signal << std::endl;
-	  //		    << " " << Signal << " "  << Bkg_f1 << std::endl;
-	  /*
+	  /*std::cout << category << "\t" << MR_l << "\t" << MR_h << "\t" << Rsq_l << "\t" << Rsq_h << "\t" << SMH << "\t" << SMH_sys.str()
+	    << "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
+	  */
+	  
 	  std::cout << "./MakeFitRun2 " 
 		    << "--inputFile=" << ntupleDir << "DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root"
 		    << " --inputFileSignal=" << ntupleDir << "T2bH-Hgg-sbm300-sbw1-chi2m230-chi2w0p1-chi1m100_CMSSW_7_6_March15_1pb_weighted.root"
 		    << " --inputFileSMH=" << ntupleDir << "SM-Higgs_1pb_weighted.root"
-		    << " --treeName=HggRazor --dataMode=data+signal --fitMode=datacard --category=" << category<< " --LowMRcut=" << MR_l 
+		    << " --treeName=HggRazor --runPeriod=run2 --dataMode=data+signal --fitMode=datacard --category=" << category<< " --LowMRcut=" << MR_l 
 		    << " --HighMRcut=" << MR_h << " --LowRSQcut=" << Rsq_l << " --HighRSQcut=" << Rsq_h << " --f1=" << Bkg_f1
-		    << " --SMH_Yield=" << SMH << " --SMH_facScale=" << SMH_facScale
-		    << " --SMH_renScale=" << SMH_renScale
-		    << " --SMH_facRenScale=" << SMH_facRenScale
-		    << " --Signal_Yield=" << Signal << " --binNumber=" << binNumber << std::endl;
-	  */
+		    << " --SMH_Yield=" << SMH << " --SMH_CL=" << SMH_sys.str()
+		    << " --Signal_Yield=" << Signal << " --Signal_CL=" << Signal_sys.str()
+		    << " --binNumber=" << binNumber << std::endl;
 	  binNumber++;
 	}
       tmpF.close();
