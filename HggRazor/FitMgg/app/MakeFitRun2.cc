@@ -172,7 +172,8 @@ int main( int argc, char* argv[])
     {
       std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
     }
-  
+
+  //SMH nominal yield
   std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
   float _SMH_Yield = 1.e-2;
   if (  SMH_Yield == "" && fitMode == "datacard" )
@@ -184,27 +185,27 @@ int main( int argc, char* argv[])
       _SMH_Yield = atof( SMH_Yield.c_str() );
     }
 
-  std::string SMH_facScale = ParseCommandLine( argc, argv, "-SMH_facScale=" );
-  if (  SMH_facScale == "" && fitMode == "datacard" )
+  //SMH Config Line
+  std::string SMH_CL = ParseCommandLine( argc, argv, "-SMH_CL=" );
+  std::stringstream _SMH_CL;
+  if (  SMH_CL == "" && fitMode == "datacard" )
     {
-      std::cerr << "[ERROR]: please provide an input SMH_facScale, --SMH_facScale=<facScale>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input SMH_CL, --SMH_CL=<SMH config line>" << std::endl;
       return -1;
     }
+  _SMH_CL << SMH_CL;
 
-  std::string SMH_renScale = ParseCommandLine( argc, argv, "-SMH_renScale=" );
-  if (  SMH_renScale == "" && fitMode == "datacard" )
+  //Signal Config Line
+  std::string Signal_CL = ParseCommandLine( argc, argv, "-Signal_CL=" );
+  std::stringstream _Signal_CL;
+  if (  Signal_CL == "" && fitMode == "datacard" )
     {
-      std::cerr << "[ERROR]: please provide an input SMH_renScale, --SMH_renScale=<renScale>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input Signal_CL, --Signal_CL=<Signal config line>" << std::endl;
       return -1;
     }
-  
-  std::string SMH_facRenScale = ParseCommandLine( argc, argv, "-SMH_facRenScale=" );
-  if (  SMH_facRenScale == "" && fitMode == "datacard" )
-    {
-      std::cerr << "[ERROR]: please provide an input SMH_facRenScale, --SMH_facRenScale=<facRenScale>" << std::endl;
-      return -1;
-    }
-  
+  _Signal_CL << Signal_CL;
+
+  //signal nominal yield
   std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
   float _Signal_Yield = 1.;
   if (  Signal_Yield == "" && fitMode == "datacard" )
@@ -468,7 +469,10 @@ int main( int argc, char* argv[])
   else if ( fitMode == "datacard" )
     {
       RooWorkspace* w_sb;
-      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_facScale, SMH_renScale, SMH_facRenScale, _Signal_Yield, binNumber );
+      std::cout << "calling MakeDataCard" << std::endl;
+      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
+      			   _Signal_Yield, Signal_CL, binNumber, categoryMode );
+      std::cout << "finish MakeDataCard" << std::endl;
       w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
