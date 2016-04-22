@@ -182,6 +182,14 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	
  	}
 
+	fprintf(m_outfile_5,"\\hline \n");
+	fprintf(m_outfile_5,"\\end{tabular} \n");
+	fprintf(m_outfile_5,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_5,"\\end{center} \n");
+	fprintf(m_outfile_5,"\\end{table*} \n \n \n");
+ 
+
+
        //print the AIC table with color and status to a file
 	std::string str_table_6 = "AIC_output/FitChoices_Table_"+category+"_ColorTable_WithStatus.tex";
         const char * file_Name_table_6 = str_table_6.c_str();
