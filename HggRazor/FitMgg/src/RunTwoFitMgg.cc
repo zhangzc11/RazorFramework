@@ -2089,7 +2089,7 @@ RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
   return pdf->generate( x, ntoys);
 };
 
-RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3, TString ffName = "doubleExp" )
+RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3,double& fitStatus_1, double& fitStatus_2, double& fitStatus_3, double& fitStatus_4,  TString ffName = "doubleExp")
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -2172,13 +2172,18 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
    RooFitResult* bres = m.save() ; 
    //_status    = r->status();
    //_covStatus = r->covQual();
-   
+  
+   fitStatus_1 = bres->status();
+   fitStatus_2 = bres->covQual();
+ 
    m.minimize("Minuit2", "Hesse");
    RooFitResult* r2 = m.save() ; 
    //_status2    = r2->status();
    //_covStatus2 = r2->covQual();
-  
-
+ 
+//print out the status here.... 
+   fitStatus_3 = r2->status();
+   fitStatus_4 = r2->covQual();
   
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
