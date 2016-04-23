@@ -2165,7 +2165,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
    //m.setEps(1e-4);
    //m.setMaxIterations(10000);
    //m.setMaxFunctionCalls(10000);
-   //m.setPrintLevel(-1);
+   //m.setPrintLevel(2);
    m.minimize("Minuit2", "Migrad");
 
    //m.migrad(); 
@@ -2261,6 +2261,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   ws->import( *pdfFrame );
   ws->import( mgg );
 
+  std::cout << fitStatus_1 << "," << fitStatus_2 << "," << fitStatus_3 << "," << fitStatus_4 << std::endl;
   return ws;
 };
 
