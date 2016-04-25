@@ -38,6 +38,8 @@ public:
   std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetFacRenScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetJesSystematic( float mr, float rsq );
+  std::pair<float, float> GetBtagSystematic( float mr, float rsq );
+  std::pair<float, float> GetMisstagSystematic( float mr, float rsq );
   float GetPdfSystematic( int i, float mr, float rsq );
   static float GetHggBF( );
 

@@ -166,7 +166,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       
       h2p_btagUp           = new TH2Poly(this->processName+"_btagUp", "", 150, 10000, 0, 1);
       h2p_btagDown         = new TH2Poly(this->processName+"_btagDown", "", 150, 10000, 0, 1);
-
+      
       h2p_misstagUp        = new TH2Poly(this->processName+"_misstagUp", "", 150, 10000, 0, 1);
       h2p_misstagDown      = new TH2Poly(this->processName+"_misstagDown", "", 150, 10000, 0, 1);
       
@@ -189,11 +189,11 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 
-	   h2p_btagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
-	   h2p_btagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
-	   
-	    h2p_misstagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
-	    h2p_misstagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_btagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_btagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  
+	  h2p_misstagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_misstagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	}
 
       return true;
@@ -558,6 +558,24 @@ std::pair<float, float> HggRazorSystematics::GetJesSystematic( float mr, float r
   float smhY      = h2p->GetBinContent( bin );
   float smhY_Up   = h2p_JesUp->GetBinContent( bin ) - smhY;
   float smhY_Down = h2p_JesDown->GetBinContent( bin ) - smhY;
+  return std::make_pair( smhY_Up, smhY_Down );
+};
+
+std::pair<float, float> HggRazorSystematics::GetBtagSystematic( float mr, float rsq )
+{
+  int bin = h2p->FindBin( mr+10, rsq+0.0001 );
+  float smhY      = h2p->GetBinContent( bin );
+  float smhY_Up   = h2p_btagUp->GetBinContent( bin ) - smhY;
+  float smhY_Down = h2p_btagDown->GetBinContent( bin ) - smhY;
+  return std::make_pair( smhY_Up, smhY_Down );
+};
+
+std::pair<float, float> HggRazorSystematics::GetMisstagSystematic( float mr, float rsq )
+{
+  int bin = h2p->FindBin( mr+10, rsq+0.0001 );
+  float smhY      = h2p->GetBinContent( bin );
+  float smhY_Up   = h2p_misstagUp->GetBinContent( bin ) - smhY;
+  float smhY_Down = h2p_misstagDown->GetBinContent( bin ) - smhY;
   return std::make_pair( smhY_Up, smhY_Down );
 };
 
