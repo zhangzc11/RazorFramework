@@ -77,6 +77,12 @@ private:
   TH2Poly* h2p_JesDown;
   //PDF
   TH2Poly* h2p_Pdf[60];
+  //BTAG
+  TH2Poly* h2p_btagUp;
+  TH2Poly* h2p_btagDown;
+  //Mistag
+  TH2Poly* h2p_misstagUp;
+  TH2Poly* h2p_misstagDown;
   
   //Systematic Histos(user must set these)
   TH1F* NEvents;
