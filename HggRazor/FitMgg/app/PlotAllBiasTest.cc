@@ -69,6 +69,61 @@ int main( int argc, char* argv[])
       fitFunc = "singleGaus";
   }
 
+
+  std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
+  if (  categoryMode == "" )
+    {
+      std::cout << "[WARNING]: please provide the category. Use --category=<highpt,highres,lowres>" << std::endl;
+      categoryMode = "??";
+    }
+ 
+  std::string LowMRcut = ParseCommandLine( argc, argv, "-LowMRcut=" );
+  std::string HighMRcut = ParseCommandLine( argc, argv, "-HighMRcut=" );
+  std::string LowRSQcut = ParseCommandLine( argc, argv, "-LowRSQcut=" );
+  std::string HighRSQcut = ParseCommandLine( argc, argv, "-HighRSQcut=" );
+  std::string SoB = ParseCommandLine( argc, argv, "-SoB=" );
+
+  if (  SoB == "" )
+    {
+      std::cout << "[WARNING]: please provide the category. Use --category=<highpt,highres,lowres>" << std::endl;
+      SoB = "??";
+    }
+ 
+  std::string BinSelection = ParseCommandLine( argc, argv, "-BinSelection=" );
+  if (  BinSelection == "" && ( LowMRcut == "" || LowRSQcut == "" ) )
+    {
+      std::cout << "[WARNING]: please provide MR cut and Rsq cut. use --LowMRcut=<yourLowMRCut> --LowRSQcut=<yourLowRSQCut>" << std::endl;
+      LowMRcut = "??";
+      LowRSQcut = "??";
+    }
+
+  if (  BinSelection == "" && ( HighMRcut == "" || HighRSQcut == "" ) )
+    {
+      std::cout << "[WARNING]: please provide High-MR cut and High-Rsq cut. use --HighMRcut=<yourHighMRCut> --HighRSQcut=<HighRSQCut>" << std::endl;
+      HighMRcut = "??";
+      HighRSQcut = "??";
+    }
+
+
+  std::string AICw1 = ParseCommandLine( argc, argv, "-AICw1=" );
+  std::string AICw2 = ParseCommandLine( argc, argv, "-AICw2=" );
+  std::string AICw3 = ParseCommandLine( argc, argv, "-AICw3=" );
+  std::string AICw4 = ParseCommandLine( argc, argv, "-AICw4=" );
+  std::string AICw5 = ParseCommandLine( argc, argv, "-AICw5=" );
+  std::string AICw6 = ParseCommandLine( argc, argv, "-AICw6=" );
+  std::string AICw7 = ParseCommandLine( argc, argv, "-AICw7=" );
+
+  std::string AICfunc1 = ParseCommandLine( argc, argv, "-AICfunc1=" );
+  std::string AICfunc2 = ParseCommandLine( argc, argv, "-AICfunc2=" );
+  std::string AICfunc3 = ParseCommandLine( argc, argv, "-AICfunc3=" );
+  std::string AICfunc4 = ParseCommandLine( argc, argv, "-AICfunc4=" );
+  std::string AICfunc5 = ParseCommandLine( argc, argv, "-AICfunc5=" );
+  std::string AICfunc6 = ParseCommandLine( argc, argv, "-AICfunc6=" );
+  std::string AICfunc7 = ParseCommandLine( argc, argv, "-AICfunc7=" );
+  
+
+
+
   std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
   if ( ifs.is_open() )
     {
@@ -178,7 +233,52 @@ int main( int argc, char* argv[])
 
   if ( mode == "table2" )
     {
-      MakeTable( mean_map, "mean" );
+        std::vector<std::string> v_func_name;// = new std::vector<std::string>;
+	std::map<std::string, std::string> func_map;
+	if(AICfunc1!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc1,AICw1));
+	v_func_name.push_back(AICfunc1);
+	}
+	if(AICfunc2!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc2,AICw2));
+	v_func_name.push_back(AICfunc2);
+	}
+	if(AICfunc3!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc3,AICw3));
+	v_func_name.push_back(AICfunc3);
+	}
+	if(AICfunc4!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc4,AICw4));
+	v_func_name.push_back(AICfunc4);
+	}
+	if(AICfunc5!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc5,AICw5));
+	v_func_name.push_back(AICfunc5);
+	}
+	if(AICfunc6!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc6,AICw6));
+	v_func_name.push_back(AICfunc6);
+	}
+	if(AICfunc7!="")
+	{
+	func_map.insert( std::pair<std::string, std::string>(AICfunc7,AICw7));
+	v_func_name.push_back(AICfunc7);
+	}
+	
+	std::cout<<"map of functions: "<<std::endl;
+	//std::sort(func_map.begin(),func_map.end());
+	//for(auto tmp:func_map)
+	for(int i=0;i<v_func_name.size();i++)
+	{
+		std::cout<<v_func_name[i]<<"   "<<func_map[v_func_name[i]]<<std::endl;
+	}
+      MakeTable2( mean_map, "mean", categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, SoB, func_map,v_func_name);
     }
   
   if ( mode == "tableFitErr" )
