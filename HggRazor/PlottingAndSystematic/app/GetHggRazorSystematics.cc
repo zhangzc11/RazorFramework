@@ -342,6 +342,10 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUpS->SetBinContent( bin, facSys.first );
 	      btagDownS->SetBinContent( bin, facSys.second );
+	      //misstag
+	      facSys = hggSys->GetMisstagSystematic( tmp[0], tmp[1] );
+	      misstagUpS->SetBinContent( bin, facSys.first );
+	      misstagDownS->SetBinContent( bin, facSys.second );
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
@@ -372,6 +376,10 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
 	      btagDown->SetBinContent( bin, btagDown->GetBinContent(bin) + facSys.second );
+	      //misstag
+	      facSys = hggSys->GetMisstagSystematic( tmp[0], tmp[1] );
+	      misstagUp->SetBinContent( bin, misstagUp->GetBinContent(bin) + facSys.first );
+	      misstagDown->SetBinContent( bin, misstagDown->GetBinContent(bin) + facSys.second );
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
@@ -432,7 +440,11 @@ int main( int argc, char* argv[] )
        btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
        btagUpS->SetBinContent( bin, btagUp->GetBinContent( bin )/nomS );
        btagDownS->SetBinContent( bin, btagDown->GetBinContent( bin )/nomS );
-       
+       //misstag
+       misstagUp->SetBinContent( bin, misstagUp->GetBinContent( bin )/nom );
+       misstagDown->SetBinContent( bin, misstagDown->GetBinContent( bin )/nom );
+       misstagUpS->SetBinContent( bin, misstagUp->GetBinContent( bin )/nomS );
+       misstagDownS->SetBinContent( bin, misstagDown->GetBinContent( bin )/nomS );
        
        std::cout << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 		 << nominal->GetBinContent( bin ) << "\t"
@@ -477,6 +489,8 @@ int main( int argc, char* argv[] )
   JesDown->Write("JesDown");
   btagUp->Write("btagUp");
   btagDown->Write("btagDown");
+  misstagUp->Write("misstagUp");
+  misstagDown->Write("misstagDown");
   for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
   sF->Close();
   
