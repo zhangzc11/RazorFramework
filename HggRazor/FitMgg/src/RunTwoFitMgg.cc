@@ -835,6 +835,12 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	}
     }
   ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+  if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+  if ( category == "hzbb" )
+    {
+      ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
+      ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+    }
   //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
   //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
   //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
