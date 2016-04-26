@@ -9,8 +9,8 @@ print "RUNNING BIAS TEST"
 
 inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root"
 
-outputDir = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_test_15Apr2016_cmscaf1nd/"
-SoverB = ["0.0","1.0","3.0","5.0"]
+outputDir = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_test_25Apr2016_cmscaf1nd/"
+SoverB = ["0.0","1.0", "3.0", "5.0"]
 
 queue = "cmscaf1nd" # change this to the queue you want to use in lxplus batch
 

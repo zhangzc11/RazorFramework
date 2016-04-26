@@ -1,1 +1,3 @@
+hzbb 150 10000 0.00 10.00 singlePow singleExp  
+highres 400 600 0.025 0.175 singleExp singlePow modExp  
 highres 600 950 0.00 0.01 singleExp singlePow modExp  
