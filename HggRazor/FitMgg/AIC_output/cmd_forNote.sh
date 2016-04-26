@@ -1,5 +1,5 @@
 rm aic_tables.tex aic_plots.tex
-cat FitChoices_Table_highpt_ColorTable.tex FitChoices_Table_highres_ColorTable.tex FitChoices_Table_lowres_ColorTable.tex FitChoices_Table_hzbb_ColorTable.tex >> aic_tables.tex
+cat FitChoices_Table_highpt_ColorTable_WithStatus.tex FitChoices_Table_highres_ColorTable_WithStatus.tex FitChoices_Table_lowres_ColorTable_WithStatus.tex FitChoices_Table_hzbb_ColorTable_WithStatus.tex >> aic_tables.tex
 cat FitChoices_Plot_highpt.tex FitChoices_Plot_highres.tex FitChoices_Plot_lowres.tex FitChoices_Plot_hzbb.tex >> aic_plots.tex
 sed -i "s/_0\./_0d/g" `grep _0\. -rl aic_plots.tex`
 python renamePDF.py highpt

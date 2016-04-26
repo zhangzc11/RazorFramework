@@ -5,7 +5,7 @@
 
 import subprocess, time, sys, os, shlex
 
-inputFile = "/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/submission/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root" #"/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
+inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root" #"/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
 
 queue = "cmscaf1nd" # change this to the queue you want to use in lxplus batch
 
