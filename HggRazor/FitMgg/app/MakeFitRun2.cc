@@ -505,7 +505,7 @@ int main( int argc, char* argv[])
       //w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], "singleExp" );
       //if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[0]));
 
-      
+    
       w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], fitStatus_1[0],fitStatus_2[0], fitStatus_3[0],fitStatus_4[0] , "doubleExp");
       w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], fitStatus_1[1],fitStatus_2[1], fitStatus_3[1],fitStatus_4[1] , "singleExp");
       w_aic[2] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], aic_2[2], aic_3[2], fitStatus_1[2],fitStatus_2[2], fitStatus_3[2],fitStatus_4[2] , "singlePow");
@@ -515,7 +515,7 @@ int main( int argc, char* argv[])
       w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], aic_2[6], aic_3[6], fitStatus_1[6],fitStatus_2[6], fitStatus_3[6],fitStatus_4[6] , "modExp");
       w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], fitStatus_1[7],fitStatus_2[7], fitStatus_3[7],fitStatus_4[7] , "poly4");
       
-      double min_aic_tmp = 999.0;
+	double min_aic_tmp = 999.0;
 
        for(int i=0;i<8;i++)
         {

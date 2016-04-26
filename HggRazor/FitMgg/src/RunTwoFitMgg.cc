@@ -2155,7 +2155,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
-  ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n );
+  ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n * 1.2);
   
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
    RooNLLVar* nll = (RooNLLVar*)ws->pdf( tag )->createNLL( data, RooFit::Extended(kTRUE), RooFit::Range("low,high") );
@@ -2165,7 +2165,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
    //m.setEps(1e-4);
    //m.setMaxIterations(10000);
    //m.setMaxFunctionCalls(10000);
-   //m.setPrintLevel(2);
+   m.setPrintLevel(2);
    m.minimize("Minuit2", "Migrad");
 
    //m.migrad(); 
@@ -2261,7 +2261,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   ws->import( *pdfFrame );
   ws->import( mgg );
 
-  std::cout << fitStatus_1 << "," << fitStatus_2 << "," << fitStatus_3 << "," << fitStatus_4 << std::endl;
+  std::cout <<ffName<<" AIC fit status:  "<< fitStatus_1 << "," << fitStatus_2 << "," << fitStatus_3 << "," << fitStatus_4 << std::endl;
   return ws;
 };
 
