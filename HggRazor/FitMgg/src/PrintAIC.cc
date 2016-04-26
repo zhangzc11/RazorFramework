@@ -188,6 +188,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	fprintf(m_outfile_5,"\\end{center} \n");
 	fprintf(m_outfile_5,"\\end{table*} \n \n \n");
  
+	fprintf(m_outfile_list," \n");
 
 
        //print the AIC table with color and status to a file

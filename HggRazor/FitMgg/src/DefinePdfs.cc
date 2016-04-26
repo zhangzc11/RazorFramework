@@ -282,12 +282,15 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
   //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
-  RooRealVar* alpha1 = new RooRealVar( tag + "_a1", "#alpha_{1}", 0.06, "" );
+  RooRealVar* alpha1 = new RooRealVar( tag + "_a1", "#alpha_{1}", 0.04, "" );
   RooRealVar* alpha2 = new RooRealVar( tag + "_a2", "#alpha_{2}", 0.06, "" );
   alpha1->setConstant(kFALSE);
   alpha2->setConstant(kFALSE);
   //alpha1->setRange(-100,0);
   //alpha2->setRange(-100,0);
+  alpha1->setMin(0.0);
+  alpha2->setMin(0.0);
+
   //--------------------------------------------
   //Square variables to avoid rising exponential
   //--------------------------------------------
@@ -374,11 +377,13 @@ TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
-  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-0.06, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",0.06, "");
   alpha->setConstant(kFALSE);
+  alpha->setMin(0.0);
   RooFormulaVar* aSq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
   RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
+  m->setMin(0.0);
   //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
   m->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}", 10, "events");  
@@ -412,12 +417,14 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1,"");
-  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2,"");
+  RooRealVar *alpha1  = new RooRealVar(tag+"_a1","#alpha_{1}",-1.0,"");
+  RooRealVar *alpha2  = new RooRealVar(tag+"_a2","#alpha_{2}",-2.0,"");
   alpha1->setConstant(kFALSE);
   alpha2->setConstant(kFALSE);
-  alpha1->setRange(-100, 0);
-  alpha2->setRange(-100, 0);
+  //alpha1->setRange(-100, 0);
+  //alpha2->setRange(-100, 0);
+  alpha1->setMax(0.0);
+  alpha2->setMax(0.0);
   RooFormulaVar* asq1 = new RooFormulaVar( tag + "_aSq1","","-1*@0*@0", *alpha1);
   RooFormulaVar* asq2 = new RooFormulaVar( tag + "_aSq2","","-1*@0*@0", *alpha2);
   
