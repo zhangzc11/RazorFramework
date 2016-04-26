@@ -208,8 +208,19 @@ int main( int argc, char* argv[] )
   
   TH2Poly* JesUp    = new TH2Poly("JesUp", "", 150, 10000, 0, 1 );
   TH2Poly* JesDown  = new TH2Poly("JesDown", "", 150, 10000, 0, 1 );
-  TH2Poly* JesUpS   = new TH2Poly("JesUpS", "", 150, 10000, 0, 1 );
-  TH2Poly* JesDownS = new TH2Poly("JesDownS", "", 150, 10000, 0, 1 );
+  TH2Poly* JesUpS   = new TH2Poly("JesUpS", "", 150, 10000, 0, 1 );//signal
+  TH2Poly* JesDownS = new TH2Poly("JesDownS", "", 150, 10000, 0, 1 );//signal
+
+  TH2Poly* btagUp    = new TH2Poly("btagUp", "", 150, 10000, 0, 1 );
+  TH2Poly* btagDown  = new TH2Poly("btagDown", "", 150, 10000, 0, 1 );
+  TH2Poly* btagUpS   = new TH2Poly("btagUpS", "", 150, 10000, 0, 1 );//signal
+  TH2Poly* btagDownS = new TH2Poly("btagDownS", "", 150, 10000, 0, 1 );//signal
+
+  TH2Poly* misstagUp    = new TH2Poly("misstagUp", "", 150, 10000, 0, 1 );
+  TH2Poly* misstagDown  = new TH2Poly("misstagDown", "", 150, 10000, 0, 1 );
+  TH2Poly* misstagUpS   = new TH2Poly("misstagUpS", "", 150, 10000, 0, 1 );//signal
+  TH2Poly* misstagDownS = new TH2Poly("misstagDownS", "", 150, 10000, 0, 1 );//signal
+  
   
   TH2Poly* pdf[60];
   TH2Poly* pdfS[60];
@@ -240,6 +251,18 @@ int main( int argc, char* argv[] )
       JesUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       JesDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       JesDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+
+      //btag
+      btagUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      btagUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      btagDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      btagDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      //misstag
+      misstagUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      misstagUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      misstagDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      misstagDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      //pdf
       for( int i = 0; i < 60; i++ )
 	{
 	  pdf[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
@@ -315,6 +338,10 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	      JesUpS->SetBinContent( bin, facSys.first );
 	      JesDownS->SetBinContent( bin, facSys.second );
+	      //btag
+	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
+	      btagUpS->SetBinContent( bin, facSys.first );
+	      btagDownS->SetBinContent( bin, facSys.second );
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
@@ -341,6 +368,10 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	      JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	      JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
+	      //btag
+	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
+	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
+	      btagDown->SetBinContent( bin, btagDown->GetBinContent(bin) + facSys.second );
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
@@ -376,25 +407,32 @@ int main( int argc, char* argv[] )
        int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
        float nom = nominal->GetBinContent( bin );
        float nomS = nominalS->GetBinContent( bin );
+       //Fac
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
-       facScaleUpS->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nomS );
+       facScaleUpS->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nomS );//FIX SIGNAL SYSTEMATIC WHEN FULL SIGNAL MODEL AVAILABLE
        facScaleDownS->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nomS );
-       
+       //Ren
        renScaleUp->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nom );
        renScaleDown->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nom );
        renScaleUpS->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nomS );
        renScaleDownS->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nomS );
-       
+       //facRen
        facRenScaleUp->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nom );
        facRenScaleDown->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nom );
        facRenScaleUpS->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nomS );
        facRenScaleDownS->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nomS );
-
+       //JES
        JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
        JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
        JesUpS->SetBinContent( bin, JesUp->GetBinContent( bin )/nomS );
        JesDownS->SetBinContent( bin, JesDown->GetBinContent( bin )/nomS );
+       //btag
+       btagUp->SetBinContent( bin, btagUp->GetBinContent( bin )/nom );
+       btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
+       btagUpS->SetBinContent( bin, btagUp->GetBinContent( bin )/nomS );
+       btagDownS->SetBinContent( bin, btagDown->GetBinContent( bin )/nomS );
+       
        
        std::cout << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 		 << nominal->GetBinContent( bin ) << "\t"
@@ -437,6 +475,8 @@ int main( int argc, char* argv[] )
   facRenScaleDown->Write("facRenScaleDown");
   JesUp->Write("JesUp");
   JesDown->Write("JesDown");
+  btagUp->Write("btagUp");
+  btagDown->Write("btagDown");
   for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
   sF->Close();
   

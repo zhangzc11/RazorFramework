@@ -103,6 +103,12 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  TString PdfSysName = Form(this->processName+"_PdfEigenVect_%d",i);
 	  h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
 	}
+      //btag
+      h2p_btagUp   = new TH2Poly(this->processName+"_btagUp", "", 150, 10000, 0, 1);
+      h2p_btagDown = new TH2Poly(this->processName+"_btagDown", "", 150, 10000, 0, 1);
+      //misstag
+      h2p_misstagUp   = new TH2Poly(this->processName+"_misstagUp", "", 150, 10000, 0, 1);
+      h2p_misstagDown = new TH2Poly(this->processName+"_misstagDown", "", 150, 10000, 0, 1);
       //adding bins
       for ( auto tmp : this->binningMap )
 	{
@@ -119,6 +125,10 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	      h2p_JesUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_JesDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_btagUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_btagDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_misstagUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_misstagDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	    }
 	}
       
@@ -148,36 +158,18 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_JesUp           = new TH2Poly(this->processName+"_JesUp", "", 150, 10000, 0, 1);
       h2p_JesDown         = new TH2Poly(this->processName+"_JesDown", "", 150, 10000, 0, 1);
       
-      /*
-      h2p = new TH2Poly( );
-      h2p->SetName( this->processName+"_nominal" );
-      
-      h2p_facScaleUp      = new TH2Poly( );
-      h2p_facScaleUp->SetName( this->processName+"_facScaleUp" );
-      h2p_facScaleDown    = new TH2Poly( );
-      h2p_facScaleDown->SetName( this->processName+"_facScaleDown" );
-      
-      h2p_renScaleUp      = new TH2Poly( );
-      h2p_renScaleUp->SetName( this->processName+"_renScaleUp" );
-      h2p_renScaleDown    = new TH2Poly( );
-      h2p_renScaleDown->SetName( this->processName+"_renScaleDown" );
-      
-      h2p_facRenScaleUp   = new TH2Poly( );
-      h2p_facRenScaleUp->SetName( this->processName+"_facRenScaleUp" );
-      h2p_facRenScaleDown = new TH2Poly( );
-      h2p_facRenScaleDown->SetName( this->processName+"_facRenScaleDown" );
-      
-      h2p_JesUp           = new TH2Poly( );
-      h2p_JesUp->SetName( this->processName+"_JesUp" );
-      h2p_JesDown         = new TH2Poly( );
-      h2p_JesDown->SetName( this->processName+"_JesDown" );
-      */
       for( int i = 0; i < n_PdfSys; i++ )
 	{
 	  TString PdfSysName = Form(this->processName+"_PdfEigenVect_%d",i);
 	  h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
 	}
-       
+      
+      h2p_btagUp           = new TH2Poly(this->processName+"_btagUp", "", 150, 10000, 0, 1);
+      h2p_btagDown         = new TH2Poly(this->processName+"_btagDown", "", 150, 10000, 0, 1);
+      
+      h2p_misstagUp        = new TH2Poly(this->processName+"_misstagUp", "", 150, 10000, 0, 1);
+      h2p_misstagDown      = new TH2Poly(this->processName+"_misstagDown", "", 150, 10000, 0, 1);
+      
       for ( auto tmp : binningVect )
 	{
 	  if ( _debug ) std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
@@ -196,6 +188,12 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  h2p_JesDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  
 	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+
+	  h2p_btagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_btagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  
+	  h2p_misstagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_misstagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	}
 
       return true;
@@ -251,60 +249,76 @@ void HggRazorSystematics::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
+      float commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;//including btag weight
+      
       if ( this->processName == "signal" )
 	{
 	  if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, this->Lumi*weight );
 	  else h2p->Fill( MR, 0.999, this->Lumi*weight);
 	}
-      else{
-	if ( t1Rsq < 1.0 )
-	  {
-	    //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
-	    //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
-	    h2p->Fill( MR, t1Rsq, this->Lumi*weight*pileupWeight );//sm-higgs
+      else
+	{
+	  if ( t1Rsq < 1.0 )
+	    {
+	      //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
+	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
+	      h2p->Fill( MR, t1Rsq, commonW );
+	      
+	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	    
-	    h2p_facScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
-	    h2p_facScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
-	    
-	    h2p_renScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
-	    h2p_renScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
-	    
-	    h2p_facRenScaleUp->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
-	    h2p_facRenScaleDown->Fill( MR, t1Rsq, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
-	    
-	    //PDF
-	    for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-	      {
-		h2p_Pdf[ipdf]->Fill( MR, t1Rsq, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
-	      }
-	  }
-	else
-	  {
-	    h2p->Fill( MR, 0.999, this->Lumi*weight*pileupWeight );//sm-higgs
-	    
-	    h2p_facScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleUp*pileupWeight*N_events/N_facScale[0] );
-	    h2p_facScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facScaleDown*pileupWeight*N_events/N_facScale[1] );
-	    
-	    h2p_renScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleUp*pileupWeight*N_events/N_facScale[2] );
-	    h2p_renScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_renScaleDown*pileupWeight*N_events/N_facScale[3] );
-	    
-	    h2p_facRenScaleUp->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleUp*pileupWeight*N_events/N_facScale[4] );
-	    h2p_facRenScaleDown->Fill( MR, 0.999, this->Lumi*weight*sf_facRenScaleDown*pileupWeight*N_events/N_facScale[5] );
-	    
-	    //PDF
-	    for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-	      {
-		h2p_Pdf[ipdf]->Fill( MR, 0.999, this->Lumi*weight*sf_pdf->at(ipdf)*pileupWeight*N_events/N_Pdf[ipdf] );
-	      }
-	  }
-	
-	//JES Up
-	if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, this->Lumi*weight*pileupWeight );
-	else h2p_JesUp->Fill( MR_JESUp, 0.999, this->Lumi*weight*pileupWeight );
-	//JES Down
-	if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, this->Lumi*weight*pileupWeight );
-	else h2p_JesDown->Fill( MR_JESDown, 0.999, this->Lumi*weight*pileupWeight );
-      }
+	      h2p_renScaleUp->Fill( MR, t1Rsq, commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	      h2p_renScaleDown->Fill( MR, t1Rsq, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      
+	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      
+	      //PDF
+	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+		{
+		  h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		}
+	      
+	      h2p_btagUp->Fill( MR, t1Rsq, commonW*sf_btagUp );
+	      h2p_btagDown->Fill( MR, t1Rsq, commonW*sf_btagDown );
+	      
+	      h2p_misstagUp->Fill( MR, t1Rsq, commonW*sf_bmistagUp );
+	      h2p_misstagDown->Fill( MR, t1Rsq, commonW*sf_bmistagDown );
+	      
+	    }
+	  else
+	    {
+	      h2p->Fill( MR, 0.999, commonW );
+	      
+	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	      
+	      h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	      h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      
+	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      
+	      //PDF
+	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+		{
+		  h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		}
+	      
+	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
+	      h2p_btagDown->Fill( MR, 0.999, commonW*sf_btagDown );
+	      
+	      h2p_misstagUp->Fill( MR, 0.999, commonW*sf_bmistagUp );
+	      h2p_misstagDown->Fill( MR, 0.999, commonW*sf_bmistagDown );
+	    }
+	  
+	  //JES Up
+	  if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, commonW );
+	  else h2p_JesUp->Fill( MR_JESUp, 0.999, commonW );
+	  //JES Down
+	  if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, commonW );
+	  else h2p_JesDown->Fill( MR_JESDown, 0.999, commonW );
+	}
     }
   
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
@@ -453,6 +467,10 @@ bool HggRazorSystematics::WriteOutput( TString outName )
       TString PdfTH2PName = Form("histo_PdfEigenVector%d", ipdf );
       if ( h2p_Pdf[ipdf] != NULL ) h2p_Pdf[ipdf]->Write( this->boxName + "_"  + PdfTH2PName );
     }
+  if ( h2p_JesUp != NULL ) h2p_btagUp->Write( this->boxName + "_histo_btagUp" );
+  if ( h2p_JesDown != NULL ) h2p_btagDown->Write( this->boxName + "_histo_btagDown" );
+  if ( h2p_JesUp != NULL ) h2p_misstagUp->Write( this->boxName + "_histo_misstagUp" );
+  if ( h2p_JesDown != NULL ) h2p_misstagDown->Write( this->boxName + "_histo_misstagDown" );
    
   fout->Close();
   if ( _debug ) std::cout << "[DEBUG]: Finishing WriteOutput" << std::endl;
@@ -540,6 +558,24 @@ std::pair<float, float> HggRazorSystematics::GetJesSystematic( float mr, float r
   float smhY      = h2p->GetBinContent( bin );
   float smhY_Up   = h2p_JesUp->GetBinContent( bin ) - smhY;
   float smhY_Down = h2p_JesDown->GetBinContent( bin ) - smhY;
+  return std::make_pair( smhY_Up, smhY_Down );
+};
+
+std::pair<float, float> HggRazorSystematics::GetBtagSystematic( float mr, float rsq )
+{
+  int bin = h2p->FindBin( mr+10, rsq+0.0001 );
+  float smhY      = h2p->GetBinContent( bin );
+  float smhY_Up   = h2p_btagUp->GetBinContent( bin ) - smhY;
+  float smhY_Down = h2p_btagDown->GetBinContent( bin ) - smhY;
+  return std::make_pair( smhY_Up, smhY_Down );
+};
+
+std::pair<float, float> HggRazorSystematics::GetMisstagSystematic( float mr, float rsq )
+{
+  int bin = h2p->FindBin( mr+10, rsq+0.0001 );
+  float smhY      = h2p->GetBinContent( bin );
+  float smhY_Up   = h2p_misstagUp->GetBinContent( bin ) - smhY;
+  float smhY_Down = h2p_misstagDown->GetBinContent( bin ) - smhY;
   return std::make_pair( smhY_Up, smhY_Down );
 };
 
