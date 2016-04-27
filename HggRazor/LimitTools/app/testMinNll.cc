@@ -659,6 +659,35 @@ int main( int argc, char* argv[] )
     }
   std::cout << "return myVec;\n}\n";
 
+
+  std::cout << "\\begin{table*}[htbH]\n\\begin{center}\n";
+  std::cout << "\\topcaption{Yields table\\label{tab:categoryTable}}\n";
+  std::cout << "\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|}\n\\hline\n";
+  std::cout << "$\\mathrm{M_{R}}\\otimes\\mathrm{R^{2}}$ & non-resonant (MC) & SM Higgs & Signal\\\\\n\\hline\n";
+  for( auto tmp : myMap )
+    {
+      double MR_bw  = (MR_H-MR_L)/nMRbins;
+      double Rsq_bw = (Rsq_H-Rsq_L)/nRSQbins;
+      
+      double MR_low   = 150 + MR_bw*(tmp.second.xl - 1);
+      double MR_high  = 150 + MR_bw*((tmp.second.xh+1) - 1);//had to artificially subtract 1 from the xh in the code above, restoring the correct values here
+      double Rsq_low  = Rsq_bw*(tmp.second.yl - 1);
+      double Rsq_high = Rsq_bw*((tmp.second.yh+1) - 1);//had to artificially subtract 1 from the xh in the code above, restoring the correct values here
+      if ( Rsq_high > 1.0 ) Rsq_high  = 1.0;
+      if ( MR_high > 9000.0 ) MR_high = 10000.0;
+
+      TString s = Form("%d-%d\GeV")
+      std::cout << std::defaultfloat;
+      std::cout << MR_low << "-" << MR_high << "\\GeV $\\otimes$ "
+		<< Rsq_low << "-"  << Rsq_high;
+      std::cout << std::fixed;
+      std::cout << std::setprecision(2);
+      std::cout << " & " << tmp.second.b_nr << " & "
+		<< tmp.second.b_smh << " & "  << tmp.second.s << "\\\\" << std::endl;
+      std::cout << std::scientific;
+    }
+  std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
+  
   //h_qnot->Write();
   h2p->Write("h2p_bFull");
   h2p_nr->Write("h2pSR_bNR");
