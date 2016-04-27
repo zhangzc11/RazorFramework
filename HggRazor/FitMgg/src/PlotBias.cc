@@ -253,6 +253,119 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
+void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type , std::string categoryMode, std::string LowMRcut, std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::string SoB, std::map<std::string, std::string> func_map, std::vector<std::string> v_func_name)
+//void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type )
+{
+  int row_ctr = 0;
+  int NumOfRow = 0;
+  std::vector< std::string > row_text;
+  std::stringstream ss_fl;//first line for table
+  ss_fl << "--";
+//
+//	for(auto:tmp:mymap)
+  for (int i=0;i<v_func_name.size();i++)
+	{
+	std::string f1 = v_func_name[i];//func_map[tmp_f1.first];
+ 	std::stringstream ss;
+      	ss << f1; 
+      	ss.precision(1);
+      	ss.setf ( std::ios::showpoint );
+      	ss.setf ( std::ios::fixed );
+      	bool isEmptyRow = true; 
+	for (int j=0;j<v_func_name.size();j++)
+		{
+		std::string f2 = v_func_name[j];//func_map[tmp_f2.first];
+	  	std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+		if ( mymap.find( mypair ) == mymap.end() )
+	    	{
+	      	continue;
+	    	}
+	  	isEmptyRow = false;
+	  	if ( row_ctr == 0 ) ss_fl << " & " << f2 <<"("<<func_map[f2]<<")"; 
+	  	std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
+	  	//std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
+	  	ss << " & " << mymap[pair]*100. << "\\%"; 
+	  
+		}
+ 	if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
+	if(!isEmptyRow)
+	{
+      		row_text.push_back( ss.str() );
+		NumOfRow++;
+	}
+      	row_ctr++;
+	}
+/*
+  for( const auto& fitf : FitFunction() )
+    //for( const auto& fitf : mymap )
+    {
+      std::string f1 = GetFitFunctionString( fitf );
+      //std::string f1 = fitf.first.first;
+      std::stringstream ss;
+      ss << f1; 
+      ss.precision(1);
+      ss.setf ( std::ios::showpoint );
+      ss.setf ( std::ios::fixed );
+      bool isEmptyRow = true; 
+      for( const auto& fitf2 : FitFunction() )
+	{
+	  std::string f2 = GetFitFunctionString( fitf2 );
+	  std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+	  if ( mymap.find( mypair ) == mymap.end() )
+	    {
+	      continue;
+	    }
+	  isEmptyRow = false;
+	  if ( row_ctr == 0 ) ss_fl << " & " << f2; 
+	  std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
+	  //std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
+	  ss << " & " << mymap[pair]*100. << "\\%"; 
+	  //std::cout << GetFitFunctionString( fitf )  << " "  << GetFitFunctionString( fitf2 ) << std::endl;
+	}
+      if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
+	if(!isEmptyRow)
+	{
+      		row_text.push_back( ss.str() );
+		NumOfRow++;
+	}
+      row_ctr++;
+    }
+  */
+	std::string str_table = "Bias_output/Bias_Table.tex";
+  const char * file_Name_table = str_table.c_str();
+  FILE* m_outfile = fopen(file_Name_table, "a");
+
+  std::cout << "\\begin{table}[htb]\n\\caption{Bias test performed in HighRes box. using the set of seven fit functions}\n\\centering\n\\begin{tabular}{";
+  fprintf(m_outfile, "\\begin{table}[htb]\n");
+  fprintf(m_outfile,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str());
+  fprintf(m_outfile, "\\centering\n\\begin{tabular}{");
+  for(int i=0;i<NumOfRow;i++)
+	{
+	std::cout<<"|c";
+	fprintf(m_outfile, "|c");
+	}
+  std::cout<<"|}\n\\hline" << std::endl;
+  fprintf(m_outfile, "|}\n\\hline \n");
+  int ctr = 0;
+  for ( auto tmp : row_text)
+    {
+      std::cout << tmp << "\\\\" << std::endl;
+      fprintf(m_outfile, "%s \\\\ \n",tmp.c_str());
+      if ( ctr == 0 ) 
+	{
+	std::cout << "\\hline\n";
+	fprintf(m_outfile, "\\hline\n");
+	}
+      ctr++;
+    }
+  std::cout << "\\hline\n\n\\hline\n\\hline\n\\end{tabular}\n\\end{table}" << std::endl;
+  fprintf(m_outfile,  "\\hline\n\\end{tabular}");
+  fprintf(m_outfile,"\n\\label{tab:Bias_%s_SoB_%s_%s_%s} \n", categoryMode.c_str(), SoB.c_str(), LowMRcut.c_str(),LowRSQcut.c_str());
+  fprintf(m_outfile,  "\\end{center}\n\\end{table} \n\n\n\n");
+   return;
+};
+
+
 double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
 {
   TFile* f = new TFile( fname , "READ" );
