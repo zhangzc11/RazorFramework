@@ -43,6 +43,7 @@ float  lowresRSQedges3[2] = {0,1.0};
 //----------------
 float HggRazorSystematics::Lumi  = 2300.0;
 float HggRazorSystematics::NR_kf = 1.37;
+int HggRazorSystematics::n_PdfSys = 60;
 
 void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
 /*
