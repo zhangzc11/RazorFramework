@@ -63,6 +63,7 @@ double RooCB::evaluate() const
 };
 
 
+
 //ClassImp(RooDoubleCB)
 
 RooDoubleCB::RooDoubleCB( ){ };
