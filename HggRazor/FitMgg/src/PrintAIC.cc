@@ -172,7 +172,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	{
 		  fprintf(m_outfile_5,"\\rowcolor[rgb]{0.31,0.78,0.47}  \n");
 		  fprintf(m_outfile_5,"%s & %2d & %6.2f & %6.2f  \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second]);
-		  fprintf(m_outfile_list,"%s   %4.3f   ",tmp.second.c_str(), tmp.first);
+		  fprintf(m_outfile_list,"%s   %4.3f   ",tmp.second.c_str(), aic_weight_map[tmp.second]);
 	}
         else
 	{

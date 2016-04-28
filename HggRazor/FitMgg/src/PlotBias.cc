@@ -336,16 +336,16 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
   FILE* m_outfile = fopen(file_Name_table, "a");
 
   std::cout << "\\begin{table}[htb]\n\\caption{Bias test performed in HighRes box. using the set of seven fit functions}\n\\centering\n\\begin{tabular}{";
-  fprintf(m_outfile, "\\begin{table}[htb]\n");
+  fprintf(m_outfile, "\\begin{table*}[h]\n\\begin{center}\n");
   fprintf(m_outfile,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str());
-  fprintf(m_outfile, "\\centering\n\\begin{tabular}{");
+  fprintf(m_outfile, "\\begin{tabular}{");
   for(int i=0;i<NumOfRow;i++)
 	{
 	std::cout<<"|c";
 	fprintf(m_outfile, "|c");
 	}
-  std::cout<<"|}\n\\hline" << std::endl;
-  fprintf(m_outfile, "|}\n\\hline \n");
+  std::cout<<"|c|}\n\\hline" << std::endl;
+  fprintf(m_outfile, "|c|}\n\\hline \n");
   int ctr = 0;
   for ( auto tmp : row_text)
     {
@@ -361,8 +361,29 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
   std::cout << "\\hline\n\n\\hline\n\\hline\n\\end{tabular}\n\\end{table}" << std::endl;
   fprintf(m_outfile,  "\\hline\n\\end{tabular}");
   fprintf(m_outfile,"\n\\label{tab:Bias_%s_SoB_%s_%s_%s} \n", categoryMode.c_str(), SoB.c_str(), LowMRcut.c_str(),LowRSQcut.c_str());
-  fprintf(m_outfile,  "\\end{center}\n\\end{table} \n\n\n\n");
-   return;
+  fprintf(m_outfile,  "\\end{center}\n\\end{table*} \n\n\n\n");
+  
+  std::string str_plot = "Bias_output/Bias_Plot.tex";
+  const char * file_Name_plot = str_plot.c_str();
+  FILE* m_outfile_2 = fopen(file_Name_plot, "a");
+for (int i=0;i<v_func_name.size();i++)
+        {
+        std::string f1 = v_func_name[i];
+	for (int j=0;j<v_func_name.size();j++)
+        {
+        std::string f2 = v_func_name[j];
+	fprintf(m_outfile_2,"\\begin{figure}[h] \n");
+  	fprintf(m_outfile_2,"\\begin{center}\n");
+  	fprintf(m_outfile_2,"\\includegraphics[width=0.6\\textwidth]{figs/Bias_plots/%s_%s_%s/SoB_%s/doublecrystalBall_biasFits_%s_%s.pdf} \n",categoryMode.c_str(), LowMRcut.c_str(), LowRSQcut.c_str(),SoB.c_str(), f1.c_str(), f2.c_str());
+	fprintf(m_outfile_2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s. - f1=%s, f2=%s} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str(), f1.c_str(), f2.c_str());
+  	fprintf(m_outfile_2,"\\label{fig:Bias_%s_SoB_%s_%s_%s_%s_%s} \n", categoryMode.c_str(), SoB.c_str(), LowMRcut.c_str(),LowRSQcut.c_str(), f1.c_str(), f2.c_str());
+  	fprintf(m_outfile_2,"\\end{center}\n");
+	fprintf(m_outfile_2,"\\end{figure} \n");
+	fprintf(m_outfile_2,"\\clearpage \n\n\n");
+	}
+	}
+
+ return;
 };
 
 
