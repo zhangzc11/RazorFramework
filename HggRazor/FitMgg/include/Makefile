@@ -5,15 +5,15 @@ INC = $(shell pwd)
 Repo = $(shell git rev-parse --show-toplevel)
 
 CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include 
-LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore
+LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -O -lRooFit -lRooFitCore -lMinuit -lHtml -lPyROOT -lFoam -lRooStats -lTreePlayer
 
 CPPFLAGS += -g -std=c++11
 
 SRC = ../src/CustomPdfs.cc
 SHARED = CustomPdfs.so
-INCLUDELIST = CustomPdfs.hh
+INCLUDELIST = CustomPdfs.hh Linkdef.h
 
-all: $(SHARED)
+all: rootdict.cc rootdict.o CustomPdfs.o $(SHARED)
 
 
 rootdict.cc: 
@@ -25,8 +25,8 @@ rootdict.o:
 CustomPdfs.o:
 	$(CXX) $(SRC) $(CPPFLAGS) $(LDFLAGS) -o $@ -I$(INC) -c
 
-$(SHARED): 
-	$(CXX) -shared rootdict.o CustomPdfs.o $(LDFLAGS) -o $@ $^
+$(SHARED): rootdict.o CustomPdfs.o
+	$(CXX) -shared  -I$(ROOTSYS)/include/ $(LDFLAGS) -o $@ $^
 
 clean :
-	rm -f *.o *.so
+	rm -f *.o *.so rootdict.cc rootdict_rdict.pcm
