@@ -10,7 +10,7 @@ LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -O -lRooFit -lRooFitCore -l
 CPPFLAGS += -g -std=c++11
 
 SRC = ../src/CustomPdfs.cc
-SHARED = CustomPdfs.so
+SHARED = libCustomPdfs.so
 INCLUDELIST = CustomPdfs.hh Linkdef.h
 
 all: rootdict.cc rootdict.o CustomPdfs.o $(SHARED)

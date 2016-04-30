@@ -8,7 +8,7 @@ HggRazor = $(Repo)/HggRazor
 CommonTools = $(HggRazor)/CommonTools
 
 CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include
-LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -L$(INC)/include -lRooFit -lRooFitCore -lCustomPdfs
+LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore -L$(INC)/include -lCustomPdfs
 
 CPPFLAGS += -g -std=c++11
 
@@ -68,6 +68,7 @@ $(TARGET5) : $(OBJ5)
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
+
 
 clean :
 	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) *~
