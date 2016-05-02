@@ -662,7 +662,7 @@ int main( int argc, char* argv[] )
 
   std::cout << "\\begin{table*}[htbH]\n\\begin{center}\n";
   std::cout << "\\topcaption{" << categoryMode << " category binning. The non-resonant, "
-	    << "SM Higgs, and signal () expected yields for an integrated luminosity correspondint to 2.3\\fb^{-1} \\label{tab:binning-" << categoryMode << "}}\n";
+	    << "SM Higgs, and signal () expected yields for an integrated luminosity correspondint to 2.3~$\\mathrm{fb}^{-1}$ \\label{tab:binning-" << categoryMode << "}}\n";
   std::cout << "\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|}\n\\hline\n";
   std::cout << "$\\mathrm{M_{R}}\\otimes\\mathrm{R^{2}}$ & non-resonant (MC) & SM Higgs & Signal\\\\\n\\hline\n";
   for( auto tmp : myMap )
