@@ -661,7 +661,8 @@ int main( int argc, char* argv[] )
 
 
   std::cout << "\\begin{table*}[htbH]\n\\begin{center}\n";
-  std::cout << "\\topcaption{Yields table\\label{tab:categoryTable}}\n";
+  std::cout << "\\topcaption{" << categoryMode << " category binning. The non-resonant, "
+	    << "SM Higgs, and signal () expected yields for an integrated luminosity correspondint to 2.3\\fb^{-1} \\label{tab:binning-" << categoryMode << "}}\n";
   std::cout << "\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|}\n\\hline\n";
   std::cout << "$\\mathrm{M_{R}}\\otimes\\mathrm{R^{2}}$ & non-resonant (MC) & SM Higgs & Signal\\\\\n\\hline\n";
   for( auto tmp : myMap )
@@ -675,16 +676,14 @@ int main( int argc, char* argv[] )
       double Rsq_high = Rsq_bw*((tmp.second.yh+1) - 1);//had to artificially subtract 1 from the xh in the code above, restoring the correct values here
       if ( Rsq_high > 1.0 ) Rsq_high  = 1.0;
       if ( MR_high > 9000.0 ) MR_high = 10000.0;
-
-      TString s = Form("%d-%d\GeV")
-      std::cout << std::defaultfloat;
-      std::cout << MR_low << "-" << MR_high << "\\GeV $\\otimes$ "
+      
+      TString s = Form("%.0f-%.0f\\GeV $\\otimes$ %.3f-%.3f & %.2f & %.2f & %.2f \\\\", MR_low, MR_high, Rsq_low, Rsq_high, tmp.second.b_nr, tmp.second.b_smh, tmp.second.s);
+      std::cout << s << std::endl;
+      /*std::cout << MR_low << "-" << MR_high << "\\GeV $\\otimes$ "
 		<< Rsq_low << "-"  << Rsq_high;
-      std::cout << std::fixed;
-      std::cout << std::setprecision(2);
       std::cout << " & " << tmp.second.b_nr << " & "
 		<< tmp.second.b_smh << " & "  << tmp.second.s << "\\\\" << std::endl;
-      std::cout << std::scientific;
+      */
     }
   std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
   

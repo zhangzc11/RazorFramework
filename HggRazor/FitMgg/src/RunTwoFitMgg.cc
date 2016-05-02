@@ -1686,7 +1686,9 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //-------------------------------
   //S i g n a l   +   B k g   P d f
   //-------------------------------
-  //  TString gaussTag  = MakeDoubleGauss("doubleGauseSB", mgg, *ws );
+  //bkg non-extended
+  TString bkgTag = MakeSinglePowNE("bkg_model", mgg, *ws );
+  //signal non-extended
   TString gaussTag = MakeDoubleGaussNE("signal", mgg, *ws );
   RooRealVar Ns( "sbModel_Ns", "N_{s}", 0, "" );
   Ns.setConstant(kFALSE);
@@ -1694,7 +1696,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooRealVar Nbkg( "sbModel_Nbkg", "N_{bkg}", 0, "" );
   Nbkg.setVal(npoints);
   Nbkg.setConstant(kFALSE);
-  RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(tag2), *ws->pdf(gaussTag) ), RooArgList( Nbkg, Ns ) );
+  RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(bkgTag), *ws->pdf(gaussTag) ), RooArgList( Nbkg, Ns ) );
   ws->import( *sbModel );
   
   RooDataSet*   data_toys;
@@ -1990,12 +1992,18 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       RooFitResult* r = m.save(); 
       _status    = r->status();
       _covStatus = r->covQual();
+      r->SetName("rMigrad");
+      ws->import( *r );
 
       //m.hesse();
       m.minimize("Minuit2", "Hesse");
       RooFitResult* r2 = m.save(); 
       _status2    = r2->status();
       _covStatus2 = r2->covQual();
+      r2->SetName("rHesse");
+      ws->import( *r2 );
+      
+      if ( _status2 == -1 ) break;
       
       //m.minos();
       RooFitResult* r3 = m.save(); 

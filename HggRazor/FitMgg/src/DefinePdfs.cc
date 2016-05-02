@@ -245,22 +245,26 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bo
 
 TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-   //------------------------------
+  //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
   //DCB: Double Crystal Ball
   RooRealVar* mu     = new RooRealVar( tag + "_DCB_muCB", "#mu_{CB}", 125, "" );
-  RooRealVar* sigma  = new RooRealVar( tag + "_DCB_sigmaCB", "#sigma_{CB}", 2, "" );
-  RooRealVar* alpha1   = new RooRealVar( tag  + "_DCB_alpha1", "#alpha_{1}", 1.0, "" );
-  RooRealVar* alpha2   = new RooRealVar( tag  + "_DCB_alpha2", "#alpha_{2}", 1.0, "" );
-  RooRealVar* n1       = new RooRealVar( tag  + "_DCB_n1", "#n_{1}", 1.0, "" );
+  RooRealVar* sigma  = new RooRealVar( tag + "_DCB_sigmaCB", "#sigma_{CB}", 1.1, "" );
+  RooRealVar* alpha1   = new RooRealVar( tag  + "_DCB_alpha1", "#alpha_{1}", 1.5, "" );
+  RooRealVar* alpha2   = new RooRealVar( tag  + "_DCB_alpha2", "#alpha_{2}", 2.8, "" );
+  RooRealVar* n1       = new RooRealVar( tag  + "_DCB_n1", "#n_{1}", 3.6, "" );
   RooRealVar* n2       = new RooRealVar( tag  + "_DCB_n2", "#n_{2}", 1.0, "" );
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   alpha1->setConstant(kFALSE);
+  alpha1->setRange(0, 100);
   alpha2->setConstant(kFALSE);
+  alpha2->setRange(0, 100);
   n1->setConstant(kFALSE);
+  n1->setRange(0, 100);
   n2->setConstant(kFALSE);
+  n2->setRange(0, 100);
   
   RooRealVar* Ns     = new RooRealVar( tag + "_DCB_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
@@ -404,7 +408,7 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   RooRealVar *alpha  = new RooRealVar(tag+"_a","#alpha",-1);
   alpha->setConstant(kFALSE);
-  RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
+  //RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
   RooRealVar *Nbkg    = new RooRealVar(tag+"_Nbkg","N_{bkg}",10, "events");
   Nbkg->setConstant(kFALSE);
 
@@ -412,6 +416,20 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*asq));
   TString pdfName     = tag+"_spow_ext";
   w.import( *(new RooAddPdf( pdfName,"", RooArgList(*pow), RooArgList(*Nbkg) )) );
+  return pdfName;
+};
+
+TString MakeSinglePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w) 
+{
+  RooRealVar *alpha  = new RooRealVar(tag+"_a","#alpha",-1);
+  alpha->setConstant(kFALSE);
+  //RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
+
+  TString pdfName     = tag+"_spow";
+  RooGenericPdf *pow = new RooGenericPdf( pdfName, "", "@0^@1", RooArgList(mgg,*alpha));
+  //RooGenericPdf *pow = new RooGenericPdf(tag+"_spow","","@0^@1",RooArgList(mgg,*asq));
+  
+  w.import( *pow );
   return pdfName;
 };
 

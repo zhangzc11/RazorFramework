@@ -8,7 +8,7 @@ HggRazor = $(Repo)/HggRazor
 CommonTools = $(HggRazor)/CommonTools
 
 CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include
-LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore
+LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore -L$(INC)/include -lCustomPdfs
 
 CPPFLAGS += -g -std=c++11
 
@@ -19,10 +19,10 @@ TARGET4 = CreateDataCardCommands
 TARGET5 = testCustomPdf
 
 SRC = app/testapp.cc src/makeInvertedANFit_v2.cc $(Aux)/src/CommandLineInput.cc
-SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc src/CustomPdfs.cc
+SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc
 SRC2 = app/PlotAllBiasTest.cc src/PlotBias.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
 SRC4 = app/CreateDataCardCommands.cc $(Aux)/src/CommandLineInput.cc
-SRC5 = app/testCustomPdf.cc src/CustomPdfs.cc
+SRC5 = app/testCustomPdf.cc
 
 OBJ = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
@@ -68,6 +68,7 @@ $(TARGET5) : $(OBJ5)
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
+
 
 clean :
 	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) *~

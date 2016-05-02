@@ -9,7 +9,7 @@
 using namespace RooFit;
 using namespace std; 
 
-//ClassImp(RooCB)
+ClassImp(RooCB);
 
 RooCB::RooCB(){};
 
@@ -63,7 +63,8 @@ double RooCB::evaluate() const
 };
 
 
-//ClassImp(RooDoubleCB)
+
+ClassImp(RooDoubleCB)
 
 RooDoubleCB::RooDoubleCB( ){ };
 
@@ -104,20 +105,27 @@ RooDoubleCB::RooDoubleCB(const RooDoubleCB& other, const char* name) :
 double RooDoubleCB::evaluate() const 
 { 
   double t = (x-mean)/width;
-  if(t>-alpha1 && t<alpha2){
-    return exp(-0.5*t*t);
-  }else if(t<-alpha1){
-    double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
-    double B1 = n1/fabs(alpha1)-fabs(alpha1);
-    return A1*pow(B1-t,-n1);
-  }else if(t>alpha2){
-    double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
-    double B2 = n2/fabs(alpha2)-fabs(alpha2);
-    return A2*pow(B2+t,-n2);
-  }else{
-    cout << "ERROR evaluating range..." << endl;
-    return 99;
-  }
+  if( t >= -alpha1 && t <= alpha2 )
+    {
+      return exp(-0.5*t*t);
+    }
+  else if ( t < -alpha1 )
+    {
+      double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
+      double B1 = n1/fabs(alpha1)-fabs(alpha1);
+      return A1*pow(B1-t,-n1);
+    }
+  else if ( t > alpha2 )
+    {
+      double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
+      double B2 = n2/fabs(alpha2)-fabs(alpha2);
+      return A2*pow(B2+t,-n2);
+    }
+  else
+    {
+      cout << "ERROR evaluating range... t = " << t << endl;
+      return 99;
+    }
    
 };
 
@@ -175,7 +183,7 @@ Double_t RooDoubleCB::analyticalIntegral(Int_t code, const char* rangeName) cons
  
 };
 
-//ClassImp(RooFermi) 
+ClassImp(RooFermi) 
 
 RooFermi::RooFermi(){};
 
@@ -208,7 +216,7 @@ double RooFermi::evaluate() const
   return 1.0/(exp((cutOff-x)/beta)+1);
 };
 
-//ClassImp(RooRelBW)
+ClassImp(RooRelBW)
 
 RooRelBW::RooRelBW(){};
 
@@ -245,7 +253,7 @@ double RooRelBW::evaluate() const
 };
 
 
-//ClassImp(Triangle)
+ClassImp(Triangle)
 
 Triangle::Triangle(){};
 
@@ -311,7 +319,7 @@ Double_t Triangle::analyticalIntegral(Int_t code, const char* rangeName) const
 
 
 
-//ClassImp(RooLevelledExp)
+ClassImp(RooLevelledExp)
 
 RooLevelledExp::RooLevelledExp(){};
 
