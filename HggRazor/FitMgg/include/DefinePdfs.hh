@@ -18,16 +18,22 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bo
 TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeFullTripleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
 TString MakeDoubleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
+TString MakeDoubleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w );//nonExtended
 TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakeDoublePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeDoublePowN1N2(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeSinglePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakePoly2NE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakePoly3NE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w);
+TString MakePoly4NE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 
 #endif
