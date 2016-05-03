@@ -323,6 +323,46 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
   return ex_pdf_name;
 };
 
+TString MakeDoubleExpNE(TString tag, RooRealVar& mgg, RooWorkspace& w)
+{
+  //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  RooRealVar* alpha1 = new RooRealVar( tag + "_doubleExp_a1", "#alpha_{1}", 0.04, "" );
+  RooRealVar* alpha2 = new RooRealVar( tag + "_doubleExp_a2", "#alpha_{2}", 0.06, "" );
+  alpha1->setConstant(kFALSE);
+  alpha2->setConstant(kFALSE);
+  //alpha1->setRange(-100,0);
+  //alpha2->setRange(-100,0);
+  alpha1->setMin(0.0);
+  alpha2->setMin(0.0);
+
+  //--------------------------------------------
+  //Square variables to avoid rising exponential
+  //--------------------------------------------
+  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_doubleExp_a1Sq", "#alpha^{2}_{1}", "-1*@0*@0", *alpha1);
+  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_doubleExp_a2Sq", "#alpha^{2}_{2}", "-1*@0*@0", *alpha2);
+  RooRealVar* frac    = new RooRealVar( tag+"_doubleExp_frac", "frac", 0.5, .0, 1.0 );
+  RooRealVar* Nbkg    = new RooRealVar( tag+"_doubleExp_Nbkg", "N_{bkg}", 10, "events" );
+  Nbkg->setConstant(kFALSE);
+  
+  //------------------
+  //C r e a t e  p.d.f
+  //------------------
+  RooExponential* exp1    = new RooExponential( tag+"_doubleExp_exp1", "", mgg, *asq1 );
+  RooExponential* exp2    = new RooExponential( tag+"_doubleExp_exp2", "", mgg, *asq2 );
+  //RooExponential* exp1    = new RooExponential( tag+"_exp1", "", mgg, *alpha1 );
+  //RooExponential* exp2    = new RooExponential( tag+"_exp2", "", mgg, *alpha2 );
+  
+  TString pdfname          = tag+"_doubleExp";
+  RooAddPdf* doubleExp = new RooAddPdf( pdfname, "", RooArgList( *exp1, *exp2 ), *frac );
+
+  w.import( *doubleExp );
+  
+  return pdfname;
+};
+
+
 TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
   //RooRealVar* a1 = new RooRealVar( tag + "_a1", "", 0.6,-1.,1.);
@@ -404,6 +444,30 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
   return pdfName;
 };
 
+TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_mexp_a","#alpha",0.06, "");
+  alpha->setConstant(kFALSE);
+  alpha->setMin(0.0);
+  RooFormulaVar* aSq = new RooFormulaVar( tag + "_mexp_aSq","","-1*@0*@0", *alpha);
+
+  RooRealVar *m = new RooRealVar(tag+"_mexp_m","m", 1., "");
+  m->setMin(0.0);
+  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
+  m->setConstant(kFALSE);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_mexp_Nbkg","N_{bkg}", 10, "events");  
+  Nbkg->setConstant(kFALSE);
+
+  TString pdfName = tag+"_mexp";
+  //Define as exp(-(alpha^2)*x^m), to avoid infinite integrals
+  RooGenericPdf *mexp = new RooGenericPdf(pdfName,"","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*m));
+  //RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
+  
+  w.import( *mexp );
+  return pdfName;
+};
+
 TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w) 
 {
   RooRealVar *alpha  = new RooRealVar(tag+"_a","#alpha",-1);
@@ -421,7 +485,7 @@ TString MakeSinglePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakeSinglePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w) 
 {
-  RooRealVar *alpha  = new RooRealVar(tag+"_a","#alpha",-1);
+  RooRealVar *alpha  = new RooRealVar(tag+"_spow_a","#alpha",-1);
   alpha->setConstant(kFALSE);
   //RooFormulaVar* asq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
@@ -461,6 +525,36 @@ TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w)
   
   return pdfName;
 };
+
+TString MakeDoublePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *alpha1  = new RooRealVar(tag+"_dpow_a1","#alpha_{1}",-1.0,"");
+  RooRealVar *alpha2  = new RooRealVar(tag+"_dpow_a2","#alpha_{2}",-2.0,"");
+  alpha1->setConstant(kFALSE);
+  alpha2->setConstant(kFALSE);
+  //alpha1->setRange(-100, 0);
+  //alpha2->setRange(-100, 0);
+  alpha1->setMax(0.0);
+  alpha2->setMax(0.0);
+  RooFormulaVar* asq1 = new RooFormulaVar( tag + "_dpow_aSq1","","-1*@0*@0", *alpha1);
+  RooFormulaVar* asq2 = new RooFormulaVar( tag + "_dpow_aSq2","","-1*@0*@0", *alpha2);
+  
+  RooRealVar *f       = new RooRealVar(tag+"_dpow_f","f",0.5, 0.0, 1.0);
+  RooRealVar *Nbkg    = new RooRealVar(tag+"_dpow_Nbkg","N_{bkg}",10,"events");
+  Nbkg->setConstant(kFALSE);
+  
+  RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*alpha1));
+  RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*alpha2));
+  //RooGenericPdf *pow1 = new RooGenericPdf(tag+"_dpow_pow1","","@0^@1",RooArgList(mgg,*asq1));
+  //RooGenericPdf *pow2 = new RooGenericPdf(tag+"_dpow_pow2","","@0^@1",RooArgList(mgg,*asq2));
+
+  TString pdfName = tag+"_dpow";
+  RooAddPdf *add      = new RooAddPdf( pdfName,"",*pow1,*pow2,*f);  
+  w.import( *add); //*(new RooAddPdf( pdfName,"", RooArgList(*add), RooArgList(*Nbkg) )) );
+  
+  return pdfName;
+};
+
 
 TString MakeDoublePowN1N2(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
@@ -507,6 +601,26 @@ TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w)
   return pdfName;
 };
 
+TString MakePoly2NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pol2_pC","C",0.5, 0,1);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol2_p0","p_0",0.3, 0,1);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol2_p1","p_1",0.27, 0,1);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol2_Nbkg","N_{bkg}",10,"events");
+  Nbkg->setConstant(kFALSE);
+  
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol2_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol2_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol2_p1mod","@0*@0",*p1);
+
+  TString pdfName = tag+"_pol2";
+  RooBernstein* bern = new RooBernstein(pdfName,"",mgg,RooArgList(*pCmod,*p0mod,*p1mod));
+  w.import(*bern);//(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
+  
+  return pdfName;
+};
+
+
 TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   RooRealVar *pC = new RooRealVar(tag+"_pC","C",1,-100,100);
@@ -528,6 +642,28 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
   
   return pdfName;
 };
+TString MakePoly3NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pol3_pC","C",1,-100,100);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol3_p0","p_0",1.0,-100,100);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol3_p1","p_1",0,-100,100);
+  RooRealVar *p2 = new RooRealVar(tag+"_pol3_p2","p_2",5,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol3_Nbkg","N_{bkg}",10,"events");
+  Nbkg->setConstant(kFALSE);
+  
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol3_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol3_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol3_p1mod","@0*@0",*p1);
+  RooFormulaVar *p2mod = new RooFormulaVar(tag+"_pol3_p2mod","@0*@0",*p2);
+  
+  TString pdfName = tag+"_pol3";
+  RooBernstein* bern = new RooBernstein(pdfName,"",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod));
+  
+  w.import(*bern);//(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
+  
+  return pdfName;
+};
+
 TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   RooRealVar *pC = new RooRealVar(tag+"_pC","C",1,-100,100);
@@ -548,6 +684,29 @@ TString MakePoly4(TString tag, RooRealVar& mgg,RooWorkspace& w)
   
   TString pdfName = tag+"_pol4_ext";
   w.import(*(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
+  
+  return pdfName;
+};
+TString MakePoly4NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
+{
+  RooRealVar *pC = new RooRealVar(tag+"_pol4_pC","C",1,-100,100);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol4_p0","p_0",1.0,-100,100);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol4_p1","p_1",0,-100,100);
+  RooRealVar *p2 = new RooRealVar(tag+"_pol4_p2","p_2",5,-100,100);
+  RooRealVar *p3 = new RooRealVar(tag+"_pol4_p3","p_3",5,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol4_Nbkg","N_{bkg}",10,"events");
+  Nbkg->setConstant(kFALSE);
+  
+  RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol4_pCmod","@0*@0",*pC);
+  RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol4_p0mod","@0*@0",*p0);
+  RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol4_p1mod","@0*@0",*p1);
+  RooFormulaVar *p2mod = new RooFormulaVar(tag+"_pol4_p2mod","@0*@0",*p2);
+  RooFormulaVar *p3mod = new RooFormulaVar(tag+"_pol4_p3mod","@0*@0",*p3);
+  
+  TString pdfName = tag+"_pol4";
+  RooBernstein* bern = new RooBernstein(pdfName,"",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod,*p3mod));
+  
+  w.import(*bern);//(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
   
   return pdfName;
 };
