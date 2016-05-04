@@ -15,12 +15,12 @@
 
 // D e f i n e  B i n n i n g
 //---------------------------
-//int HggRazorClass::n_mgg = 38;
-//float HggRazorClass::mgg_l = 103.;
-//float HggRazorClass::mgg_h = 160.;
-int HggRazorClass::n_mgg = 30;
-float HggRazorClass::mgg_l = 60.;
-float HggRazorClass::mgg_h = 120.;
+int HggRazorClass::n_mgg = 38;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
+//int HggRazorClass::n_mgg = 30;
+//float HggRazorClass::mgg_l = 60.;
+//float HggRazorClass::mgg_h = 120.;
 
 int HggRazorClass::n_ptgg = 70;
 float HggRazorClass::ptgg_l = 20.;
@@ -168,10 +168,10 @@ float lres_k[2] = { 1.0, 1.0};
 
 //DATA
 //GammaGamma
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
 //EBEB
-TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -182,11 +182,11 @@ TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 
 
 //MC
 //GammaGamma
-//TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
 //Zee
 //EBEB
-TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -199,8 +199,8 @@ TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso ==
 //T r i g g e r   C u t 
 //---------------------
 //TString triggerCut = "(HLTDecision[63] || HLTDecision[64] || HLTDecision[65] || HLTDecision[66] || HLTDecision[67] || HLTDecision[68] || HLTDecision[69] || HLTDecision[74]) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-//TString triggerCut = "1";
+//TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+TString triggerCut = "1";
 //--------------------------------
 //D i p h o t o n  M a s s   C u t 
 //--------------------------------
@@ -290,7 +290,7 @@ int main ( int argc, char* argv[] )
   TH1D* mc2 = new TH1D();
 
   int map_size = mapList.size();
-  const int nprocesses = 2;
+  const int nprocesses = 7;
   //check nprocesses and map_size consistency
   if( map_size != nprocesses )
     {
@@ -310,12 +310,12 @@ int main ( int argc, char* argv[] )
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
-	  if ( !(process == Process::data || process == Process::dy) ) continue;
-	  /*if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet
-	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
+	  //if ( !(process == Process::data || process == Process::dy) ) continue;
+	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet
+		 || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;
 	  /*if ( !(process == Process::data || process == Process::signal || process == Process::diphoton || process == Process::gammaJet
-	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
-	  std::cout << "[INFO] PROCESS: " << processName << " ,process #: " << ctr << std::endl;
+		 || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;
+		 std::cout << "[INFO] PROCESS: " << processName << " ,process #: " << ctr << std::endl;*/
 	  //-----------------------------
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
@@ -357,10 +357,12 @@ int main ( int argc, char* argv[] )
 	      std::cout << "[WARNING]: Empty selected tree in process: " << processName << std::endl;
 	      continue;
 	    }
+
+	  std::cout << "[INFO]: reduced TTree has been created" << std::endl;
 	  //------------------------------------------------
 	  //C r e a t in g   S e l e c t i o n   O b j e c t
 	  //------------------------------------------------
-	  hggclass = new HggRazorClass( cutTree, processName, "INCLUSIVE", false, false );
+	  hggclass = new HggRazorClass( cutTree, processName, "INCLUSIVE", true, true );
 	  hggclass->InitMrRsqCustomHisto( N_HighRes, MR_HighRes, N_HighRes, Rsq_HighRes );
 	  //Creating Histos
 	  hggclass->Loop();
