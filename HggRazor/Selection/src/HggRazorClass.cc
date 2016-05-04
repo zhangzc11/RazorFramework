@@ -443,21 +443,21 @@ void HggRazorClass::Loop()
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
-  
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
   for (Long64_t jentry=0; jentry < nentries; jentry++ )
     {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+      //std::cout << "[INFO]: entry: " << ientry << std::endl;
       double w;
-      xsecSF = 1.0;
       if ( this->processName == "data" || this->processName == "signal")
 	{
 	  w = 1.0;
 	}
       else
 	{ 
-	  w = xsecSF*weight*pileupWeight;
+	  w = weight*pileupWeight;
 	}
       total_in += w;
       bool pho1_isFake = false;
@@ -488,10 +488,13 @@ void HggRazorClass::Loop()
 	  total_rm += w;
 	  continue;
 	}
-      
-      //std::cout << "weight: " << w << std::endl;
+
+      std::cout << "[INFO]: before histos: " << ientry << std::endl;
+      h_mgg->Integral();
+      std::cout << "weight: " << w << std::endl;
       h_mgg->Fill( mGammaGamma, w );
-      //std::cout << "mgg: " << mGammaGamma << std::endl;
+      std::cout << "[INFO]: pass one histo: " << ientry << std::endl;
+      std::cout << "mgg: " << mGammaGamma << std::endl;
       h_ptgg->Fill( pTGammaGamma, w );
       h_sigmaMoverM->Fill( sigmaMoverM, w );
       
@@ -658,7 +661,7 @@ float HggRazorClass::GetYields( float mr, float rsq, float mgg_l, float mgg_h )
 	    && fabs( pho1Eta ) < 1.48 && fabs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt > 25.
 	    && ( pho1Pt > 40. || pho2Pt > 40. ) && pTGammaGamma > 20. )
 	{
-	  sel_events += xsecSF;
+	  sel_events += weight;
 	}
     }
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
@@ -682,8 +685,8 @@ float HggRazorClass::GetYields( float mr, float rsq, float mgg_l, float mgg_h, d
 	    && fabs( pho1Eta ) < 1.48 && fabs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt > 25.
 	    && ( pho1Pt > 40. || pho2Pt > 40. ) && pTGammaGamma > 20. )
 	{
-	  sel_events += xsecSF;
-	  err += xsecSF*xsecSF;
+	  sel_events += weight;
+	  err += weight*weight;
 	}
     }
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;

@@ -1679,7 +1679,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events (N_sideband/NORMALIZE_INTEGRAL_SIDEBAND)
-  //npoints = 10*npoints;
+  npoints = 2*npoints;
   //npoints = 350;//only use this to set the number of toys bkg;
 
   std::cout << "npoints: " << npoints << std::endl;
@@ -2018,6 +2018,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       RooMinimizer m(*nll);
       m.setStrategy(2);
       m.setPrintLevel(-1);
+      m.setMaxFunctionCalls(5000);
       m.setMinimizerType("Minuit2");
       
       m.minimize("Minuit2", "Migrad");
@@ -2035,8 +2036,18 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       _covStatus2 = r2->covQual();
       r2->SetName("rHesse");
       ws->import( *r2 );
+
+      m.minimize("Minuit2", "Migrad");
+      r = m.save();
+      _status    = r->status();
+      _covStatus = r->covQual();
+      m.minimize("Minuit2", "Hesse");
+      r2 = m.save(); 
+      _status2    = r2->status();
+      _covStatus2 = r2->covQual();
       
-      if ( _status2 == -1 ) break;
+      
+      //if ( _status2 == -1 ) break;
       
       //m.minos();
       RooFitResult* r3 = m.save(); 
