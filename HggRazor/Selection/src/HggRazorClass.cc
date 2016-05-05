@@ -450,7 +450,6 @@ void HggRazorClass::Loop()
       
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      if ( this->processName == "diphoton" ) std::cout << "[INFO]: entry: " << ientry << std::endl;
       double w;
       if ( this->processName == "data" || this->processName == "signal")
 	{

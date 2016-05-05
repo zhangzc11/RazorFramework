@@ -524,6 +524,12 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );
       s->SetMaximum( 1.5*s->GetMaximum() );
+
+      
+      s->SetMinimum( 1e-1 );
+      s->SetMaximum( 1.5*s->GetMaximum() );
+      pad1->SetLogy();
+      pad1->Update();
     }
   else if ( var == "ptgg" )
     {
