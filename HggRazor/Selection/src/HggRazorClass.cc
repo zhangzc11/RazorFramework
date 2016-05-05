@@ -447,9 +447,10 @@ void HggRazorClass::Loop()
   for (Long64_t jentry=0; jentry < nentries; jentry++ )
     {
       Long64_t ientry = LoadTree(jentry);
+      
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      //std::cout << "[INFO]: entry: " << ientry << std::endl;
+      if ( this->processName == "diphoton" ) std::cout << "[INFO]: entry: " << ientry << std::endl;
       double w;
       if ( this->processName == "data" || this->processName == "signal")
 	{
@@ -489,12 +490,8 @@ void HggRazorClass::Loop()
 	  continue;
 	}
 
-      std::cout << "[INFO]: before histos: " << ientry << std::endl;
-      h_mgg->Integral();
-      std::cout << "weight: " << w << std::endl;
+      
       h_mgg->Fill( mGammaGamma, w );
-      std::cout << "[INFO]: pass one histo: " << ientry << std::endl;
-      std::cout << "mgg: " << mGammaGamma << std::endl;
       h_ptgg->Fill( pTGammaGamma, w );
       h_sigmaMoverM->Fill( sigmaMoverM, w );
       

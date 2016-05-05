@@ -15,7 +15,7 @@ const float axisTitleOffset = .8;
 
 const float axisTitleSizeRatioX   = 0.18;
 const float axisLabelSizeRatioX   = 0.12;
-const float axisTitleOffsetRatioX = 0.84;
+const float axisTitleOffsetRatioX = 0.94;
 
 const float axisTitleSizeRatioY   = 0.15;
 const float axisLabelSizeRatioY   = 0.108;
@@ -433,7 +433,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   c->SetFrameBorderMode(0);
   c->SetFrameBorderMode(0);
 
-  TPad *pad1 = new TPad("pad1","pad1", .0, 0.25, 1., 1.);
+  TPad *pad1 = new TPad("pad1","pad1", .0, 0.3, 1., 1.);
   pad1->SetBottomMargin(0);
   pad1->SetRightMargin( rightMargin );
   pad1->SetLeftMargin( leftMargin );
@@ -462,10 +462,10 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   data->Draw("sameE");
   AddCMS( c );
 
-  TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.25);
-  pad2->SetTopMargin(0);
+  TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.29);
+  pad2->SetTopMargin(0.04);
   pad2->SetTopMargin(0.008);
-  pad2->SetBottomMargin(0.35);
+  pad2->SetBottomMargin(0.4);
   pad2->SetRightMargin( rightMargin );
   pad2->SetLeftMargin( leftMargin );
   pad2->SetGridy();
@@ -500,8 +500,8 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       //ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetTitle("R^{2}");
       s->SetMinimum( 1e-7 );
-      s->SetMaximum( 1e2*s->GetMaximum() );
-      s->GetYaxis()->SetTitle("events / 0.04");
+      s->SetMaximum( 1e4*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.05");
       pad1->SetLogy();
       pad1->Update();
       pad2->Update();
@@ -511,9 +511,9 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       //s->GetXaxis()->SetRangeUser(0.0, 2000.0);
       //ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
       ratio->GetXaxis()->SetTitle("M_{R} (GeV)");
-      s->GetYaxis()->SetTitle("events / 25 (GeV)");
+      s->GetYaxis()->SetTitle("events / 50 (GeV)");
       s->SetMinimum( 1e-1 );
-      s->SetMaximum( 1e2*s->GetMaximum() );
+      s->SetMaximum( 1e4*mc->GetMaximum() );
       pad1->SetLogy();
       pad1->Update();
     }
@@ -521,15 +521,15 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     {
       //s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
+      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
       s->SetMinimum( 0 );
-      s->SetMaximum( 1.2*s->GetMaximum() );
+      s->SetMaximum( 1.5*s->GetMaximum() );
     }
   else if ( var == "ptgg" )
     {
       ratio->GetXaxis()->SetTitle("p_{T}^{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
       pad1->Update();
@@ -538,7 +538,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
       pad1->Update();
@@ -546,21 +546,21 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1eta" )
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{1}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 2.3e0*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.2");
+      s->SetMaximum( 2.0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho1phi" )
     {
       ratio->GetXaxis()->SetTitle("#phi^{#gamma^{1}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.2");
+      s->SetMaximum( 2.0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho1sigmaIetaIeta" )
     {
       ratio->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{1}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.0004");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -569,7 +569,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1r9" )
     {
       ratio->GetXaxis()->SetTitle("R^{#gamma^{1}}_{9}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.03");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -578,7 +578,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1HoverE" )
     {
       ratio->GetXaxis()->SetTitle("H/E^{#gamma^{1}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.002");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -587,7 +587,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1sumChargedHadronPt" )
     {
       ratio->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{1}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -596,7 +596,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1sumNeutralHadronEt" )
     {
       ratio->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{1}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -605,7 +605,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1sumPhotonEt" )
     {
       ratio->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{1}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -614,7 +614,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho1sigmaEoverE" )
     {
       ratio->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{1}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.0005");
       s->SetMaximum( 1.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
@@ -622,7 +622,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
       s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
       pad1->Update();
@@ -630,21 +630,21 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2eta" )
     {
       ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{2}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 2.3e0*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.2");
+      s->SetMaximum( 2.0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho2phi" )
     {
       ratio->GetXaxis()->SetTitle("#phi^{#gamma^{2}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
-      s->SetMaximum( 1.3e0*s->GetMaximum() );
+      s->GetYaxis()->SetTitle("events / 0.2");
+      s->SetMaximum( 2.0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
   else if ( var == "pho2sigmaIetaIeta" )
     {
       ratio->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{2}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.0004");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -653,7 +653,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2r9" )
     {
       ratio->GetXaxis()->SetTitle("R^{#gamma^{2}}_{9}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.03");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -662,7 +662,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2HoverE" )
     {
       ratio->GetXaxis()->SetTitle("H/E^{#gamma^{2}}");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.02");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -671,7 +671,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2sumChargedHadronPt" )
     {
       ratio->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{2}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -680,7 +680,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2sumNeutralHadronEt" )
     {
       ratio->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{2}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -689,7 +689,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2sumPhotonEt" )
     {
       ratio->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{2}} (GeV)");
-      s->GetYaxis()->SetTitle("events / 10 (GeV)");
+      s->GetYaxis()->SetTitle("events / 0.1 (GeV)");
       s->SetMaximum( 1e1*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
@@ -698,7 +698,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "pho2sigmaEoverE" )
     {
       ratio->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{2}}");
-      s->GetYaxis()->SetTitle("events");
+      s->GetYaxis()->SetTitle("events / 0.0005");
       s->SetMaximum( 1.3e0*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
     }
@@ -706,16 +706,27 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     {
       ratio->GetXaxis()->SetTitle("N_{jets}");
       s->GetYaxis()->SetTitle("events");
-      s->SetMaximum( 1e1*s->GetMaximum() );
+      s->SetMaximum( 1e2*s->GetMaximum() );
       s->SetMinimum( 1e-1 );
       pad1->SetLogy();
       pad1->Update();
     }
-
-  //ratio->GetXaxis()->SetTitle( label );
-  //s->GetYaxis()->SetTitle("events");
-  //s->SetMaximum( 2e0*data->GetMaximum() );
-  s->SetMinimum( 1e-7 );
+  else if ( var == "sigmaMoverM" )
+    {
+      ratio->GetXaxis()->SetTitle("#sigma_{M}/M");
+      s->GetYaxis()->SetTitle("events / ");
+      s->SetMaximum( 1.5*s->GetMaximum() );
+      s->SetMinimum( 1e-1 );
+      //pad1->SetLogy();
+      pad1->Update();
+    }
+  else
+    {
+      //ratio->GetXaxis()->SetTitle( label );
+      //s->GetYaxis()->SetTitle("events");
+      s->SetMaximum( 3.0*mc->GetMaximum() );
+      s->SetMinimum( 1e-7 );
+    }
   //pad1->SetLogy();
   pad1->Update();
   //pad1->SetLogy();
@@ -949,7 +960,7 @@ bool AddCMS( TCanvas* C )
   float lumiy = 0.945;
   float lumifont = 42;
   
-  float cmsx = 0.33;
+  float cmsx = 0.28;
   float cmsy = 0.875;
   float cmsTextFont   = 61;  // default is helvetic-bold
   float extrax = cmsx + 0.078;
