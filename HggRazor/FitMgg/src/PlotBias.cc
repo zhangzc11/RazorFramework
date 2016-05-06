@@ -409,10 +409,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(30,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
       tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
       tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(21,-3.0, 4.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
@@ -666,9 +666,9 @@ myF_SG->SetLineWidth( 3 );
 
   TString _sigma_DTCB = Form("%.1f", 100.0*sigma_DTCB );
   TString _alpha_high_DTCB = Form("%.1f", alpha_high_DTCB );
-  TString _alpha_low_DTCB = Form("%.1f", alpha_high_DTCB );
-  TString _n_high_DTCB = Form("%.1f", alpha_high_DTCB );
-  TString _n_low_DTCB = Form("%.1f", alpha_high_DTCB );
+  TString _alpha_low_DTCB = Form("%.1f", alpha_low_DTCB );
+  TString _n_high_DTCB = Form("%.1f", n_high_DTCB );
+  TString _n_low_DTCB = Form("%.1f", n_low_DTCB );
  
   TLatex tex2;
   tex2.SetNDC();
@@ -712,9 +712,9 @@ if(fitFunc == "doubleTailCrystalBall" )
   tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
   tex2.DrawLatex( 0.89, 0.80, "   #sigma = " + _sigma_DTCB + " %");
   tex2.DrawLatex( 0.89, 0.72, "   #alpha_{high} = " + _alpha_high_DTCB);
-  tex2.DrawLatex( 0.89, 0.64, "#n_{high} = " + _n_high_DTCB);
+  tex2.DrawLatex( 0.89, 0.64, "n_{high} = " + _n_high_DTCB);
   tex2.DrawLatex( 0.89, 0.56, "#alpha_{low} = " + _alpha_low_DTCB);
-  tex2.DrawLatex( 0.89, 0.48, "#n_{low} = " + _n_low_DTCB );
+  tex2.DrawLatex( 0.89, 0.48, "n_{low} = " + _n_low_DTCB );
   //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
  }
 
@@ -854,7 +854,7 @@ double doubletailcrystalball_function(double *x, double *par) //(double mean, do
 	}
 	if(t>alpha_high)
 	{
-		return P_Const*std::exp(-0.5*alpha_high*alpha_high)/std::pow((alpha_high/n_high)*(n_high/alpha_high-alpha_high-t),n_high);	
+		return P_Const*std::exp(-0.5*alpha_high*alpha_high)/std::pow((alpha_high/n_high)*(n_high/alpha_high-alpha_high+t),n_high);	
 	}
 
 };
