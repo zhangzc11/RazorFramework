@@ -664,11 +664,11 @@ myF_SG->SetLineWidth( 3 );
   TString _w1_DCB = Form("%.1f", w1_DCB_value );
  
 
-  TString _sigma_DCB = Form("%.1f", 100.0*sigma_DTCB );
-  TString _alpha_high_DCB = Form("%.1f", alpha_high_DTCB );
-  TString _alpha_low_DCB = Form("%.1f", alpha_high_DTCB );
-  TString _n_high_DCB = Form("%.1f", alpha_high_DTCB );
-  TString _n_low_DCB = Form("%.1f", alpha_high_DTCB );
+  TString _sigma_DTCB = Form("%.1f", 100.0*sigma_DTCB );
+  TString _alpha_high_DTCB = Form("%.1f", alpha_high_DTCB );
+  TString _alpha_low_DTCB = Form("%.1f", alpha_high_DTCB );
+  TString _n_high_DTCB = Form("%.1f", alpha_high_DTCB );
+  TString _n_low_DTCB = Form("%.1f", alpha_high_DTCB );
  
   TLatex tex2;
   tex2.SetNDC();
