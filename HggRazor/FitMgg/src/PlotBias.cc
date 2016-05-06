@@ -409,10 +409,10 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
@@ -457,6 +457,13 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   double sigma1_DCB_value = 0.0;
   double sigma2_DCB_value = 0.0;
   double w1_DCB_value = 0.0;
+	
+  double mean_DTCB = 0.0;
+  double sigma_DTCB = 0.0;
+  double alpha_high_DTCB = 0.0;
+  double alpha_low_DTCB = 0.0;
+  double n_high_DTCB = 0.0;
+  double n_low_DTCB = 0.0;
 
 //crystal ball 
 TF1* myF_CB = new TF1("myF_CB", crystalball_function, -6.0, 4.0, 5 );
@@ -469,6 +476,31 @@ myF_CB->SetParameter(3, hbias->GetMean());
 myF_CB->SetParameter(4, hbias->GetMaximum());	
 myF_CB->SetLineColor( kBlue );
 myF_CB->SetLineWidth( 3 );
+
+
+
+//double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+//0: mean
+//1: sigma
+//2: P_const
+//3: alpha_high
+//4: alpha_low
+//5: n_high
+//6: n_low
+TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -6.0, 4.0, 7 );
+myF_DTCB->SetParameter(0, hbias_gaus->GetMean()); 
+myF_DTCB->SetParameter(1, hbias_gaus->GetStdDev());
+myF_DTCB->SetParameter(2, hbias->GetMaximum());
+myF_DTCB->SetParameter(3, 1.0);
+//myF_DTCB->SetParLimits(3, 0.0, 999);	
+myF_DTCB->SetParameter(4, 1.0);
+//myF_DTCB->SetParLimits(4, 0.0, 999);		
+myF_DTCB->SetParameter(5, 1.0);
+//myF_DTCB->SetParLimits(5, 0.0, 999);	
+myF_DTCB->SetParameter(6, 1.0);
+//myF_DTCB->SetParLimits(6, 0.0, 999);	
+myF_DTCB->SetLineColor( kBlue );
+myF_DTCB->SetLineWidth( 3 );
  
 //double crystal ball 
 TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -6.0, 4.0, 8 );
@@ -570,6 +602,25 @@ myF_SG->SetLineWidth( 3 );
 	alpha_DCB_value = myF_DCB->GetParameter(0);
 	w1_DCB_value = myF_DCB->GetParameter(6);
 	}
+//double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+//0: mean
+//1: sigma
+//2: P_const
+//3: alpha_high
+//4: alpha_low
+//5: n_high
+//6: n_low
+	 else if (fitFunc == "doubleTailCrystalBall")
+  	{
+	hbias->Fit( myF_DTCB, "LR");
+        mu_value[0] = myF_DTCB->GetParameter(0);
+ 	sigma_DTCB = myF_DTCB->GetParameter(1);
+ 	alpha_high_DTCB = myF_DTCB->GetParameter(3);
+ 	alpha_low_DTCB = myF_DTCB->GetParameter(4);
+ 	n_high_DTCB = myF_DTCB->GetParameter(5);
+ 	n_low_DTCB = myF_DTCB->GetParameter(6);
+	
+	}
 
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -6.0, 6.0 );
@@ -611,7 +662,14 @@ myF_SG->SetLineWidth( 3 );
   TString _sigma2_DCB = Form("%.1f", 100.0*sigma2_DCB_value );
   TString _mean2_DCB = Form("%.1f", 100.0*mean2_DCB_value );
   TString _w1_DCB = Form("%.1f", w1_DCB_value );
-  
+ 
+
+  TString _sigma_DCB = Form("%.1f", 100.0*sigma_DTCB );
+  TString _alpha_high_DCB = Form("%.1f", alpha_high_DTCB );
+  TString _alpha_low_DCB = Form("%.1f", alpha_high_DTCB );
+  TString _n_high_DCB = Form("%.1f", alpha_high_DTCB );
+  TString _n_low_DCB = Form("%.1f", alpha_high_DTCB );
+ 
   TLatex tex2;
   tex2.SetNDC();
   tex2.SetTextFont(52);
@@ -648,6 +706,18 @@ myF_SG->SetLineWidth( 3 );
   tex2.DrawLatex( 0.89, 0.48, "#alpha = " + _alpha_DCB );
   //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
  }
+
+if(fitFunc == "doubleTailCrystalBall" )
+ {
+  tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
+  tex2.DrawLatex( 0.89, 0.80, "   #sigma = " + _sigma_DTCB + " %");
+  tex2.DrawLatex( 0.89, 0.72, "   #alpha_{high} = " + _alpha_high_DTCB);
+  tex2.DrawLatex( 0.89, 0.64, "#n_{high} = " + _n_high_DTCB);
+  tex2.DrawLatex( 0.89, 0.56, "#alpha_{low} = " + _alpha_low_DTCB);
+  tex2.DrawLatex( 0.89, 0.48, "#n_{low} = " + _n_low_DTCB );
+  //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
+ }
+
 
   TLatex latex;
   latex.SetNDC();
@@ -759,8 +829,33 @@ double doublecrystalball_function(double *x, double *par) //(double x, double al
 	}
 };
 
+double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+{
+        // evaluate the crystal ball function
+        double mean = par[0];
+	double sigma = par[1];
+	if (sigma <= 0.0)     return 0.;
+	double P_Const = par[2];
+	double alpha_high = std::abs(par[3]);
+	double alpha_low = std::abs(par[4]);
+	double n_high = std::abs(par[5]);
+	double n_low = std::abs(par[6]);
+	double t = (x[0] - mean)/sigma;
+	 
+	
+	if((t>-1.0*alpha_low)&&(t<alpha_high))
+	{
+		return P_Const*std::exp(-0.5*t*t);
+	}
 
+	if(t<-1.0*alpha_low)
+	{
+		return P_Const*std::exp(-0.5*alpha_low*alpha_low)/std::pow((alpha_low/n_low)*(n_low/alpha_low-alpha_low-t),n_low);	
+	}
+	if(t>alpha_high)
+	{
+		return P_Const*std::exp(-0.5*alpha_high*alpha_high)/std::pow((alpha_high/n_high)*(n_high/alpha_high-alpha_high-t),n_high);	
+	}
 
-
-
+};
 

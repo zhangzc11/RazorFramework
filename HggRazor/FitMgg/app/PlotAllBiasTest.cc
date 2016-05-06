@@ -64,7 +64,7 @@ int main( int argc, char* argv[])
   std::string fitFunc = ParseCommandLine( argc, argv, "-fitFunc=" );
   if (fitFunc == "") 
   {
-      std::cerr << "[WARNING]: please provide the bias fit function by using --fitFunc=<singleGaus/doubleGaus/crystalBall/doublecrystalBall>" << std::endl;
+      std::cerr << "[WARNING]: please provide the bias fit function by using --fitFunc=<singleGaus/doubleGaus/crystalBall/doublecrystalBall/doubleTailCrystalBall>" << std::endl;
       std::cerr << "[WARNING]: fit function not indicated, use default one: singleGaus" <<std::endl;
       fitFunc = "singleGaus";
   }
