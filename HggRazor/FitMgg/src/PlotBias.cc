@@ -409,7 +409,7 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(30,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
       tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
       tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
       tree->Draw("biasNorm>>hbias_gaus(21,-3.0, 4.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
@@ -492,13 +492,14 @@ myF_DTCB->SetParameter(0, hbias_gaus->GetMean());
 myF_DTCB->SetParameter(1, hbias_gaus->GetStdDev());
 myF_DTCB->SetParameter(2, hbias->GetMaximum());
 myF_DTCB->SetParameter(3, 1.0);
-//myF_DTCB->SetParLimits(3, 0.0, 999);	
+double limit_Max = std::numeric_limits<double>::infinity();
+myF_DTCB->SetParLimits(3, 0.0, limit_Max);	
 myF_DTCB->SetParameter(4, 1.0);
-//myF_DTCB->SetParLimits(4, 0.0, 999);		
+myF_DTCB->SetParLimits(4, 0.0, limit_Max);		
 myF_DTCB->SetParameter(5, 1.0);
-//myF_DTCB->SetParLimits(5, 0.0, 999);	
+myF_DTCB->SetParLimits(5, 0.0, limit_Max);	
 myF_DTCB->SetParameter(6, 1.0);
-//myF_DTCB->SetParLimits(6, 0.0, 999);	
+myF_DTCB->SetParLimits(6, 0.0, limit_Max);	
 myF_DTCB->SetLineColor( kBlue );
 myF_DTCB->SetLineWidth( 3 );
  
