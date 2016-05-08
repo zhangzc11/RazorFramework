@@ -15,7 +15,7 @@
 #include <RooWorkspace.h>
 #include <RooPlot.h>
 
-void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[] , std::map<std::string, double> fitStatus_1_map , std::map<std::string, double> fitStatus_2_map , std::map<std::string, double> fitStatus_3_map , std::map<std::string, double> fitStatus_4_map) 
+void PrintAICTable(double Nbkg, std::string category, std::string LowMRcut,std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::map<std::string, double> delta_aic_map, std::map<std::string, double> delta_aic_map_2,std::map<std::string, double> delta_aic_map_3, std::map<std::string, double> aic_weight_map, std::map<std::string, double> aic_weight_map_2, std::map<std::string, double> aic_weight_map_3, RooWorkspace *w[] , std::map<std::string, double> fitStatus_1_map , std::map<std::string, double> fitStatus_2_map , std::map<std::string, double> fitStatus_3_map , std::map<std::string, double> fitStatus_4_map) 
 {
 
 	std::map< std::string, std::string > func_name;
@@ -241,7 +241,7 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 
 	fprintf(m_outfile_7,"\\begin{table*}[h] \n");
 	fprintf(m_outfile_7,"\\begin{center} \n");
-	fprintf(m_outfile_7,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_7,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s. - $N_{sb} = %4.0f$} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str(), Nbkg);
 	fprintf(m_outfile_7,"\\begin{tabular}{|c|c|ccc|c|} \n");
 	fprintf(m_outfile_7,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$ & $\\omega_{max}/\\omega$ & status \\\\ \\hline \n");
         max_AIC_weight = 1.0;
