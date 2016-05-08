@@ -232,7 +232,48 @@ void PrintAICTable(std::string category, std::string LowMRcut,std::string HighMR
 	fprintf(m_outfile_6,"\\end{table*} \n \n \n");
  
 
+	 //print the AIC table with color and status to a file
+	std::string str_table_7 = "AIC_output/FitChoices_Table_"+category+"_ColorTable_WithStatus_Percentage.tex";
+        const char * file_Name_table_7 = str_table_7.c_str();
+	FILE* m_outfile_7 = fopen(file_Name_table_7, "a");
+
 	
+
+	fprintf(m_outfile_7,"\\begin{table*}[h] \n");
+	fprintf(m_outfile_7,"\\begin{center} \n");
+	fprintf(m_outfile_7,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), category.c_str());
+	fprintf(m_outfile_7,"\\begin{tabular}{|c|c|ccc|c|} \n");
+	fprintf(m_outfile_7,"\\hline function & \\#P & $\\Delta AIC$ & $\\omega$ & $\\omega_{max}/\\omega$ & status \\\\ \\hline \n");
+        max_AIC_weight = 1.0;
+        isMaxAIC = true;
+	for ( auto tmp :sort_func_name) 
+      {
+	if(isMaxAIC)
+	{
+		max_AIC_weight = aic_weight_map[tmp.second];
+		isMaxAIC = false;
+	}
+	if(aic_weight_map[tmp.second] > 0.1*max_AIC_weight)
+	{
+		  fprintf(m_outfile_7,"\\rowcolor[rgb]{0.31,0.78,0.47}  \n");
+		  fprintf(m_outfile_7,"%s & %2d & %6.3f & %6.3f & %6.3f & %2.0f, %2.0f \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second], max_AIC_weight/aic_weight_map[tmp.second],fitStatus_1_map[tmp.second], fitStatus_2_map[tmp.second]);
+	}
+        else
+	{
+		  fprintf(m_outfile_7,"\\rowcolor[rgb]{1.0,0.41,0.38}  \n");
+		  fprintf(m_outfile_7,"%s & %2d & %6.3f & %6.3f & %6.3f & %2.0f, %2.0f \\\\ \n",func_name[tmp.second].c_str(), num_par[tmp.second], delta_aic_map[tmp.second], aic_weight_map[tmp.second],max_AIC_weight/aic_weight_map[tmp.second], fitStatus_1_map[tmp.second], fitStatus_2_map[tmp.second]);
+	}
+	
+ 	}
+
+	fprintf(m_outfile_7,"\\hline \n");
+	fprintf(m_outfile_7,"\\end{tabular} \n");
+	fprintf(m_outfile_7,"\\label{tab:%s_%s_%s} \n", category.c_str(),LowMRcut.c_str(),LowRSQcut.c_str());
+	fprintf(m_outfile_7,"\\end{center} \n");
+	fprintf(m_outfile_7,"\\end{table*} \n \n \n");
+ 
+
+
 	//plot the fit
 	double delta_aic_2[8]={delta_aic[0],delta_aic[6],delta_aic[1],delta_aic[7],delta_aic[3],delta_aic[4],delta_aic[5],delta_aic[2]};
 	double weight_aic_2[8]={weight_aic[0],weight_aic[6],weight_aic[1],weight_aic[7],weight_aic[3],weight_aic[4],weight_aic[5],weight_aic[2]};
