@@ -2268,6 +2268,28 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
 //print out the status here.... 
    fitStatus_3 = r2->status();
    fitStatus_4 = r2->covQual();
+
+	int max_loop_AIC = 100;	
+   while(fitStatus_3!=0 && max_loop_AIC>0)
+	{
+   	m.minimize("Minuit2", "Migrad");
+	bres = m.save();
+	fitStatus_1 = bres->status();
+   	fitStatus_2 = bres->covQual();
+	if(fitStatus_1==0)	break;
+
+   	m.minimize("Minuit2", "Hesse");
+	r2 = m.save();
+	fitStatus_3 = r2->status();
+   	fitStatus_4 = r2->covQual();
+	if(fitStatus_3==0)
+	{
+		fitStatus_1 = fitStatus_3;
+		fitStatus_2 = fitStatus_4;
+		break;
+	}
+	max_loop_AIC --;
+	}
   
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
