@@ -2173,7 +2173,7 @@ RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
   return pdf->generate( x, ntoys);
 };
 
-RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3,double& fitStatus_1, double& fitStatus_2, double& fitStatus_3, double& fitStatus_4,  TString ffName = "doubleExp")
+RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double* Nbkg,  double& AIC, double& AIC_2, double& AIC_3,double& fitStatus_1, double& fitStatus_2, double& fitStatus_3, double& fitStatus_4,  TString ffName = "doubleExp")
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -2239,6 +2239,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
+  *Nbkg = n;
   ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n * 1.2);
   
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
@@ -2282,15 +2283,21 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
 	r2 = m.save();
 	fitStatus_3 = r2->status();
    	fitStatus_4 = r2->covQual();
+	if(fitStatus_3==0) 	break;
+	//{
+	//	fitStatus_1 = fitStatus_3;
+	//	fitStatus_2 = fitStatus_4;
+	//	break;
+	//}
+	max_loop_AIC --;
+	}
+ 	
 	if(fitStatus_3==0)
 	{
 		fitStatus_1 = fitStatus_3;
 		fitStatus_2 = fitStatus_4;
-		break;
-	}
-	max_loop_AIC --;
-	}
-  
+	
+	} 
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
   std::cout << "===================" << std::endl;
