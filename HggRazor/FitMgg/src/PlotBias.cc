@@ -253,7 +253,7 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type , std::string categoryMode, std::string LowMRcut, std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::string SoB, std::map<std::string, std::string> func_map, std::vector<std::string> v_func_name)
+void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, std::map< std::pair<std::string,std::string>, double > mymap_err, TString type , std::string categoryMode, std::string LowMRcut, std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::string SoB, std::map<std::string, std::string> func_map, std::vector<std::string> v_func_name)
 //void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type )
 {
   int row_ctr = 0;
@@ -284,7 +284,7 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
 	  	if ( row_ctr == 0 ) ss_fl << " & " << f2 <<"("<<func_map[f2]<<")"; 
 	  	std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  	//std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
-	  	ss << " & " << mymap[pair]*100. << "\\%"; 
+	  	ss << " & (" << mymap[pair]*100. << "$\\pm$ "<< mymap_err[pair]*100. << ")\\%"; 
 	  
 		}
  	if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
@@ -374,7 +374,7 @@ for (int i=0;i<v_func_name.size();i++)
         std::string f2 = v_func_name[j];
 	fprintf(m_outfile_2,"\\begin{figure}[h] \n");
   	fprintf(m_outfile_2,"\\begin{center}\n");
-  	fprintf(m_outfile_2,"\\includegraphics[width=0.6\\textwidth]{figs/Bias_plots/%s_%s_%s/SoB_%s/doublecrystalBall_biasFits_%s_%s.pdf} \n",categoryMode.c_str(), LowMRcut.c_str(), LowRSQcut.c_str(),SoB.c_str(), f1.c_str(), f2.c_str());
+  	fprintf(m_outfile_2,"\\includegraphics[width=0.6\\textwidth]{figs/Bias_plots/%s_%s_%s/SoB_%s/doubleTailCrystalBall_biasFits_%s_%s.pdf} \n",categoryMode.c_str(), LowMRcut.c_str(), LowRSQcut.c_str(),SoB.c_str(), f1.c_str(), f2.c_str());
 	fprintf(m_outfile_2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s. - f1=%s, f2=%s} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str(), f1.c_str(), f2.c_str());
   	fprintf(m_outfile_2,"\\label{fig:Bias_%s_SoB_%s_%s_%s_%s_%s} \n", categoryMode.c_str(), SoB.c_str(), LowMRcut.c_str(),LowRSQcut.c_str(), f1.c_str(), f2.c_str());
   	fprintf(m_outfile_2,"\\end{center}\n");
@@ -387,7 +387,7 @@ for (int i=0;i<v_func_name.size();i++)
 };
 
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
+double FitBias(double* mu_bias_err, TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
 {
   TFile* f = new TFile( fname , "READ" );
 
@@ -487,7 +487,7 @@ myF_CB->SetLineWidth( 3 );
 //4: alpha_low
 //5: n_high
 //6: n_low
-TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -6.0, 4.0, 7 );
+TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -2.5, 3.0, 7 );
 myF_DTCB->SetParameter(0, hbias_gaus->GetMean()); 
 myF_DTCB->SetParameter(1, hbias_gaus->GetStdDev());
 myF_DTCB->SetParameter(2, hbias->GetMaximum());
@@ -614,7 +614,8 @@ myF_SG->SetLineWidth( 3 );
 	 else if (fitFunc == "doubleTailCrystalBall")
   	{
 	hbias->Fit( myF_DTCB, "LR");
-        mu_value[0] = myF_DTCB->GetParameter(0);
+	mu_value[0] = myF_DTCB->GetParameter(0);
+        *mu_bias_err = myF_DTCB->GetParError(0);
  	sigma_DTCB = myF_DTCB->GetParameter(1);
  	alpha_high_DTCB = myF_DTCB->GetParameter(3);
  	alpha_low_DTCB = myF_DTCB->GetParameter(4);
