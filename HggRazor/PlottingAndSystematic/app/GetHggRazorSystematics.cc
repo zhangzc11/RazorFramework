@@ -47,14 +47,12 @@ float  lowresRSQedges3[2] = {0,1.0};
 //New Binning From Significance Calculation
 //-----------------------------------------
 //HighPt
-float bin_highpt0[4] = {150,0.13,10000,1};
-float bin_highpt1[4] = {750,0,10000,0.01};
-float bin_highpt2[4] = {750,0.01,10000,0.13};
-float bin_highpt3[4] = {500,0,750,0.03};
-float bin_highpt4[4] = {500,0.03,750,0.13};
-float bin_highpt5[4] = {150,0,400,0.13};
-float bin_highpt6[4] = {400,0,500,0.045};
-float bin_highpt7[4] = {400,0.045,500,0.13};
+float bin_highpt0[4] = {600,0,10000,0.01};
+float bin_highpt1[4] = {600,0.01,10000,1};
+float bin_highpt2[4] = {150,0.085,600,1};
+float bin_highpt3[4] = {150,0,450,0.085};
+float bin_highpt4[4] = {450,0,600,0.02};
+float bin_highpt5[4] = {450,0.02,600,0.085};
 std::vector<float*> SetBinning_highpt()
 {
   std::vector<float*> myVec;
@@ -64,8 +62,6 @@ std::vector<float*> SetBinning_highpt()
   myVec.push_back(bin_highpt3);
   myVec.push_back(bin_highpt4);
   myVec.push_back(bin_highpt5);
-  myVec.push_back(bin_highpt6);
-  myVec.push_back(bin_highpt7);
   return myVec;
 };
 //HZbb
@@ -77,13 +73,13 @@ std::vector<float*> SetBinning_hzbb()
   return myVec;
 };
 //HighRes
-float bin_highres0[4] = {600,0.01,10000,1};
-float bin_highres1[4] = {150,0.175,600,1};
-float bin_highres2[4] = {150,0,400,0.175};
-float bin_highres3[4] = {400,0,600,0.025};
-float bin_highres4[4] = {400,0.025,600,0.175};
-float bin_highres5[4] = {600,0,950,0.01};
-float bin_highres6[4] = {950,0,10000,0.01};
+float bin_highres0[4] = {600,0,10000,1};
+float bin_highres1[4] = {150,0.13,600,1};
+float bin_highres2[4] = {450,0,600,0.005};
+float bin_highres3[4] = {450,0.005,600,0.13};
+float bin_highres4[4] = {150,0,350,0.13};
+float bin_highres5[4] = {350,0,450,0.015};
+float bin_highres6[4] = {350,0.015,450,0.13};
 std::vector<float*> SetBinning_highres()
 {
   std::vector<float*> myVec;
@@ -97,13 +93,10 @@ std::vector<float*> SetBinning_highres()
   return myVec;
 };
 //LowRes
-float bin_lowres0[4] = {500,0.01,10000,1};
-float bin_lowres1[4] = {150,0.15,500,1};
-float bin_lowres2[4] = {150,0,400,0.15};
-float bin_lowres3[4] = {400,0,500,0.015};
-float bin_lowres4[4] = {400,0.015,500,0.15};
-float bin_lowres5[4] = {500,0,800,0.01};
-float bin_lowres6[4] = {800,0,10000,0.01};
+float bin_lowres0[4] = {500,0,10000,1};
+float bin_lowres1[4] = {150,0.11,500,1};
+float bin_lowres2[4] = {150,0,400,0.11};
+float bin_lowres3[4] = {400,0,500,0.11};
 std::vector<float*> SetBinning_lowres()
 {
   std::vector<float*> myVec;
@@ -111,11 +104,9 @@ std::vector<float*> SetBinning_lowres()
   myVec.push_back(bin_lowres1);
   myVec.push_back(bin_lowres2);
   myVec.push_back(bin_lowres3);
-  myVec.push_back(bin_lowres4);
-  myVec.push_back(bin_lowres5);
-  myVec.push_back(bin_lowres6);
   return myVec;
 };
+
 
 
 //----------------
