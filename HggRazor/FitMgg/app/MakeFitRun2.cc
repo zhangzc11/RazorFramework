@@ -429,6 +429,7 @@ int main( int argc, char* argv[])
   double fitStatus_2[8];
   double fitStatus_3[8];
   double fitStatus_4[8];
+  double Nbkg = 0;
   std::map< std::string, double > aic_map;
   std::map< std::string, double > aic_map_2;
   std::map< std::string, double > aic_map_3;
@@ -506,14 +507,14 @@ int main( int argc, char* argv[])
       //if( aic_map.find("singleExp") == aic_map.end() ) aic_map.insert( std::pair<std::string, double>("singleExp",aic[0]));
 
     
-      w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[0], aic_2[0], aic_3[0], fitStatus_1[0],fitStatus_2[0], fitStatus_3[0],fitStatus_4[0] , "doubleExp");
-      w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[1], aic_2[1], aic_3[1], fitStatus_1[1],fitStatus_2[1], fitStatus_3[1],fitStatus_4[1] , "singleExp");
-      w_aic[2] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[2], aic_2[2], aic_3[2], fitStatus_1[2],fitStatus_2[2], fitStatus_3[2],fitStatus_4[2] , "singlePow");
-      w_aic[3] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[3], aic_2[3], aic_3[3], fitStatus_1[3],fitStatus_2[3], fitStatus_3[3],fitStatus_4[3] , "doublePow");
-      w_aic[4] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[4], aic_2[4], aic_3[4], fitStatus_1[4],fitStatus_2[4], fitStatus_3[4],fitStatus_4[4] , "poly2");
-      w_aic[5] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[5], aic_2[5], aic_3[5], fitStatus_1[5],fitStatus_2[5], fitStatus_3[5],fitStatus_4[5] , "poly3");
-      w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[6], aic_2[6], aic_3[6], fitStatus_1[6],fitStatus_2[6], fitStatus_3[6],fitStatus_4[6] , "modExp");
-      w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName, aic[7], aic_2[7], aic_3[7], fitStatus_1[7],fitStatus_2[7], fitStatus_3[7],fitStatus_4[7] , "poly4");
+      w_aic[0] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[0], aic_2[0], aic_3[0], fitStatus_1[0],fitStatus_2[0], fitStatus_3[0],fitStatus_4[0] , "doubleExp");
+      w_aic[1] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[1], aic_2[1], aic_3[1], fitStatus_1[1],fitStatus_2[1], fitStatus_3[1],fitStatus_4[1] , "singleExp");
+      w_aic[2] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[2], aic_2[2], aic_3[2], fitStatus_1[2],fitStatus_2[2], fitStatus_3[2],fitStatus_4[2] , "singlePow");
+      w_aic[3] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[3], aic_2[3], aic_3[3], fitStatus_1[3],fitStatus_2[3], fitStatus_3[3],fitStatus_4[3] , "doublePow");
+      w_aic[4] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[4], aic_2[4], aic_3[4], fitStatus_1[4],fitStatus_2[4], fitStatus_3[4],fitStatus_4[4] , "poly2");
+      w_aic[5] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[5], aic_2[5], aic_3[5], fitStatus_1[5],fitStatus_2[5], fitStatus_3[5],fitStatus_4[5] , "poly3");
+      w_aic[6] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[6], aic_2[6], aic_3[6], fitStatus_1[6],fitStatus_2[6], fitStatus_3[6],fitStatus_4[6] , "modExp");
+      w_aic[7] = MakeSideBandFitAIC_2( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName,&Nbkg, aic[7], aic_2[7], aic_3[7], fitStatus_1[7],fitStatus_2[7], fitStatus_3[7],fitStatus_4[7] , "poly4");
       
 	double min_aic_tmp = 999.0;
 
@@ -763,7 +764,7 @@ int main( int argc, char* argv[])
 	  std::cout << tmp.first << " AICc Weights: " << aic_weight_map[tmp.first] << std::endl;
 	}
       
-      PrintAICTable(categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic, fitStatus_1_map, fitStatus_2_map, fitStatus_3_map, fitStatus_4_map);
+      PrintAICTable(Nbkg, categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, delta_aic_map,delta_aic_map_2,delta_aic_map_3,aic_weight_map,aic_weight_map_2,aic_weight_map_3,w_aic, fitStatus_1_map, fitStatus_2_map, fitStatus_3_map, fitStatus_4_map);
       //PlotSidebandFit(LowMRcut,LowRSQcut,w_aic);
       
     }

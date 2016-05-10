@@ -1681,7 +1681,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events (N_sideband/NORMALIZE_INTEGRAL_SIDEBAND)
-  npoints = 2*npoints;
+ // npoints = 2*npoints;
   //npoints = 350;//only use this to set the number of toys bkg;
 
   std::cout << "npoints: " << npoints << std::endl;
@@ -2032,23 +2032,49 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       ws->import( *r );
 
       //m.hesse();
+      if(_status!=0)
+	{
       m.minimize("Minuit2", "Hesse");
+	}
       RooFitResult* r2 = m.save(); 
       _status2    = r2->status();
       _covStatus2 = r2->covQual();
       r2->SetName("rHesse");
       ws->import( *r2 );
+	
 
+     // m.minimize("Minuit2", "Migrad");
+     // m.minimize("Minuit2", "Hesse");
+     // m.minimize("Minuit2", "Migrad");
+     // m.minimize("Minuit2", "Hesse");
+     /* 
       m.minimize("Minuit2", "Migrad");
       r = m.save();
       _status    = r->status();
       _covStatus = r->covQual();
-      m.minimize("Minuit2", "Hesse");
-      r2 = m.save(); 
-      _status2    = r2->status();
-      _covStatus2 = r2->covQual();
-      
-      
+*/
+	
+      int loop_Max = 100;
+	int status2_before = _status2;
+
+	while((status2_before!=0)&&(loop_Max>0))
+	{
+	  m.minimize("Minuit2", "Migrad");
+      	  r = m.save();
+          _status    = r->status();
+          _covStatus = r->covQual();
+
+	if(_status ==0 ) break;
+
+	 m.minimize("Minuit2", "Hesse");
+      	 r2 = m.save(); 
+       	 _status2    = r2->status();
+      	 _covStatus2 = r2->covQual();
+	if(_status2 == 0) break;
+ 
+          loop_Max --;
+	}
+
       //if ( _status2 == -1 ) break;
       
       //m.minos();
@@ -2149,7 +2175,7 @@ RooDataSet* GenerateToys( RooAbsPdf* pdf, RooRealVar x, int ntoys = 100 )
   return pdf->generate( x, ntoys);
 };
 
-RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, double& AIC_2, double& AIC_3,double& fitStatus_1, double& fitStatus_2, double& fitStatus_3, double& fitStatus_4,  TString ffName = "doubleExp")
+RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double* Nbkg,  double& AIC, double& AIC_2, double& AIC_3,double& fitStatus_1, double& fitStatus_2, double& fitStatus_3, double& fitStatus_4,  TString ffName = "doubleExp")
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   
@@ -2215,6 +2241,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
+  *Nbkg = n;
   ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n * 1.2);
   
   //RooFitResult* bres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
@@ -2244,7 +2271,35 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
 //print out the status here.... 
    fitStatus_3 = r2->status();
    fitStatus_4 = r2->covQual();
-  
+
+	int max_loop_AIC = 100;	
+   while(fitStatus_3!=0 && max_loop_AIC>0)
+	{
+   	m.minimize("Minuit2", "Migrad");
+	bres = m.save();
+	fitStatus_1 = bres->status();
+   	fitStatus_2 = bres->covQual();
+	if(fitStatus_1==0)	break;
+
+   	m.minimize("Minuit2", "Hesse");
+	r2 = m.save();
+	fitStatus_3 = r2->status();
+   	fitStatus_4 = r2->covQual();
+	if(fitStatus_3==0) 	break;
+	//{
+	//	fitStatus_1 = fitStatus_3;
+	//	fitStatus_2 = fitStatus_4;
+	//	break;
+	//}
+	max_loop_AIC --;
+	}
+ 	
+	if(fitStatus_3==0)
+	{
+		fitStatus_1 = fitStatus_3;
+		fitStatus_2 = fitStatus_4;
+	
+	} 
   std::cout << "===================" << std::endl;
   std::cout << "[INFO]: LEAVING FIT" << std::endl;
   std::cout << "===================" << std::endl;
