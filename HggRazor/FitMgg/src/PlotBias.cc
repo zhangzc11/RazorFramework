@@ -295,6 +295,43 @@ void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, 
 	}
       	row_ctr++;
 	}
+
+	//get the final function (after AIC and bias test)
+	bool isSelected = false;
+	std::string finalFunction = "";
+	for (int j=0;j<v_func_name.size();j++)
+	{
+		std::string f2 = v_func_name[j];
+		bool passBiasCut = true;
+		for (int i=0;i<v_func_name.size();i++)
+		{
+			std::string f1 = v_func_name[i];
+			std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+			if ( mymap.find( mypair ) == mymap.end() )
+                	{
+                	continue;
+                	}
+			std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
+			double t_bias = mymap[pair];
+			double t_bias_err = mymap_err[pair];
+			if(std::abs(t_bias)-std::abs(t_bias_err) > 0.26)
+			{
+				passBiasCut = false;
+			}		
+		}
+		if(passBiasCut && (!isSelected))
+		{
+			finalFunction = f2;
+			isSelected = true;
+		}
+	}
+	std::string str_table_func = "Bias_output/function_list.list";
+	const char * file_Name_table_func = str_table_func.c_str();
+  	FILE* m_outfile_func = fopen(file_Name_table_func, "a");	
+	if(SoB=="0.0")
+	{
+		fprintf(m_outfile_func, "%-10s   %-10s   %-10s   %-10s   %-10s   %-10s   \n", categoryMode.c_str(), LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(),finalFunction.c_str());
+	}
 /*
   for( const auto& fitf : FitFunction() )
     //for( const auto& fitf : mymap )
