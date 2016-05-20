@@ -452,7 +452,7 @@ TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
   //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
   RooRealVar *alpha = new RooRealVar(tag+"_mexp_a","#alpha",-0.06, "");
   alpha->setConstant(kFALSE);
-//  alpha->setMax(0.0);
+  //alpha->setMax(0.0);
   RooFormulaVar* aSq = new RooFormulaVar( tag + "_mexp_aSq","","-1*@0*@0", *alpha);
 
   RooRealVar *m = new RooRealVar(tag+"_mexp_m","m", 1., "");
