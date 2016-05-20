@@ -2055,23 +2055,23 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
 */
 	
       int loop_Max = 100;
-	int status2_before = _status2;
-
-	while((status2_before!=0)&&(loop_Max>0))
+      int status2_before = _status2;
+      
+      while((status2_before!=0)&&(loop_Max>0))
 	{
 	  m.minimize("Minuit2", "Migrad");
       	  r = m.save();
           _status    = r->status();
           _covStatus = r->covQual();
-
-	if(_status ==0 ) break;
-
-	 m.minimize("Minuit2", "Hesse");
-      	 r2 = m.save(); 
-       	 _status2    = r2->status();
-      	 _covStatus2 = r2->covQual();
-	if(_status2 == 0) break;
- 
+	  
+	  if ( _status ==0 ) break;
+	
+	  m.minimize("Minuit2", "Hesse");
+	  r2 = m.save(); 
+	  _status2    = r2->status();
+	  _covStatus2 = r2->covQual();
+	  if ( _status2 == 0 ) break;
+	  
           loop_Max --;
 	}
 
@@ -2132,6 +2132,13 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       delete nll;
     }
 
+  RooPlot* ffPlot = mgg.frame();
+  ffPlot->SetName("SBFit");
+  ffPlot->SetTitle("");
+  data_toys->plotOn( ffPlot );
+  sbModel->plotOn( ffPlot, RooFit::LineColor(kViolet), RooFit::Range("Full"), RooFit::NormRange("low,high"));      
+  ws->import( *ffPlot );
+  
   std::cout << "[DEBUG]: out of toys loop" << std::endl; 
   RooPlot* f_mgg = mgg.frame();
   f_mgg->SetName("toys_plot");
