@@ -328,14 +328,14 @@ TString MakeDoubleExpNE(TString tag, RooRealVar& mgg, RooWorkspace& w)
   //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
-  RooRealVar* alpha1 = new RooRealVar( tag + "_doubleExp_a1", "#alpha_{1}", -0.04, "" );
-  RooRealVar* alpha2 = new RooRealVar( tag + "_doubleExp_a2", "#alpha_{2}", -0.06, "" );
+  RooRealVar* alpha1 = new RooRealVar( tag + "_doubleExp_a1", "#alpha_{1}", 0.04, "" );
+  RooRealVar* alpha2 = new RooRealVar( tag + "_doubleExp_a2", "#alpha_{2}", 0.06, "" );
   alpha1->setConstant(kFALSE);
   alpha2->setConstant(kFALSE);
   //alpha1->setRange(-100,0);
   //alpha2->setRange(-100,0);
-  alpha1->setMax(0.0);
-  alpha2->setMax(0.0);
+  alpha1->setMin(0.0);
+  alpha2->setMin(0.0);
 
   //--------------------------------------------
   //Square variables to avoid rising exponential
@@ -349,10 +349,8 @@ TString MakeDoubleExpNE(TString tag, RooRealVar& mgg, RooWorkspace& w)
   //------------------
   //C r e a t e  p.d.f
   //------------------
-  //RooExponential* exp1    = new RooExponential( tag+"_doubleExp_exp1", "", mgg, *asq1 );
-  RooExponential* exp1    = new RooExponential( tag+"_doubleExp_exp1", "", mgg, *alpha1 );
-  //RooExponential* exp2    = new RooExponential( tag+"_doubleExp_exp2", "", mgg, *asq2 );
-  RooExponential* exp2    = new RooExponential( tag+"_doubleExp_exp2", "", mgg, *alpha2 );
+  RooExponential* exp1    = new RooExponential( tag+"_doubleExp_exp1", "", mgg, *asq1 );
+  RooExponential* exp2    = new RooExponential( tag+"_doubleExp_exp2", "", mgg, *asq2 );
   //RooExponential* exp1    = new RooExponential( tag+"_exp1", "", mgg, *alpha1 );
   //RooExponential* exp2    = new RooExponential( tag+"_exp2", "", mgg, *alpha2 );
   
@@ -422,23 +420,20 @@ TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
-  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-0.06, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",0.06, "");
   alpha->setConstant(kFALSE);
- // alpha->setMax(0.0);
-  RooFormulaVar* aSq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
+  alpha->setMin(0.0);
+  //RooFormulaVar* aSq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
   RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
-//  m->setMin(0.0);
-  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
+  m->setMin(0.0);
   m->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}", 10, "events");  
   Nbkg->setConstant(kFALSE);
 
   //Define as exp(-(alpha^2)*x^m), to avoid infinite integrals
   //RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*m));
-  RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*alpha,mgg,*m));
-  //RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
+  RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(-1*@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
   
   TString pdfName = tag+"_mexp_ext";
   RooAddPdf* modExp_Ext = new RooAddPdf( pdfName, "modExp", RooArgList(*mexp), RooArgList(*Nbkg) );
@@ -450,13 +445,13 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
   //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
-  RooRealVar *alpha = new RooRealVar(tag+"_mexp_a","#alpha",-0.06, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_mexp_a","#alpha",0.06, "");
   alpha->setConstant(kFALSE);
-  //alpha->setMax(0.0);
+  alpha->setMin(0.0);
   RooFormulaVar* aSq = new RooFormulaVar( tag + "_mexp_aSq","","-1*@0*@0", *alpha);
 
   RooRealVar *m = new RooRealVar(tag+"_mexp_m","m", 1., "");
- // m->setMin(0.0);
+  m->setMin(0.0);
   //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
   m->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_mexp_Nbkg","N_{bkg}", 10, "events");  
@@ -465,8 +460,7 @@ TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
   TString pdfName = tag+"_mexp";
   //Define as exp(-(alpha^2)*x^m), to avoid infinite integrals
   //RooGenericPdf *mexp = new RooGenericPdf(pdfName,"","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*m));
-  RooGenericPdf *mexp = new RooGenericPdf(pdfName,"","exp(@0*(@1^@2))",RooArgList(*alpha,mgg,*m));
-  //RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
+  RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(-@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
   
   w.import( *mexp );
   return pdfName;
