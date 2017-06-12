@@ -1,12 +1,14 @@
+
+
 # Setup Correctly
+export SCRAM_ARCH=slc6_amd64_gcc493
 
-cd include
+cmsrel CMSSW_7_6_3
 
-make
+cd CMSSW_7_6_3/src
 
-cd ..
+git clone -b hacked git@github.com:zhangzc11/RazorFramework.git
 
-make
+cd RazorFramework/HggRazor/FitMgg
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/include
-
+source setup.sh

@@ -1,4 +1,5 @@
 cmsenv
+source /afs/cern.ch/work/c/cpena/public/myRootHacked6V2/bin/thisroot.sh
 cd include
 make
 cd ..
