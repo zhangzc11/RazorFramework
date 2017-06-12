@@ -41,7 +41,7 @@ const float topMargin    = 0.07;
 const float bottomMargin = 0.12;
 */
 
-const float lumi = 15.2;
+const float lumi = 2.3;
 //Axis
 const float axisTitleSize = 0.06;
 const float axisTitleOffset = .8;
@@ -63,7 +63,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "26.4 fb^{-1} (13 TeV)";
+TString lumiText = "2.3 fb^{-1} (13 TeV)";
 
 float lumix = 0.955;
 float lumiy = 0.945;
@@ -299,44 +299,13 @@ void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, 
 	//get the final function (after AIC and bias test)
 	bool isSelected = false;
 	std::string finalFunction = "";
-	std::string finalAIC = "";
-	std::vector<std::string> v_func_name_prefered_order;
-	v_func_name_prefered_order.push_back("singleExp");
-	v_func_name_prefered_order.push_back("singlePow");
-	v_func_name_prefered_order.push_back("modExp");
-	v_func_name_prefered_order.push_back("doubleExp");
-	v_func_name_prefered_order.push_back("doublePow");
-	v_func_name_prefered_order.push_back("poly2");
-	v_func_name_prefered_order.push_back("poly3");
-	v_func_name_prefered_order.push_back("poly4");
-	
-	int erased_N = 0;
-	for(int j=0;j<v_func_name_prefered_order.size();j++)
+	for (int j=0;j<v_func_name.size();j++)
 	{
-		std::string f = v_func_name_prefered_order[j-erased_N];
-		bool in_list = false;
+		std::string f2 = v_func_name[j];
+		bool passBiasCut = true;
 		for (int i=0;i<v_func_name.size();i++)
 		{
-			std::string f_in = v_func_name[i];
-			if(f_in==f)
-			{
-			in_list = true;
-			}
-		}
-		if(!in_list)
-			{
-				v_func_name_prefered_order.erase(v_func_name_prefered_order.begin()+j-erased_N);
-				erased_N++;
-			}
-
-	}
-	for (int j=0;j<v_func_name_prefered_order.size();j++)
-	{
-		std::string f2 = v_func_name_prefered_order[j];
-		bool passBiasCut = true;
-		for (int i=0;i<v_func_name_prefered_order.size();i++)
-		{
-			std::string f1 = v_func_name_prefered_order[i];
+			std::string f1 = v_func_name[i];
 			std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
 			if ( mymap.find( mypair ) == mymap.end() )
                 	{
@@ -353,39 +322,15 @@ void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, 
 		if(passBiasCut && (!isSelected))
 		{
 			finalFunction = f2;
-			finalAIC = func_map[f2];
 			isSelected = true;
 		}
-	}
-	double max_bias=0.0;
-	double max_bias_err=0.0;
-	if(finalFunction!="")
-	{
-	for (int i=0;i<v_func_name.size();i++)
-	{
-		std::string f1 = v_func_name[i];
-               	std::pair<std::string, std::string> mypair = std::make_pair( f1, finalFunction );
-		if ( mymap.find( mypair ) == mymap.end() )
-                        {
-                        continue;
-                        }
-                        std::pair< std::string, std::string > pair = std::make_pair( f1, finalFunction );
-                        double t_bias = mymap[pair];
-                        double t_bias_err = mymap_err[pair];			
-
-		if(std::abs(t_bias)>std::abs(max_bias))
-		{
-		max_bias = t_bias;
-		max_bias_err =t_bias_err; 
-		}
-	}
 	}
 	std::string str_table_func = "Bias_output/function_list.list";
 	const char * file_Name_table_func = str_table_func.c_str();
   	FILE* m_outfile_func = fopen(file_Name_table_func, "a");	
 	if(SoB=="0.0")
 	{
-		fprintf(m_outfile_func, "%-10s   %-10s   %-10s   %-10s   %-10s   %-10s   %-10s   (%-4.1f $\\pm$ %-4.1f)\\% \n", categoryMode.c_str(), LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(),finalFunction.c_str(),finalAIC.c_str(),max_bias*100.0, max_bias_err*100.0);
+		fprintf(m_outfile_func, "%-10s   %-10s   %-10s   %-10s   %-10s   %-10s   \n", categoryMode.c_str(), LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(),finalFunction.c_str());
 	}
 /*
   for( const auto& fitf : FitFunction() )
@@ -431,7 +376,7 @@ void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, 
   fprintf(m_outfile, "\\begin{table*}[h]\n\\begin{center}\n");
   fprintf(m_outfile,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str());
   fprintf(m_outfile, "\\begin{tabular}{");
-  for(int i=0;i<v_func_name.size();i++)
+  for(int i=0;i<NumOfRow;i++)
 	{
 	std::cout<<"|c";
 	fprintf(m_outfile, "|c");
@@ -501,18 +446,18 @@ double FitBias(double* mu_bias_err, TString fname = "", TString f1 = "dumm1", TS
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_gaus(21,-4.0, 3.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(21,-3.0, 4.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
-      //tree->Draw("(-1.0*biasNorm)>>hbias(200,-50, 50)", "", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias(24,-6.0, 6.0)", "", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_P(12,0.0, 6.0)", "", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_N(12,-6.0, 0.0)", "", "goff");
-      tree->Draw("(-1.0*biasNorm)>>hbias_gaus(14,-4.0, 3.0)", "", "goff");
+      //tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
+      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "", "goff");
+      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "", "goff");
     }
   
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
@@ -558,7 +503,7 @@ double FitBias(double* mu_bias_err, TString fname = "", TString f1 = "dumm1", TS
   double n_low_DTCB = 0.0;
 
 //crystal ball 
-TF1* myF_CB = new TF1("myF_CB", crystalball_function, -4.0, 6.0, 5 );
+TF1* myF_CB = new TF1("myF_CB", crystalball_function, -6.0, 4.0, 5 );
 //double crystalball_function(double *x, double *par) //(double x, double alpha, double n, double sigma, double mean)
 myF_CB->SetParameter(0, 0.1);	
 myF_CB->SetParameter(1, 1.5);	
@@ -579,7 +524,7 @@ myF_CB->SetLineWidth( 3 );
 //4: alpha_low
 //5: n_high
 //6: n_low
-TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -3.0, 2.5, 7 );
+TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -2.5, 3.0, 7 );
 myF_DTCB->SetParameter(0, hbias_gaus->GetMean()); 
 myF_DTCB->SetParameter(1, hbias_gaus->GetStdDev());
 myF_DTCB->SetParameter(2, hbias->GetMaximum());
@@ -596,7 +541,7 @@ myF_DTCB->SetLineColor( kBlue );
 myF_DTCB->SetLineWidth( 3 );
  
 //double crystal ball 
-TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -4.0, 6.0, 8 );
+TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -6.0, 4.0, 8 );
 //0: alpha
 //1: n
 //2: sigma1

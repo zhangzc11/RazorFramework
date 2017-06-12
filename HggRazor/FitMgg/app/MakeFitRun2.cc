@@ -352,15 +352,27 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && (pho1passIso == 0 || pho2passIso == 0) && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  // TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto== 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && ((pho1Pt/mGammaGamma>40.0/125.0)||(pho2Pt/mGammaGamma>40.0/125.0))  && (pho1Pt/mGammaGamma> 25.0/125.0) && (pho2Pt/mGammaGamma>25.0/125.0)";
   //assymetric cut on photon PT
   //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   TString cutMETfilters = "";
   TString cutTrigger = "";
-  if(fitMode == "AIC2")
+
+  TString cutMETfiltersData = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
+  TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] )";
+
+  if(fitMode == "AIC2" || fitMode == "biasSignal")
      {
-	cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-	cutTrigger = "&&  HLTDecision[65] == 1";
+	//cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+	//cutTrigger = "&&  HLTDecision[65] == 1";
+	//cutTrigger = "&&  HLTDecision[82] == 1";
+	//TString cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
+	//TString cutTrigger = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] )";
+	cutMETfilters = cutMETfiltersData;
+        cutTrigger = cutTriggerData;
+
      }
   //****************************************************
   //Category Cut String
@@ -374,6 +386,8 @@ int main( int argc, char* argv[])
       else if (categoryMode == "highres") categoryCutString = " && ptgg < 110 && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015 ";
       else if (categoryMode == "lowres") categoryCutString = " && ptgg < 110  && abs(mbb-125)>=25 && abs(mbb-91.2)>=25 && !(pho1_sigEoE < 0.015 && pho2_sigEoE < 0.015) ";
       else if (categoryMode == "inclusive") categoryCutString = "";
+      else if (categoryMode == "inclusiveElectron") categoryCutString = " && box == 3 ";
+      else if (categoryMode == "inclusiveMuon") categoryCutString = " && box == 2";
     }
   else if ( runPeriod == "run1" )
     {
@@ -393,6 +407,8 @@ int main( int argc, char* argv[])
       else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
       else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "inclusive") categoryCutString = "";
+      else if (categoryMode == "inclusiveElectron") categoryCutString = " && box == 3 ";
+      else if (categoryMode == "inclusiveMuon") categoryCutString = " && box == 2";
     }
   //---------------------------------------------
   // A l e x ' s   T r e e   F o r m at   C a s e

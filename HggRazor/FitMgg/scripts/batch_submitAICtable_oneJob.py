@@ -5,34 +5,47 @@
 
 import subprocess, time, sys, os, shlex
 
-inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root" #"/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/DoubleEG_Run2015_CMSSW_7_6_March15_GoodLumi.root" #"/afs/cern.ch/work/c/cpena/public/CMSSW_7_5_3_patch1/src/RazorCommon/DoubleEG_Run2015D_TOTAL_NoCuts_GoodLumi_Jan27.root" #change this to the input ntuple you are using 
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_2016B_PRv2_GoodLumiGoldenJun16.root"
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_Run2_MRSkim_2p3_plus_7p7ifb.root"
 
-queue = "cmscaf1nd" # change this to the queue you want to use in lxplus batch
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_Run2_MRSkim_2p3_12p9ifb.root"
+
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_Run2_MRSkim_NoPhotonIso_2p3+12p9ifb.root"
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_2016BCDEFG.root"
+#inputFile = "root://eoscms//eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016ToRunG/V3p5_PhotonCorrJuly20_RegularSelectionSequence_20160921/HggRazor_DoubleEG_2016BCDEFG_GoodLumiGolden_26p394ifb.root"
+ 
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_2016BCDEFG_GoodLumiGolden_26p394ifb.root"
+
+#inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_2016_GoodLumiGolden_33p6ifb.root"
+inputFile = "/afs/cern.ch/work/z/zhicaiz/public/RazorInput/HggRazor_DoubleEG_2016_Rereco_GoodLumiGolden_36p2ifb.root"
+
+queue = "cmscaf1nw" # change this to the queue you want to use in lxplus batch
 
 if __name__ == "__main__":
 	bin_list_filename = sys.argv[1]
 	
 	pwd = os.getcwd()
 	work_directory = pwd.replace("scripts","")
-	os.system("rm -rf "+work_directory+"AIC_output/highpt")
+	#os.system("rm -rf "+work_directory+"AIC_output/highpt")
         os.system("mkdir -p "+work_directory+"AIC_output/highpt")
-        os.system("rm -rf "+work_directory+"AIC_output/highres")
+        #os.system("rm -rf "+work_directory+"AIC_output/highres")
         os.system("mkdir -p "+work_directory+"AIC_output/highres")
-        os.system("rm -rf "+work_directory+"AIC_output/lowres")
+        #os.system("rm -rf "+work_directory+"AIC_output/lowres")
         os.system("mkdir -p "+work_directory+"AIC_output/lowres")
-        os.system("rm -rf "+work_directory+"AIC_output/hzbb")
+        #os.system("rm -rf "+work_directory+"AIC_output/hzbb")
         os.system("mkdir -p "+work_directory+"AIC_output/hzbb")
-        os.system("rm -rf "+pwd+"/submit")
+        #os.system("rm -rf "+pwd+"/submit")
         os.system("mkdir -p "+pwd+"/submit")
 	
-	env_script_n = pwd + "/submit/" + "run_AIC_cmd.sh"
+	env_script_n = pwd + "/submit/" + "runA_job_00000.sh"
 	env_script_f = open(env_script_n, 'w')
 	
 	env_script_f.write("#!/bin/bash\n")
 	env_script_f.write("cd " + work_directory + "\n")
 	env_script_f.write("ulimit -c 0\n")
 	env_script_f.write("eval `scramv1 runtime -sh`\n")
-	env_script_f.write("source /afs/cern.ch/work/c/cpena/public/myRootHacked6/bin/thisroot.sh \n")
+	env_script_f.write("source /afs/cern.ch/work/c/cpena/public/myRootHacked6V2/bin/thisroot.sh \n")
 	
 	with open(bin_list_filename,"r") as bin_list_file:
 		for this_bin in bin_list_file:

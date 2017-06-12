@@ -33,7 +33,7 @@ protected:
 
 private:
 
-  ClassDef(RooCB,1)
+  //ClassDef(RooCB,1)
 };
 
  
@@ -69,7 +69,7 @@ protected:
 
 private:
 
-  ClassDef(RooDoubleCB,1)
+  //ClassDef(RooDoubleCB,1)
 };
  
 class RooFermi : public RooAbsPdf {
@@ -94,7 +94,7 @@ protected:
 
 private:
 
-  ClassDef(RooFermi,1) 
+  //ClassDef(RooFermi,1) 
 };
   
 class RooRelBW : public RooAbsPdf {
@@ -121,7 +121,7 @@ protected:
 
 private:
 
-  ClassDef(RooRelBW,1)
+  //ClassDef(RooRelBW,1)
 };
  
 
@@ -154,7 +154,7 @@ protected:
 
 private:
   
-  ClassDef(Triangle,1)
+  //ClassDef(Triangle,1)
 };
 
 
@@ -188,7 +188,7 @@ protected:
 
 private:
 
-  ClassDef(RooLevelledExp,1)
+  //ClassDef(RooLevelledExp,1)
 };
 
 

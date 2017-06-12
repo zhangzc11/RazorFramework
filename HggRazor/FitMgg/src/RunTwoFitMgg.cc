@@ -139,8 +139,8 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(57);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
   mgg.setRange("signal", 103, 160);
   
   RooRealVar w( "xsecSF", "w", 0, 10000 );
@@ -157,11 +157,11 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
   //ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full") );
   //RooFitResult* bres = ws->pdf( tag3 )->fitTo( data, RooFit::Strategy(2), RooFit::Save(kTRUE), RooFit::Extended(kTRUE), RooFit::Range("Full") );
 
-  mgg.setRange("sregion", 122.04, 128.96);
+  mgg.setRange("sregion", 121, 129);
   RooAbsReal* sint = ws->pdf( tag3 )->createIntegral( mgg, RooFit::NormSet(mgg), RooFit::Range("sregion") ) ; 
   RooAbsReal* Nfit = ws->pdf( tag3 )->createIntegral( mgg, RooFit::Range("Full") ) ;
   std::cout << sint->getVal() << std::endl;
-  float N_sideband = data.sumEntries(Form("(mgg>%0.2f && mgg <120) || (mgg>131 && mgg<%0.2f)",103.,160.));
+  float N_sideband = data.sumEntries(Form("(mgg>%0.2f && mgg <121) || (mgg>129 && mgg<%0.2f)",103.,160.));
   /*
   double n1 = ws->var("sideband_fitNbkg1")->getVal();
   double n2 = ws->var("sideband_fitNbkg2")->getVal();
@@ -197,14 +197,14 @@ void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName )
 {
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",100,400,"GeV");
   mgg.setBins(30);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 131, 160);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
   
-  mgg.setRange("low_v2", 100, 120);
-  mgg.setRange("high_v2", 131, 400);
+  mgg.setRange("low_v2", 100, 121);
+  mgg.setRange("high_v2", 129, 400);
   
   mgg.setRange("signal", 103, 160);
-  mgg.setRange("sig", 120., 130.);
+  mgg.setRange("sig", 121., 129.);
 
   TString tag3 = MakeDoubleExpN1N2( "sideband_fit_v2", mgg, w );
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
@@ -233,7 +233,7 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
 {
   RooAbsPdf* NewModel = w.pdf( pdfName );
   RooRealVar* mgg = w.var( mggName );
-  mgg->setRange("sig", 122.08, 128.92);
+  mgg->setRange("sig", 121, 129);
   //mgg->setRange("sig", 103.0, 160.);
   RooAbsReal* fIntegral = NewModel->createIntegral(*mgg);
   RooAbsReal* fIntegral2 = NewModel->createIntegral(*mgg, RooFit::NormSet(*mgg), RooFit::Range("sig") );
@@ -256,9 +256,9 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
-  mgg.setRange( "signal", 115, 135. );
-  mgg.setRange( "high", 135, 160);
-  mgg.setRange( "low", 103, 120);
+  mgg.setRange( "signal", 121, 129. );
+  mgg.setRange( "high", 129, 160);
+  mgg.setRange( "low", 103, 121);
   mgg.setRange( "full", 103, 160 );
   //--------------------------------
   //I m p or t i n g   D a t a
@@ -601,9 +601,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
-  mgg.setRange( "signal", 115, 135. );
-  mgg.setRange( "high", 135, 160);
-  mgg.setRange( "low", 103, 120);
+  mgg.setRange( "signal", 115, 129. );
+  mgg.setRange( "high", 129, 160);
+  mgg.setRange( "low", 103, 121);
   //--------------------------------
   //I m p or t i n g   D a t a
   //--------------------------------
@@ -1011,8 +1011,8 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(57);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 135, 160);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
   mgg.setRange("Full", 103, 160);
 
   TString tag;
@@ -1079,7 +1079,7 @@ RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainM
   RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
-  double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>131 && mgg<160)");
+  double n = data.sumEntries(" (mgg>103 && mgg<121) || (mgg>129 && mgg<160)");
   std::cout << "n -> " << n << std::endl;
   AIC = 2*minNll + 2*K + 2*K*(K+1)/(n-K-1);
   std::cout << "AIC: " << AIC << std::endl;
@@ -1115,9 +1115,9 @@ RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, 
   
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
   mgg.setBins(38);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 135, 160);
-  mgg.setRange("sig", 122.08, 128.92);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
+  mgg.setRange("sig", 121, 129);
   mgg.setRange("Full", 103, 160);
   /*
   TString tag1, tag2;
@@ -1529,10 +1529,10 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   //Creating observable
   //-------------------
   RooRealVar mgg( mggName,"m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(38);
-  mgg.setRange("low", 103, 120. );//low sideband
-  mgg.setRange("high", 135, 160.);//high sideband
-  mgg.setRange("sig", 122.08, 128.92);//highRes signal region
+  mgg.setBins(57);
+  mgg.setRange("low", 103, 121. );//low sideband
+  mgg.setRange("high", 129, 160.);//high sideband
+  mgg.setRange("sig", 121, 129);//highRes signal region
   mgg.setRange("Full", 103.0, 160.0);//Full range for this analysis
 
   //-----------------------------------------------------------------
@@ -1648,7 +1648,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
   //getting total n_entries and n_sideband
   //double n_sideband = data.sumEntries("(mgg > 103. && mgg < 120.) || (mgg > 135. && mgg < 160.)");
-  TString sbCut = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 120., mggName.Data(), 135., mggName.Data(), 160.);
+  TString sbCut = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 121., mggName.Data(), 129., mggName.Data(), 160.);
   double n_sideband = data.sumEntries( sbCut );
 
   //----------------------------------------------
@@ -1681,7 +1681,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   RooAbsReal* f1Integral_sb = ws->pdf( tag1 )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("low,high") );
   double f1Int_sb = f1Integral_sb->getVal();
   int npoints = (int)n_sideband/f1Int_sb;//re-scaling sideband to total bkg events (N_sideband/NORMALIZE_INTEGRAL_SIDEBAND)
- // npoints = 2*npoints;
+  npoints = npoints;
   //npoints = 350;//only use this to set the number of toys bkg;
 
   std::cout << "npoints: " << npoints << std::endl;
@@ -1859,6 +1859,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
   TRandom3* r = new TRandom3(0);
   TRandom3* r2 = new TRandom3(0);
   std::cout << "ENTERING LOOP" << std::endl;
+  int file_num = 0;
   for ( int i = 0; i < ntoys; i++ )
     {
       //-----------------------------------------------------------
@@ -2054,7 +2055,7 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       _covStatus = r->covQual();
 */
 	
-      int loop_Max = 100;
+      int loop_Max = 20;
       int status2_before = _status2;
       
       while((status2_before!=0)&&(loop_Max>0))
@@ -2127,6 +2128,20 @@ RooWorkspace* DoBiasTestSignal( TTree* tree, TString mggName, TString f1, TStrin
       std::cout << "before filling tree" << std::endl;
       //std::cout << "iteration:" << i << std::endl;
       outTree->Fill();
+/*
+      if(int(i/1000.)>file_num)
+	{
+		file_num ++;
+		TString ind_name;
+		ind_name.Form("%d",int(i/1000.));
+		
+		TString outName_tmp = outName+"_Tree_"+	ind_name+".root";
+	 	TFile* _fout = new TFile( outName_tmp, "recreate");
+                outTree->Write();
+                std::cout << "[INFO] intermidiate saving the TTree at nToy = " << 100*file_num << std::endl;
+                _fout->Close();
+	}
+*/
       //delete data_toys;
       //delete signal_toys;
       delete nll;
@@ -2188,8 +2203,8 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(38);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 135, 160);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
   mgg.setRange("Full", 103, 160);
 
   TString tag;
@@ -2247,7 +2262,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   std::cout << "====================" << std::endl;
   //Sideband Fit
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*tree) );
-  double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<120) || (mGammaGamma>135 && mGammaGamma<160)");
+  double n = data.sumEntries(" (mGammaGamma>103 && mGammaGamma<121) || (mGammaGamma>129 && mGammaGamma<160)");
   *Nbkg = n;
   ws->var( "sideband_fit_"+ffName+"_Nbkg")->setVal( n * 1.2);
   
@@ -2279,7 +2294,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
    fitStatus_3 = r2->status();
    fitStatus_4 = r2->covQual();
 
-	int max_loop_AIC = 100;	
+	int max_loop_AIC = 10;	
    while(fitStatus_3!=0 && max_loop_AIC>0)
 	{
    	m.minimize("Minuit2", "Migrad");
@@ -2324,7 +2339,7 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
   RooArgSet* floatPars = ws->pdf( tag )->getParameters(data);
   double K = floatPars->getSize() - 1.;
   std::cout << "K -> " << K << std::endl;
-  //double n = data.sumEntries(" (mgg>103 && mgg<120) || (mgg>135 && mgg<160)");
+  //double n = data.sumEntries(" (mgg>103 && mgg<121) || (mgg>129 && mgg<160)");
 
   if ( n-K-1 > 0 )
     {
@@ -2335,6 +2350,13 @@ RooWorkspace* MakeSideBandFitAIC_2( TTree* tree, float forceSigma, bool constrai
       std::cout << "AIC: " << AIC << std::endl;
       std::cout << "AIC_2: " << AIC_2 << std::endl;
       std::cout << "AIC_3: " << AIC_3 << std::endl;
+
+	if(std::isnan(nll->getVal()))
+        {
+        AIC = 9999.;
+        AIC_2 = 9999.;
+        AIC_3=9999.;
+        }
     }
   else
     {
@@ -2395,11 +2417,11 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   
   RooRealVar mgg(mggName,"m_{#gamma#gamma}",103,160,"GeV");
   mgg.setBins(38);
-  mgg.setRange("low", 103, 120);
-  mgg.setRange("high", 135, 160);
+  mgg.setRange("low", 103, 121);
+  mgg.setRange("high", 129, 160);
   mgg.setRange("Full", 103, 160);
   //HighRes Signal Region
-  mgg.setRange("sig", 122.08, 128.92);
+  mgg.setRange("sig", 121, 129);
   
   TString tag1, tag2;
   if ( f1 == "doubleExp" )
@@ -2453,7 +2475,7 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
   //-------------------
   RooDataHist data( "data", "my_data", RooArgList(mgg), mggData );
   TString totalEntriesStr = Form("(%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 160.);
-  TString sbEntriesStr = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 120., mggName.Data(), 135., mggName.Data(), 160.);
+  TString sbEntriesStr = Form("(%s>%.2f && %s<%.2f) || (%s>%.2f && %s<%.2f)", mggName.Data(), 103., mggName.Data(), 121., mggName.Data(), 129., mggName.Data(), 160.);
   //npoints = data.sumEntries( totalEntriesStr );
   int sbpoints =  data.sumEntries( sbEntriesStr );
 
@@ -2609,13 +2631,13 @@ RooWorkspace* SelectBinning( TH1F* mggData, TString mggName, TString f1, TString
       //signal integral
       sigInt_hat = intTF1*n_hat;
       //Single Exp Uncertainty Calculation
-      //122.08, 128.92
+      //121, 129
       //getting correlation matrix parameters from correlation matrix
       TMatrixDSym corrMatrix = r3->correlationMatrix();
       const double* pData = corrMatrix.GetMatrixArray();
       //propagation of uncertainty
-      double eta    = exp(-alpha_hat*122.08) - exp(-alpha_hat*128.92);
-      double etaMod = 128.92*exp(-alpha_hat*128.92) - 122.08*exp(-alpha_hat*122.08);
+      double eta    = exp(-alpha_hat*121) - exp(-alpha_hat*128.9);
+      double etaMod = 129*exp(-alpha_hat*129) - 121*exp(-alpha_hat*121);
       double xi     = exp(-alpha_hat*103.) - exp(-alpha_hat*160.);
       double xiMod  = 103.*exp(-alpha_hat*103.) - 160.*exp(-alpha_hat*160.);
       double dIdN = eta/xi;

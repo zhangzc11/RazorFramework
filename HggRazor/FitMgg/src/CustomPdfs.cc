@@ -9,7 +9,7 @@
 using namespace RooFit;
 using namespace std; 
 
-ClassImp(RooCB);
+//ClassImp(RooCB);
 
 RooCB::RooCB(){};
 
@@ -64,7 +64,7 @@ double RooCB::evaluate() const
 
 
 
-ClassImp(RooDoubleCB)
+//ClassImp(RooDoubleCB)
 
 RooDoubleCB::RooDoubleCB( ){ };
 
@@ -183,7 +183,7 @@ Double_t RooDoubleCB::analyticalIntegral(Int_t code, const char* rangeName) cons
  
 };
 
-ClassImp(RooFermi) 
+//ClassImp(RooFermi) 
 
 RooFermi::RooFermi(){};
 
@@ -216,7 +216,7 @@ double RooFermi::evaluate() const
   return 1.0/(exp((cutOff-x)/beta)+1);
 };
 
-ClassImp(RooRelBW)
+//ClassImp(RooRelBW)
 
 RooRelBW::RooRelBW(){};
 
@@ -253,7 +253,7 @@ double RooRelBW::evaluate() const
 };
 
 
-ClassImp(Triangle)
+//ClassImp(Triangle)
 
 Triangle::Triangle(){};
 
@@ -319,7 +319,7 @@ Double_t Triangle::analyticalIntegral(Int_t code, const char* rangeName) const
 
 
 
-ClassImp(RooLevelledExp)
+//ClassImp(RooLevelledExp)
 
 RooLevelledExp::RooLevelledExp(){};
 
